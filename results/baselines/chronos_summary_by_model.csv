@@ -1,0 +1,5 @@
+ModelType,Avg_Accuracy,Avg_ROC_AUC,Avg_Trades,Avg_WinRate,Avg_Sharpe,Avg_TotalReturn
+finetuned,0.4833,0.4812,53.2222,0.4618,-0.3923,0.043
+finetuned_cov,0.5003,0.4998,53.2222,0.4603,-0.3796,0.139
+multivariate,0.4908,0.4756,53.2222,0.4161,-1.0664,-0.2463
+zero-shot,0.49,0.46,53.2222,0.4253,-1.0176,-0.2482
