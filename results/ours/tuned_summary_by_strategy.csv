@@ -1,0 +1,5 @@
+Strategy,Avg_Accuracy,Avg_ROC_AUC,Avg_Trades,Avg_WinRate,Avg_Sharpe,Avg_TotalReturn
+long_only,0.4825,0.5339,7.0884,0.2893,0.4707,0.129
+long_only_confidence,0.4827,0.535,2.4966,0.1191,0.217,0.04
+long_short,0.4916,0.5515,52.2542,0.4213,-0.8962,0.0328
+long_short_confidence,0.4826,0.5341,21.7415,0.2729,-0.7927,-0.1514
