@@ -554,7 +554,7 @@ def generate_latex_table_by_auc(df, strategy="long_short"):
         "XGBoost": "XGB",
         "LightGBM": "LGBM",
         "RandomForest": "RF",
-        "GradientBoosting": "XGB",
+        "GradientBoosting": "GB",
         "LogisticRegression": "LR",
         "SVM": "SVM"
     }
@@ -624,7 +624,7 @@ def generate_latex_table_by_sharpe(df, strategy="long_short"):
         "XGBoost": "XGB",
         "LightGBM": "LGBM",
         "RandomForest": "RF",
-        "GradientBoosting": "XGB",
+        "GradientBoosting": "GB",
         "LogisticRegression": "LR",
         "SVM": "SVM"
     }
