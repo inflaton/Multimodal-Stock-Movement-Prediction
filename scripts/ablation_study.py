@@ -8,15 +8,21 @@ This script runs ablation experiments to evaluate the contribution of different 
 4. News Only - Only news sentiment
 5. Social Media Only - Only social media sentiment
 
-Note: Full Model (Tech + Sent 70:30) results are already available from main experiments.
+Note: Full Model (Tech + Sent 70:30) results are already available from main experiments in results/ours/.
+
+Requirements:
+- For technical_only: Only requires dataset/training_data/
+- For sentiment configurations (news_only, social_only, equal_weights): Requires raw sentiment
+  files with Type column in dataset/sentiment/raw/. These files should have the pattern:
+  *{stock}*.csv and contain columns: Date, Type, Sentiment_Score
 
 Usage:
-    python ablation_study.py --config technical_only --all-stocks
-    python ablation_study.py --config sentiment_only --stock AAPL
-    python ablation_study.py --all-configs --all-stocks
-    python ablation_study.py --config technical_only --all-stocks --skip-lstm  # Skip LSTM (faster)
-    python ablation_study.py --config technical_only --all-stocks --only-lstm  # Run only LSTM
-    python ablation_study.py --config technical_only --all-stocks --force-cpu  # Force CPU mode
+    python scripts/ablation_study.py --config technical_only --all-stocks
+    python scripts/ablation_study.py --config sentiment_only --stock AAPL
+    python scripts/ablation_study.py --all-configs --all-stocks
+    python scripts/ablation_study.py --config technical_only --all-stocks --skip-lstm  # Skip LSTM
+    python scripts/ablation_study.py --config technical_only --all-stocks --only-lstm  # Only LSTM
+    python scripts/ablation_study.py --config technical_only --all-stocks --force-cpu  # Force CPU
 """
 
 import os
@@ -53,7 +59,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, roc_auc_score
-from xgboost import XGBClassifier
+
+# Try to import XGBoost (optional dependency due to OpenMP requirements)
+try:
+    from xgboost import XGBClassifier
+    XGBOOST_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: XGBoost not available: {e}")
+    print("Continuing without XGBoost. To fix: brew install libomp && pip install --upgrade xgboost")
+    XGBOOST_AVAILABLE = False
+    XGBClassifier = None
+
 from lightgbm import LGBMClassifier
 
 # Deep learning
@@ -267,6 +283,12 @@ MODELS = {
     },
 }
 
+# Remove XGBoost if not available
+if not XGBOOST_AVAILABLE:
+    if "XGBoost" in MODELS:
+        del MODELS["XGBoost"]
+        print("Note: XGBoost removed from models list (library not available)")
+
 # LSTM hyperparameter search space
 LSTM_SPACE = [
     Real(1e-4, 1e-2, name="learning_rate", prior="log-uniform"),
@@ -302,13 +324,19 @@ def load_stock_data(stock: str, data_dir: str) -> pd.DataFrame:
 def load_raw_sentiment(stock: str, sentiment_dir: str) -> pd.DataFrame:
     """
     Load raw sentiment data with News/Social Media types for custom weighting.
+
+    Expected file pattern: *{stock}*.csv (e.g., news_sentiment_finbert_tone_aapl_2020.csv)
+    Required columns: Date, Type (News/Social Media), Sentiment_Score
     """
     sentiment_path = Path(sentiment_dir)
-    pattern = f"*{stock.lower()}*_filtered.csv"
+    pattern = f"*{stock.lower()}*.csv"
     files = list(sentiment_path.glob(pattern))
 
     if not files:
-        print(f"  Warning: No raw sentiment files found for {stock}")
+        print(f"  ERROR: No raw sentiment files found for {stock} in {sentiment_dir}")
+        print(f"  Looking for pattern: {pattern}")
+        print(f"  These files are required for news_only, social_only, and equal_weights configs")
+        print(f"  Hint: Copy raw sentiment files to {sentiment_dir}")
         return None
 
     all_dfs = []
@@ -879,7 +907,9 @@ def run_ablation_for_stock(
     train_df = df[df["Year"].isin(TRAIN_YEARS)].copy()
     test_df = df[df["Year"] == TEST_YEAR].copy()
 
-    print(f"Training samples: {len(train_df)}, Test samples: {len(test_df)}")
+    print(f"\nTrain/Test Split:")
+    print(f"  Training: {len(train_df)} samples ({train_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {train_df['__DateDT__'].max().strftime('%Y-%m-%d')})")
+    print(f"  Testing:  {len(test_df)} samples ({test_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {test_df['__DateDT__'].max().strftime('%Y-%m-%d')})")
 
     # Find best thresholds for each horizon
     if horizons is None:
@@ -1155,19 +1185,19 @@ def main():
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="../data",
+        default="dataset/training_data",
         help="Directory containing stock data",
     )
     parser.add_argument(
         "--sentiment-dir",
         type=str,
-        default="../../dataset/news & social media/finbert sentiment",
+        default="dataset/sentiment/raw",
         help="Directory containing raw sentiment data",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
-        default=".",
+        default="results/ablation",
         help="Directory to save ablation results",
     )
     parser.add_argument(

@@ -18,14 +18,14 @@
 #   - news_only: News sentiment only
 #   - social_only: Social media sentiment only
 #
-# Note: Full Model (Tech + Sent 70:30) results are from main experiments in v1/
+# Note: Full Model (Tech + Sent 70:30) results are from main experiments in results/ours/
 
 set -e  # Exit on error
 
-# Default settings (relative paths from ablation/ directory)
-DATA_DIR="../data"
-SENTIMENT_DIR="../../dataset/news & social media/finbert sentiment"
-OUTPUT_DIR="."
+# Default settings (relative paths from github/ root directory)
+DATA_DIR="dataset/training_data"
+SENTIMENT_DIR="dataset/sentiment/raw"
+OUTPUT_DIR="results/ablation"
 N_CALLS=30
 CONFIG=""
 STOCK=""
@@ -78,6 +78,20 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  --data-dir DIR           Training data directory (default: dataset/training_data)"
+            echo "  --sentiment-dir DIR      Sentiment data directory (default: dataset/sentiment/raw)"
+            echo "  --output-dir DIR         Output directory for results (default: results/ablation)"
+            echo "  --n-calls N              Number of optimization iterations (default: 30)"
+            echo "  --config CONFIG          Run specific ablation configuration only"
+            echo "                           Options: technical_only, sentiment_only, equal_weights,"
+            echo "                                    news_only, social_only"
+            echo "  --stock STOCK            Run for specific stock only (e.g., NVDA)"
+            echo "  --skip-lstm              Skip LSTM model (faster training)"
+            echo "  --only-lstm              Run only LSTM model (skip other ML models)"
+            echo "  --force-cpu              Force CPU mode (disable CuDNN GPU)"
             exit 1
             ;;
     esac
@@ -142,38 +156,38 @@ if [ -n "$CONFIG" ]; then
     echo "=============================================================="
     echo "Running ablation: $CONFIG"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config "$CONFIG" $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config "$CONFIG" $COMMON_ARGS
 else
     # Run all configurations
     echo ""
     echo "=============================================================="
     echo "Running ablation: technical_only"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config technical_only $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config technical_only $COMMON_ARGS
 
     echo ""
     echo "=============================================================="
     echo "Running ablation: sentiment_only"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config sentiment_only $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config sentiment_only $COMMON_ARGS
 
     echo ""
     echo "=============================================================="
     echo "Running ablation: equal_weights"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config equal_weights $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config equal_weights $COMMON_ARGS
 
     echo ""
     echo "=============================================================="
     echo "Running ablation: news_only"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config news_only $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config news_only $COMMON_ARGS
 
     echo ""
     echo "=============================================================="
     echo "Running ablation: social_only"
     echo "=============================================================="
-    eval python "$SCRIPT_DIR/ablation_study.py" --config social_only $COMMON_ARGS
+    eval python "$SCRIPT_DIR/scripts/ablation_study.py" --config social_only $COMMON_ARGS
 fi
 
 echo ""

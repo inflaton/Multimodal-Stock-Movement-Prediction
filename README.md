@@ -11,7 +11,7 @@ This repository contains the official implementation and datasets for our paper:
 
 ## 📄 Abstract
 
-Predicting short-term stock price movements remains challenging due to market volatility and the influence of both quantitative and qualitative factors. We propose a multimodal framework that integrates technical indicators with FinBERT-based sentiment analysis from financial news and social media for 2-10 day stock direction prediction. Six model families—LSTM, Random Forest, XGBoost, LightGBM, Logistic Regression, and SVM—are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020-2024.
+Predicting short-term stock price movements remains challenging due to market volatility and the influence of both quantitative and qualitative factors. We propose a multimodal framework that integrates technical indicators with FinBERT-based sentiment analysis from financial news and social media for 2-10 day stock direction prediction. Seven model families—LSTM, Random Forest, XGBoost, LightGBM, Gradient Boosting, Logistic Regression, and SVM—are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020-2024.
 
 Our key findings:
 - **ROC-AUC vs Sharpe trade-off**: AUC-optimized models achieve strong discriminative performance (0.697 average, peak 0.793), while Sharpe-optimized models deliver superior risk-adjusted returns (2.05 average Sharpe, 66.8% win rate)
@@ -23,7 +23,7 @@ Our key findings:
 
 1. **Multimodal Framework**: Integration of FinBERT-Tone sentiment from financial news and social media with technical indicators (OHLCV data) for 2-10 day stock direction prediction
 
-2. **Systematic Evaluation**: Comprehensive comparison of six model families with Bayesian hyperparameter optimization, revealing critical trade-offs between ROC-AUC and Sharpe ratio selection criteria
+2. **Systematic Evaluation**: Comprehensive comparison of seven model families with Bayesian hyperparameter optimization, revealing critical trade-offs between ROC-AUC and Sharpe ratio selection criteria
 
 3. **Sentiment Aggregation**: Demonstration that reliability-weighted sentiment aggregation (70% news, 30% social media) substantially improves trading performance, with ablation studies revealing complementary roles of technical and sentiment features
 
@@ -77,6 +77,18 @@ cd multimodal-stock-prediction
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+#### Optional: XGBoost Support (macOS)
+
+XGBoost requires the OpenMP library (`libomp`) on macOS. If you encounter an XGBoost import error:
+
+```bash
+# Install OpenMP library via Homebrew
+brew install libomp
+
+# Reinstall XGBoost
+pip install --upgrade xgboost
 ```
 
 ### Quick Start
@@ -254,49 +266,45 @@ See individual training scripts for complete hyperparameter ranges.
 
 ### Step-by-Step Guide
 
-1. **Generate Training Data** (if using raw data):
-```bash
-jupyter notebook notebooks/02_generate_training_data.ipynb
-```
+1. **Update Sentiment Data** (if needed):
+
+   ```bash
+   jupyter notebook notebooks/01_update_sentiments_for_training_data.ipynb
+   ```
 
 2. **Train All Task-Specific Models**:
-```bash
-# Train all models for all stocks
-./run_all_hyperparameter_tuning.sh
-```
 
-3. **Train Foundation Model Baselines**:
-```bash
-# Chronos-2 (zero-shot)
-python scripts/chronos_baseline.py --all-stocks
+   ```bash
+   # Train all models for all stocks
+   ./run_all_hyperparameter_tuning.sh
+   ```
 
-# Chronos-2 (fine-tuned)
-python scripts/chronos_finetune.py --all-stocks --use-covariates
+3. **Run Ablation Study**:
 
-# FinCast (zero-shot)
-python scripts/fincast_baseline.py --all-stocks
+   ```bash
+   # Run ablation experiments for all configurations
+   ./run_ablation_study.sh
+   ```
 
-# FinCast (fine-tuned)
-python scripts/fincast_finetune.py --all-stocks
-```
+4. **Train Foundation Model Baselines**:
 
-4. **Analyze and Compare Results**:
-```bash
-# Baseline comparison
-jupyter notebook notebooks/08_baseline_results.ipynb
+   ```bash
+   # Run all foundation model baselines (Chronos-2 and FinCast)
+   ./run_baselines.sh
+   ```
 
-# Tuned models analysis
-jupyter notebook notebooks/09_tuned_models_results.ipynb
+5. **Analyze Results**:
 
-# Ablation studies
-jupyter notebook notebooks/10_ablation_study.ipynb
-```
+   ```bash
+   # Our task-specific models results
+   jupyter notebook notebooks/02_our_results.ipynb
 
-5. **Generate Paper Tables**:
-```bash
-# Update SOTA table in LaTeX
-python scripts/update_sota_table.py
-```
+   # Ablation study analysis
+   jupyter notebook notebooks/03_ablation_study.ipynb
+
+   # Baseline models comparison
+   jupyter notebook notebooks/04_baseline_results.ipynb
+   ```
 
 ## 🎯 Key Findings
 

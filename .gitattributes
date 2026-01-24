@@ -1,0 +1,9 @@
+dataset/sentiment/raw/news_sentiment_finbert_tone_aapl_2023.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_meta.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_spy.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_tsla.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_aapl_2020.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_aapl_2021.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_aapl_2022.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_aapl_2024.csv filter=lfs diff=lfs merge=lfs -text
+dataset/sentiment/raw/news_sentiment_finbert_tone_nvda.csv filter=lfs diff=lfs merge=lfs -text
