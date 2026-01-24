@@ -70,8 +70,8 @@ CUDA 11.8+ (for GPU acceleration, optional)
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/multimodal-stock-prediction.git
-cd multimodal-stock-prediction
+https://github.com/inflaton/Multimodal-Stock-Movement-Prediction.git
+cd Multimodal-Stock-Movement-Prediction
 ```
 
 2. Install dependencies:
@@ -140,9 +140,9 @@ python scripts/fincast_finetune.py --all-stocks --use-covariates
 Use Jupyter notebooks for comprehensive analysis:
 
 ```bash
-jupyter notebook notebooks/08_baseline_results.ipynb        # Baseline comparison
-jupyter notebook notebooks/09_tuned_models_results.ipynb    # Tuned models analysis
-jupyter notebook notebooks/10_ablation_study.ipynb          # Ablation studies
+jupyter notebook notebooks/02_our_results.ipynb      # Tuned models analysis
+jupyter notebook notebooks/03_ablation_study.ipynb   # Ablation studies
+jupyter notebook notebooks/04_baseline_results.ipynb # Baseline comparison
 ```
 
 ## 📈 Main Results
@@ -203,16 +203,16 @@ jupyter notebook notebooks/10_ablation_study.ipynb          # Ablation studies
 │   ├── chronos_inference.py
 │   ├── fincast_baseline.py
 │   ├── fincast_finetune.py
-│   ├── generate_training_data.py
+│   ├── ablation_study.py
 │   ├── analyze_chronos_results.py
 │   ├── analyze_tuned_results.py
-│   └── update_sota_table.py
+│   └── analyze_ablation_results.py
 │
 ├── notebooks/                      # Jupyter notebooks for analysis
-│   ├── 02_generate_training_data.ipynb
-│   ├── 08_baseline_results.ipynb
-│   ├── 09_tuned_models_results.ipynb
-│   └── 10_ablation_study.ipynb
+│   ├── 01_update_sentiments_for_training_data.ipynb
+│   ├── 02_our_results.ipynb
+│   ├── 03_ablation_study.ipynb
+│   └── 04_baseline_results.ipynb
 │
 ├── results/                        # Model results and metrics
 │   ├── chronos_all_results_combined.csv
@@ -230,7 +230,7 @@ jupyter notebook notebooks/10_ablation_study.ipynb          # Ablation studies
 ### Model Training Pipeline
 
 1. **Data Preprocessing**: Load and validate stock data with technical indicators and sentiment scores
-2. **Hyperparameter Optimization**: Bayesian optimization (Optuna) with 100 trials per configuration
+2. **Hyperparameter Optimization**: Bayesian optimization (scikit-optimize) with 30 iterations per configuration
 3. **Model Training**: Train on 2020-2023 data with early stopping
 4. **Evaluation**: Test on 2024 out-of-sample data
 5. **Trading Simulation**: Non-overlapping backtest with 10 bps transaction fees
@@ -248,9 +248,8 @@ jupyter notebook notebooks/10_ablation_study.ipynb          # Ablation studies
 
 **XGBoost:**
 - `n_estimators`: [50, 500]
-- `max_depth`: [3, 10]
+- `max_depth`: [3, 12]
 - `learning_rate`: [0.01, 0.3]
-- `min_child_weight`: [1, 10]
 - `subsample`: [0.5, 1.0]
 - `colsample_bytree`: [0.5, 1.0]
 
@@ -296,14 +295,9 @@ See individual training scripts for complete hyperparameter ranges.
 5. **Analyze Results**:
 
    ```bash
-   # Our task-specific models results
-   jupyter notebook notebooks/02_our_results.ipynb
-
-   # Ablation study analysis
-   jupyter notebook notebooks/03_ablation_study.ipynb
-
-   # Baseline models comparison
-   jupyter notebook notebooks/04_baseline_results.ipynb
+   jupyter notebook notebooks/02_our_results.ipynb      # Our task-specific models results
+   jupyter notebook notebooks/03_ablation_study.ipynb   # Ablation study analysis
+   jupyter notebook notebooks/04_baseline_results.ipynb # Baseline models comparison
    ```
 
 ## 🎯 Key Findings
@@ -374,7 +368,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **FinBERT** and **FinBERT-Tone** for sentiment analysis
 - **Chronos-2** and **FinCast** for foundation model baselines
-- **Optuna** for Bayesian hyperparameter optimization
+- **scikit-optimize** for Bayesian hyperparameter optimization
 - **scikit-learn**, **XGBoost**, **LightGBM**, **TensorFlow** for machine learning implementations
 - Financial data providers: Yahoo Finance, MarketWatch, Google News
 - Social media data sources: Reddit, StockTwits, Twitter/X
