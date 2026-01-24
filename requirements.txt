@@ -17,6 +17,7 @@ torch>=2.0.0
 # Hyperparameter Optimization
 optuna>=3.0.0
 hyperopt>=0.2.7
+scikit-optimize>=0.9.0
 
 # Time Series
 statsmodels>=0.14.0
