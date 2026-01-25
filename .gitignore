@@ -209,3 +209,5 @@ nohup.out
 
 results/baselines/finetuned_covariates/chronos2_finetuned_*
 results/baselines/finetuned_single/chronos2_finetuned_*
+
+/FinCast-fts
