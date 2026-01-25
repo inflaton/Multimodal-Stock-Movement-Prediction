@@ -3,27 +3,75 @@
 Update SOTA Comparison Table in main.tex
 
 This script updates the baseline values in the SOTA comparison table (\\label{tab:sota})
-with the latest results from Chronos-2 experiments.
+with the latest results from Chronos-2 and FinCast experiments.
 
 Usage:
-    python update_sota_table.py
-    python update_sota_table.py --tex-file main.tex
-    python update_sota_table.py --results-file chronos_all_results_combined.csv
+    python scripts/update_sota_table.py
+    python scripts/update_sota_table.py --tex-file docs/main.tex
+    python scripts/update_sota_table.py --results-dir results/baselines
 """
 
 import pandas as pd
 import argparse
 import re
 import os
+from pathlib import Path
 
 
-def load_chronos_results(results_file: str) -> pd.DataFrame:
-    """Load and prepare Chronos results."""
-    df = pd.read_csv(results_file)
+def load_chronos_results(results_dir: str) -> pd.DataFrame:
+    """Load and prepare Chronos results from results directory."""
+    chronos_file = Path(results_dir) / "chronos_all_results_combined.csv"
+
+    if not chronos_file.exists():
+        print(f"Warning: Chronos results file not found: {chronos_file}")
+        return pd.DataFrame()
+
+    df = pd.read_csv(chronos_file)
 
     # Filter for long_short strategy only
     df = df[df["Strategy"] == "long_short"].copy()
 
+    return df
+
+
+def load_fincast_results(results_dir: str) -> pd.DataFrame:
+    """Load and prepare FinCast results from results directory."""
+    fincast_zeroshot_file = Path(results_dir) / "fincast_all_stocks_results.csv"
+
+    # Try newer filename first, then fall back to older one
+    fincast_finetuned_file = Path(results_dir) / "finetuned_fincast" / "fincast_finetuned_all_results.csv"
+    if not fincast_finetuned_file.exists():
+        fincast_finetuned_file = Path(results_dir) / "finetuned_fincast" / "fincast_finetuned_all_stocks_results.csv"
+
+    dfs = []
+
+    # Load zero-shot results
+    if fincast_zeroshot_file.exists():
+        df_zeroshot = pd.read_csv(fincast_zeroshot_file)
+        df_zeroshot["ModelType"] = "zero-shot"
+        dfs.append(df_zeroshot)
+        print(f"  Loaded {len(df_zeroshot)} zero-shot results")
+    else:
+        print(f"Warning: FinCast zero-shot file not found: {fincast_zeroshot_file}")
+
+    # Load fine-tuned results
+    if fincast_finetuned_file.exists():
+        df_finetuned = pd.read_csv(fincast_finetuned_file)
+        df_finetuned["ModelType"] = "finetuned"
+        # Align column names (fine-tuned has "Threshold", zero-shot has "BestThreshold")
+        if "Threshold" in df_finetuned.columns and "BestThreshold" not in df_finetuned.columns:
+            df_finetuned = df_finetuned.rename(columns={"Threshold": "BestThreshold"})
+        dfs.append(df_finetuned)
+        print(f"  Loaded {len(df_finetuned)} fine-tuned results")
+    else:
+        print(f"Warning: FinCast fine-tuned file not found: {fincast_finetuned_file}")
+
+    # Combine all results
+    if not dfs:
+        print("Warning: No FinCast results found")
+        return pd.DataFrame()
+
+    df = pd.concat(dfs, ignore_index=True)
     return df
 
 
@@ -86,10 +134,13 @@ def calculate_baseline_metrics(df: pd.DataFrame, model_types: list) -> dict:
     return metrics
 
 
-def generate_baseline_rows(df: pd.DataFrame) -> dict:
-    """Generate all baseline rows for the SOTA table."""
+def generate_chronos_baseline_rows(df: pd.DataFrame) -> dict:
+    """Generate Chronos-2 baseline rows for the SOTA table."""
 
     baselines = {}
+
+    if df.empty:
+        return baselines
 
     # Chronos-2 Zero-shot
     # Price only: model_type = 'zero-shot'
@@ -111,50 +162,128 @@ def generate_baseline_rows(df: pd.DataFrame) -> dict:
     return baselines
 
 
-def format_baseline_rows(baselines: dict) -> str:
-    """Format baseline rows as LaTeX table content."""
+def generate_fincast_baseline_rows(df: pd.DataFrame) -> dict:
+    """Generate FinCast baseline rows for the SOTA table."""
+
+    baselines = {}
+
+    if df.empty:
+        return baselines
+
+    # FinCast Zero-shot (Price only)
+    fincast_zeroshot = calculate_baseline_metrics(df, ["zero-shot", "zeroshot"])
+
+    # FinCast Fine-tuned (Price only)
+    fincast_finetuned = calculate_baseline_metrics(df, ["finetuned", "fine-tuned"])
+
+    baselines["fincast_zeroshot"] = fincast_zeroshot
+    baselines["fincast_finetuned"] = fincast_finetuned
+
+    return baselines
+
+
+def find_best_baseline_accuracy(fincast_baselines: dict, chronos_baselines: dict) -> float:
+    """Find the best (maximum) accuracy value across all baselines."""
+    best_acc = -float('inf')
+
+    # Collect all baseline metrics
+    all_baselines = {**fincast_baselines, **chronos_baselines}
+
+    for _, metrics in all_baselines.items():
+        if metrics:
+            for sel_type in ["auc", "sharpe"]:
+                if sel_type in metrics and "acc" in metrics[sel_type]:
+                    best_acc = max(best_acc, metrics[sel_type]["acc"])
+
+    return best_acc
+
+
+def format_fincast_rows(baselines: dict, best_acc: float) -> str:
+    """Format FinCast baseline rows as LaTeX table content."""
+
+    lines = []
+
+    # FinCast Zero-shot section
+    lines.append("\\multicolumn{7}{l}{\\textit{FinCast~\\cite{zhu2025fincast} Zero-shot}} \\\\")
+
+    if baselines.get("fincast_zeroshot"):
+        m = baselines["fincast_zeroshot"]["auc"]
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+
+        m = baselines["fincast_zeroshot"]["sharpe"]
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+
+    lines.append("\\midrule")
+
+    # FinCast Fine-tuned section
+    lines.append("\\multicolumn{7}{l}{\\textit{FinCast~\\cite{zhu2025fincast} Fine-tuned}} \\\\")
+
+    if baselines.get("fincast_finetuned"):
+        m = baselines["fincast_finetuned"]["auc"]
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+
+        m = baselines["fincast_finetuned"]["sharpe"]
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+
+    return "\n".join(lines)
+
+
+def format_chronos_rows(baselines: dict, best_acc: float) -> str:
+    """Format Chronos-2 baseline rows as LaTeX table content."""
 
     lines = []
 
     # Chronos-2 Zero-shot section
     lines.append("\\multicolumn{7}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos} Zero-shot}} \\\\")
 
-    if baselines["chronos_zeroshot_price"]:
+    if baselines.get("chronos_zeroshot_price"):
         m = baselines["chronos_zeroshot_price"]["auc"]
-        lines.append(f"\\quad Price only & AUC & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_zeroshot_cov"]:
+    if baselines.get("chronos_zeroshot_cov"):
         m = baselines["chronos_zeroshot_cov"]["auc"]
-        lines.append(f"\\quad + Sentiment & AUC & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad + Sentiment & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_zeroshot_price"]:
+    if baselines.get("chronos_zeroshot_price"):
         m = baselines["chronos_zeroshot_price"]["sharpe"]
-        lines.append(f"\\quad Price only & Sharpe & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_zeroshot_cov"]:
+    if baselines.get("chronos_zeroshot_cov"):
         m = baselines["chronos_zeroshot_cov"]["sharpe"]
-        lines.append(f"\\quad + Sentiment & Sharpe & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad + Sentiment & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
     lines.append("\\midrule")
 
     # Chronos-2 Fine-tuned section
     lines.append("\\multicolumn{7}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos} Fine-tuned}} \\\\")
 
-    if baselines["chronos_finetuned_price"]:
+    if baselines.get("chronos_finetuned_price"):
         m = baselines["chronos_finetuned_price"]["auc"]
-        lines.append(f"\\quad Price only & AUC & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_finetuned_cov"]:
+    if baselines.get("chronos_finetuned_cov"):
         m = baselines["chronos_finetuned_cov"]["auc"]
-        lines.append(f"\\quad + Sentiment & AUC & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad + Sentiment & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_finetuned_price"]:
+    if baselines.get("chronos_finetuned_price"):
         m = baselines["chronos_finetuned_price"]["sharpe"]
-        lines.append(f"\\quad Price only & Sharpe & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    if baselines["chronos_finetuned_cov"]:
+    if baselines.get("chronos_finetuned_cov"):
         m = baselines["chronos_finetuned_cov"]["sharpe"]
-        lines.append(f"\\quad + Sentiment & Sharpe & {m['acc']:.3f} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
+        lines.append(f"\\quad + Sentiment & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
     return "\n".join(lines)
 
@@ -169,22 +298,22 @@ def update_sota_table(tex_file: str, new_content: str) -> bool:
     with open(tex_file, 'r') as f:
         content = f.read()
 
-    # Pattern to match Chronos-2 sections in the SOTA table
-    # We'll replace everything from the first Chronos-2 Zero-shot line to the midrule before "Ours"
+    # Pattern to match baseline sections in the SOTA table
+    # We'll replace everything from FinCast Zero-shot to the midrule before "Ours"
     pattern = (
-        r"(\\multicolumn\{7\}\{l\}\{\\textit\{Chronos-2.*?Zero-shot\}\} \\\\)"  # First occurrence of Chronos-2 Zero-shot
-        r"(.*?)"  # Old Chronos-2 content (capture all between first and last)
+        r"(\\multicolumn\{7\}\{l\}\{\\textit\{FinCast.*?Zero-shot\}\} \\\\)"  # First occurrence of FinCast Zero-shot
+        r"(.*?)"  # Old baseline content (FinCast + Chronos-2)
         r"(\\midrule\s*\n\\multicolumn\{7\}\{l\}\{\\textit\{Ours)"  # Start of "Ours" section
     )
 
     match = re.search(pattern, content, re.DOTALL)
 
     if not match:
-        print("Error: Could not find Chronos-2 sections in SOTA table")
-        print("Looking for pattern starting with: \\multicolumn{7}{l}{\\textit{Chronos-2")
+        print("Error: Could not find baseline sections in SOTA table")
+        print("Looking for pattern starting with: \\multicolumn{7}{l}{\\textit{FinCast")
         return False
 
-    # Replace the Chronos-2 sections, including the first header line
+    # Replace all baseline sections, including the first header line
     new_content_full = content[:match.start(1)] + new_content + "\n" + content[match.start(3):]
 
     with open(tex_file, 'w') as f:
@@ -197,15 +326,15 @@ def update_sota_table(tex_file: str, new_content: str) -> bool:
 def main():
     parser = argparse.ArgumentParser(description="Update SOTA Comparison Table in main.tex")
     parser.add_argument(
-        "--results-file",
+        "--results-dir",
         type=str,
-        default="chronos_all_results_combined.csv",
-        help="Path to combined Chronos results CSV",
+        default="results/baselines",
+        help="Directory containing baseline results CSV files",
     )
     parser.add_argument(
         "--tex-file",
         type=str,
-        default="main.tex",
+        default="docs/main.tex",
         help="Path to main.tex file",
     )
 
@@ -214,39 +343,74 @@ def main():
     print("=" * 80)
     print("UPDATING SOTA TABLE")
     print("=" * 80)
-    print(f"Results file: {args.results_file}")
+    print(f"Results directory: {args.results_dir}")
     print(f"LaTeX file: {args.tex_file}")
     print()
 
     # Load results
-    if not os.path.exists(args.results_file):
-        print(f"Error: Results file not found: {args.results_file}")
+    if not os.path.exists(args.results_dir):
+        print(f"Error: Results directory not found: {args.results_dir}")
         return
 
-    print("Loading Chronos results...")
-    df = load_chronos_results(args.results_file)
-    print(f"Loaded {len(df)} result rows")
-    print(f"Model types: {df['ModelType'].unique()}")
-    print(f"Stocks: {df['Stock'].unique()}")
+    print("Loading Chronos-2 results...")
+    chronos_df = load_chronos_results(args.results_dir)
+    if not chronos_df.empty:
+        print(f"Loaded {len(chronos_df)} Chronos-2 result rows")
+        print(f"Model types: {chronos_df['ModelType'].unique()}")
+        print(f"Stocks: {chronos_df['Stock'].unique()}")
+    else:
+        print("No Chronos-2 results found")
+    print()
+
+    print("Loading FinCast results...")
+    fincast_df = load_fincast_results(args.results_dir)
+    if not fincast_df.empty:
+        print(f"Loaded {len(fincast_df)} FinCast result rows")
+        print(f"Model types: {fincast_df['ModelType'].unique()}")
+        print(f"Stocks: {fincast_df['Stock'].unique()}")
+    else:
+        print("No FinCast results found")
     print()
 
     # Generate baseline rows
     print("Calculating baseline metrics...")
-    baselines = generate_baseline_rows(df)
+    chronos_baselines = generate_chronos_baseline_rows(chronos_df)
+    fincast_baselines = generate_fincast_baseline_rows(fincast_df)
 
     # Print summary
     print("\nBaseline Metrics Summary:")
     print("-" * 80)
-    for name, metrics in baselines.items():
-        if metrics:
-            print(f"\n{name}:")
-            print(f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}")
-            print(f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}")
+
+    if fincast_baselines:
+        print("\nFinCast Baselines:")
+        for name, metrics in fincast_baselines.items():
+            if metrics:
+                print(f"\n{name}:")
+                print(f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}")
+                print(f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}")
+
+    if chronos_baselines:
+        print("\nChronos-2 Baselines:")
+        for name, metrics in chronos_baselines.items():
+            if metrics:
+                print(f"\n{name}:")
+                print(f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}")
+                print(f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}")
     print()
 
     # Format as LaTeX
     print("Generating LaTeX table content...")
-    latex_content = format_baseline_rows(baselines)
+
+    # Find best baseline accuracy for bolding
+    best_acc = find_best_baseline_accuracy(fincast_baselines, chronos_baselines)
+    print(f"Best baseline accuracy: {best_acc:.3f}")
+
+    fincast_latex = format_fincast_rows(fincast_baselines, best_acc)
+    chronos_latex = format_chronos_rows(chronos_baselines, best_acc)
+
+    # Combine FinCast and Chronos-2 sections with midrule between
+    latex_content = fincast_latex + "\n\\midrule\n" + chronos_latex
+
     print("\nGenerated LaTeX content:")
     print("-" * 80)
     print(latex_content)
