@@ -91,6 +91,34 @@ brew install libomp
 pip install --upgrade xgboost
 ```
 
+### FinCast Baseline Setup
+
+To run FinCast baseline experiments, you need to set up the FinCast environment separately:
+
+```bash
+# Clone the FinCast repository
+git clone https://github.com/inflaton/FinCast-fts.git
+cd FinCast-fts
+
+# Create conda environment and install dependencies
+bash ./env_setup.sh && bash ./dep_install.sh
+
+# Return to main project directory
+cd ..
+```
+
+This will create a conda environment named `fincast_v1` with Python 3.11 and all required dependencies including PyTorch 2.5.0 with CUDA 12.4 support.
+
+**Note**: FinCast requires:
+- Python 3.11+
+- PyTorch 2.5+
+- CUDA 11.8+ for GPU acceleration (PyTorch 2.5.0 supports compute capabilities sm_50, sm_80, sm_86, sm_89, sm_90, sm_90a)
+- Conda for environment management
+
+**GPU Compatibility**: Newer GPUs like NVIDIA GB10 (sm_121 Blackwell architecture) are not supported by PyTorch 2.5.0. For these GPUs:
+- Set `export CUDA_VISIBLE_DEVICES=""` to run on CPU, or
+- Install PyTorch 2.9+ nightly/from source with sm_121 support
+
 ### Quick Start
 
 #### 1. Train Task-Specific Models
@@ -131,8 +159,11 @@ python scripts/chronos_finetune.py --all-stocks --use-covariates
 # Zero-shot
 python scripts/fincast_baseline.py --all-stocks
 
-# Fine-tuned
-python scripts/fincast_finetune.py --all-stocks --use-covariates
+# Fine-tuning (trains models)
+python scripts/fincast_finetune.py --all-stocks
+
+# Fine-tuned inference (evaluates fine-tuned models)
+python scripts/fincast_finetuned_inference.py --all-stocks
 ```
 
 #### 3. Analyze Results
@@ -203,6 +234,7 @@ jupyter notebook notebooks/04_baseline_results.ipynb # Baseline comparison
 │   ├── chronos_inference.py
 │   ├── fincast_baseline.py
 │   ├── fincast_finetune.py
+│   ├── fincast_finetuned_inference.py
 │   ├── ablation_study.py
 │   ├── analyze_chronos_results.py
 │   ├── analyze_tuned_results.py
@@ -217,6 +249,12 @@ jupyter notebook notebooks/04_baseline_results.ipynb # Baseline comparison
 ├── results/                        # Model results and metrics
 │   ├── chronos_all_results_combined.csv
 │   └── Filtered_*_hyperparameter_tuned_results.csv
+│
+├── FinCast-fts/                    # FinCast foundation model (git submodule)
+│   ├── env_setup.sh              # Create conda environment
+│   ├── dep_install.sh            # Install dependencies
+│   ├── scripts/                  # FinCast training scripts
+│   └── README.md                 # FinCast documentation
 │
 ├── models/                         # Trained model checkpoints (to be added)
 ├── docs/                           # Documentation
@@ -265,34 +303,47 @@ See individual training scripts for complete hyperparameter ranges.
 
 ### Step-by-Step Guide
 
-1. **Update Sentiment Data** (if needed):
+1. **Set Up FinCast Environment** (for baseline comparisons):
+
+   ```bash
+   # Clone and set up FinCast
+   git clone https://github.com/inflaton/FinCast-fts.git
+   cd FinCast-fts
+   bash ./env_setup.sh && bash ./dep_install.sh
+   cd ..
+   ```
+
+2. **Update Sentiment Data** (if needed):
 
    ```bash
    jupyter notebook notebooks/01_update_sentiments_for_training_data.ipynb
    ```
 
-2. **Train All Task-Specific Models**:
+3. **Train All Task-Specific Models**:
 
    ```bash
    # Train all models for all stocks
    ./run_all_hyperparameter_tuning.sh
    ```
 
-3. **Run Ablation Study**:
+4. **Run Ablation Study**:
 
    ```bash
    # Run ablation experiments for all configurations
    ./run_ablation_study.sh
    ```
 
-4. **Train Foundation Model Baselines**:
+5. **Train Foundation Model Baselines**:
 
    ```bash
-   # Run all foundation model baselines (Chronos-2 and FinCast)
-   ./run_baselines.sh
+   # Run Chronos-2 baselines (zero-shot and fine-tuned, with/without sentiment)
+   ./run_baselines_chronos-2.sh
+
+   # Run FinCast baselines (zero-shot, fine-tuning, and inference)
+   ./run_baselines_fincast.sh
    ```
 
-5. **Analyze Results**:
+6. **Analyze Results**:
 
    ```bash
    jupyter notebook notebooks/02_our_results.ipynb      # Our task-specific models results
@@ -329,11 +380,13 @@ See individual training scripts for complete hyperparameter ranges.
 ## 💻 Hardware Requirements
 
 - **Minimum**: 16GB RAM, CPU-only training
-- **Recommended**: 32GB RAM, NVIDIA GPU (8GB+ VRAM) for LSTM training
+- **Recommended**: 32GB RAM, NVIDIA GPU (8GB+ VRAM) for LSTM and foundation model training
+- **Foundation Models**: NVIDIA GPU with CUDA 11.8+ (CUDA 12.4+ recommended for FinCast)
 - **Training Time**:
   - Task-specific models: 1-4 hours per stock (CPU)
   - LSTM models: 2-6 hours per stock (GPU)
-  - Foundation models: 4-12 hours per stock (GPU)
+  - Chronos-2 baselines: 4-8 hours per stock (GPU)
+  - FinCast baselines: 6-12 hours per stock (GPU)
 
 ## 📝 Citation
 
@@ -367,7 +420,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **FinBERT** and **FinBERT-Tone** for sentiment analysis
-- **Chronos-2** and **FinCast** for foundation model baselines
+- **Chronos-2** ([Amazon Science](https://github.com/amazon-science/chronos-forecasting)) for time-series foundation model baselines
+- **FinCast** ([Zhu et al., CIKM 2025](https://arxiv.org/abs/2508.19609)) for financial time-series foundation model baselines
 - **scikit-optimize** for Bayesian hyperparameter optimization
 - **scikit-learn**, **XGBoost**, **LightGBM**, **TensorFlow** for machine learning implementations
 - Financial data providers: Yahoo Finance, MarketWatch, Google News

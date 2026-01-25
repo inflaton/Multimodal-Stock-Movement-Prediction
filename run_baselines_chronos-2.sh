@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Run foundation model baselines (Chronos-2 and FinCast)
-# Usage: ./run_baselines.sh
+# Run foundation model baselines (Chronos-2)
+# Usage: ./run_baselines_chronos-2.sh
 
 set -e  # Exit on error
 
 echo "========================================="
-echo "Running Foundation Model Baselines"
+echo "Running Chronos-2 Foundation Model Baselines"
 echo "========================================="
 echo ""
 
@@ -40,27 +40,7 @@ python scripts/chronos_finetune.py --all-stocks --use-covariates
 echo "✓ Completed"
 echo ""
 
-# FinCast Zero-shot
-echo "-----------------------------------------"
-echo "5. FinCast Zero-shot (Price Only)"
-echo "-----------------------------------------"
-python scripts/fincast_baseline.py --all-stocks
-echo "✓ Completed"
-echo ""
-
-# FinCast Fine-tuned
-echo "-----------------------------------------"
-echo "6. FinCast Fine-tuned (With Sentiment)"
-echo "-----------------------------------------"
-python scripts/fincast_finetune.py --all-stocks --use-covariates
-echo "✓ Completed"
-echo ""
-
 echo "========================================="
-echo "All Baselines Complete!"
+echo "All Chronos-2 Baselines Complete!"
 echo "========================================="
-echo ""
-echo "Results saved to the respective output directories."
-echo ""
-echo "To analyze baseline results, use:"
-echo "  jupyter notebook notebooks/08_baseline_results.ipynb"
+

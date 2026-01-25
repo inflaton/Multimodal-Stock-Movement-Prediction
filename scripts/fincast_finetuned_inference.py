@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Fin
 from fincast_finetune import load_fincast_model_for_training, wrap_model_with_peft
 
 # Constants
+STOCKS = ["AAPL", "META", "NVDA", "SPY", "TSLA"]
 TRAIN_YEARS = [2020, 2021, 2022]
 TEST_YEAR = 2023
 ALL_HORIZONS = list(range(2, 11))
@@ -211,13 +212,12 @@ def run_inference_for_stock(
     stock,
     finetuned_model_path,
     base_model_path,
-    data_dir="./data",
-    output_dir=".",
+    data_dir="./dataset/training_data",
+    output_dir="./results/baselines/finetuned_fincast",
     context_length=128,
     lora_r=8,
     lora_alpha=16,
     use_dora=False,
-    use_all_horizons=True,
 ):
     """Run inference for a single stock using fine-tuned model."""
 
@@ -247,11 +247,9 @@ def run_inference_for_stock(
 
     print(f"Test samples: {len(test_prices)}")
 
-    # Determine horizons to test
-    if use_all_horizons:
-        horizons = ALL_HORIZONS
-    else:
-        horizons = [10]  # Default
+    # Use all horizons with default thresholds
+    print(f"Using all horizons with default thresholds")
+    horizons = ALL_HORIZONS
 
     results = []
 
@@ -343,53 +341,90 @@ def run_inference_for_stock(
 
 def main():
     parser = argparse.ArgumentParser(description="FinCast fine-tuned model inference")
-    parser.add_argument("--stock", type=str, required=True, help="Stock symbol")
+    parser.add_argument("--stock", type=str, help="Stock symbol (required if not using --all-stocks)")
+    parser.add_argument(
+        "--all-stocks", action="store_true", help="Run inference for all stocks"
+    )
     parser.add_argument(
         "--finetuned-model",
         type=str,
-        required=True,
-        help="Path to fine-tuned model (.pth file)",
+        help="Path to fine-tuned model (.pth file). If not provided, will look in output-dir/{stock}/best_model.pth",
     )
     parser.add_argument(
         "--base-model",
         type=str,
-        default="../FinCast-fts/model_weights/v1.pth",
+        default="./FinCast-fts/model_weights/v1.pth",
         help="Path to base FinCast model",
     )
-    parser.add_argument("--data-dir", type=str, default="./data", help="Data directory")
-    parser.add_argument("--output-dir", type=str, default=".", help="Output directory")
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default="./dataset/training_data",
+        help="Directory containing stock data CSV files",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="./results/baselines/finetuned_fincast",
+        help="Directory to save inference results",
+    )
     parser.add_argument(
         "--context-length", type=int, default=128, help="Context length"
     )
     parser.add_argument("--lora-r", type=int, default=8, help="LoRA rank")
     parser.add_argument("--lora-alpha", type=int, default=16, help="LoRA alpha")
     parser.add_argument("--use-dora", action="store_true", help="Use DoRA instead of LoRA")
-    parser.add_argument(
-        "--use-all-horizons",
-        action="store_true",
-        help="Test all horizons (2-10)",
-    )
 
     args = parser.parse_args()
+
+    # Validate arguments
+    if not args.all_stocks and not args.stock:
+        parser.error("Either --stock or --all-stocks must be specified")
 
     # Create output directory
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
-    # Run inference
-    run_inference_for_stock(
-        stock=args.stock,
-        finetuned_model_path=args.finetuned_model,
-        base_model_path=args.base_model,
-        data_dir=args.data_dir,
-        output_dir=args.output_dir,
-        context_length=args.context_length,
-        lora_r=args.lora_r,
-        lora_alpha=args.lora_alpha,
-        use_dora=args.use_dora,
-        use_all_horizons=args.use_all_horizons,
-    )
+    # Determine stocks to process
+    stocks = STOCKS if args.all_stocks else [args.stock]
 
-    print("\nDone!")
+    # Run inference for each stock
+    all_results = []
+    for stock in stocks:
+        # Determine model path
+        if args.finetuned_model:
+            model_path = args.finetuned_model
+        else:
+            # Default: look for best_model.pth in output_dir/{stock}/
+            model_path = f"{args.output_dir}/{stock}/best_model.pth"
+
+        if not Path(model_path).exists():
+            print(f"\n⚠️  Model not found for {stock}: {model_path}")
+            print(f"Skipping {stock}...")
+            continue
+
+        results = run_inference_for_stock(
+            stock=stock,
+            finetuned_model_path=model_path,
+            base_model_path=args.base_model,
+            data_dir=args.data_dir,
+            output_dir=args.output_dir,
+            context_length=args.context_length,
+            lora_r=args.lora_r,
+            lora_alpha=args.lora_alpha,
+            use_dora=args.use_dora,
+        )
+        all_results.append(results)
+
+    # Combine and save all results if processing multiple stocks
+    if args.all_stocks and all_results:
+        combined_df = pd.concat(all_results, ignore_index=True)
+        combined_file = f"{args.output_dir}/fincast_finetuned_all_results.csv"
+        combined_df.to_csv(combined_file, index=False)
+        print(f"\n✓ Combined results saved to: {combined_file}")
+
+    print("\n" + "="*80)
+    print("All inference complete!")
+    print("="*80)
 
 
 if __name__ == "__main__":

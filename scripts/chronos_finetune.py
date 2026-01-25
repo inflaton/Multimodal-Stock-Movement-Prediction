@@ -8,9 +8,17 @@ Requirements:
     pip install autogluon.timeseries
 
 Usage:
+    # Fine-tune models for all stocks (loads existing models by default)
     python chronos_finetune.py --all-stocks
+
+    # Fine-tune for a single stock
     python chronos_finetune.py --stock AAPL
+
+    # Fine-tune with covariates
     python chronos_finetune.py --all-stocks --use-covariates
+
+    # Force re-training even if models exist
+    python chronos_finetune.py --all-stocks --overwrite-if-exists
 """
 
 import warnings
@@ -82,13 +90,6 @@ def load_data(stock: str, data_dir: str) -> pd.DataFrame:
     df["__DateDT__"] = pd.to_datetime(df["Date"], format="%d/%m/%Y", errors="coerce")
     df["Year"] = df["__DateDT__"].dt.year
     return df
-
-
-def load_results(stock: str, results_dir: str) -> pd.DataFrame:
-    """Load hyperparameter tuning results to get thresholds and horizons."""
-    return pd.read_csv(
-        f"{results_dir}/Filtered_{stock}_hyperparameter_tuned_results.csv"
-    )
 
 
 def calculate_target(df: pd.DataFrame, horizon: int, threshold: float) -> pd.Series:
@@ -331,6 +332,7 @@ def finetune_model(
     fine_tune_steps: int = DEFAULT_FINE_TUNE_STEPS,
     time_limit: int = 600,
     output_dir: str = "./chronos_models",
+    skip_if_exists: bool = False,
 ) -> TimeSeriesPredictor:
     """
     Fine-tune Chronos-2 model.
@@ -346,6 +348,7 @@ def finetune_model(
     fine_tune_steps : number of fine-tuning steps
     time_limit : time limit in seconds for fitting
     output_dir : directory to save the model
+    skip_if_exists : if True, load existing model instead of re-training
 
     Returns:
     --------
@@ -372,8 +375,16 @@ def finetune_model(
     # Create predictor
     model_path = Path(f"{output_dir}/chronos2_{model_suffix}_{stock}_h{horizon}")
 
+    # Check if model already exists and skip_if_exists is enabled
+    if skip_if_exists and model_path.exists():
+        print(f"Loading existing model from {model_path}...")
+        predictor = TimeSeriesPredictor.load(str(model_path))
+        print(f"Model loaded successfully (skipped training)")
+        return predictor
+
     # Remove existing model directory to avoid warnings
     if model_path.exists():
+        print(f"Removing existing model at {model_path}...")
         shutil.rmtree(model_path)
 
     predictor = TimeSeriesPredictor(
@@ -535,7 +546,6 @@ def generate_rolling_predictions(
 def run_finetuned_baseline_for_stock(
     stock: str,
     data_dir: str,
-    results_dir: str,
     output_dir: str = ".",
     fine_tune: bool = True,
     fine_tune_lr: float = DEFAULT_FINE_TUNE_LR,
@@ -544,15 +554,19 @@ def run_finetuned_baseline_for_stock(
     covariate_cols: list = None,
     use_multi_stock_training: bool = True,
     time_limit: int = 600,
-    use_all_horizons: bool = False,
     strategy: str = STRATEGY_LONG_SHORT,
     confidence_threshold: float = DEFAULT_CONFIDENCE_THRESHOLD,
     context_length: int = 60,
+    skip_if_exists: bool = False,
 ) -> pd.DataFrame:
     """
     Run fine-tuned Chronos-2 baseline for all horizons of a given stock.
 
     Uses rolling predictions (like zero-shot baseline) for fair comparison.
+
+    Parameters:
+    -----------
+    skip_if_exists : bool, if True, load existing models instead of re-training
     """
     mode = "Fine-tuned" if fine_tune else "Zero-shot"
     print(f"\n{'='*70}")
@@ -585,21 +599,9 @@ def run_finetuned_baseline_for_stock(
             train_df, stock, covariate_cols if use_covariates else None
         )
 
-    # Load existing results to get horizons and thresholds
-    if use_all_horizons:
-        print(f"Using all horizons with default thresholds")
-        horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
-    else:
-        try:
-            existing_results = load_results(stock, results_dir)
-            horizons_thresholds = existing_results[
-                ["Horizon", "BestThreshold"]
-            ].values.tolist()
-        except FileNotFoundError:
-            print(
-                f"Warning: No existing results found for {stock}. Using all horizons with default thresholds."
-            )
-            horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
+    # Use all horizons with default thresholds
+    print(f"Using all horizons with default thresholds")
+    horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
 
     results = []
 
@@ -610,8 +612,7 @@ def run_finetuned_baseline_for_stock(
         print(f"{'-'*50}")
 
         try:
-            # Fine-tune the model
-            print(f"{'Fine-tuning' if fine_tune else 'Running zero-shot'} Chronos-2...")
+            # Fine-tune the model (or load existing)
             predictor = finetune_model(
                 train_ts,
                 horizon=horizon,
@@ -622,6 +623,7 @@ def run_finetuned_baseline_for_stock(
                 fine_tune_steps=fine_tune_steps,
                 time_limit=time_limit,
                 output_dir=output_dir,
+                skip_if_exists=skip_if_exists,
             )
 
             # Generate rolling predictions (like zero-shot baseline)
@@ -741,20 +743,14 @@ def main():
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="./data",
+        default="./dataset/training_data",
         help="Directory containing *_data_model_training.csv files",
     )
     parser.add_argument(
-        "--results-dir",
-        type=str,
-        default=".",
-        help="Directory containing Filtered_*_hyperparameter_tuned_results.csv files",
-    )
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default=".",
-        help="Directory to save output results",
+        "--output-dir", 
+        type=str, 
+        default="./results/baselines/finetuned_single", 
+        help="Directory to save output results"
     )
     parser.add_argument(
         "--no-fine-tune",
@@ -782,7 +778,7 @@ def main():
         "--covariates",
         type=str,
         nargs="+",
-        default=["Filtered Sentiment Score"],
+        default=["Weighted Sentiment Score"],
         help="Covariate column names to use",
     )
     parser.add_argument(
@@ -795,11 +791,6 @@ def main():
         "--multi-stock-training",
         action="store_true",
         help="Use all stocks for training (default: use only target stock)",
-    )
-    parser.add_argument(
-        "--use-all-horizons",
-        action="store_true",
-        help="Use all horizons (2-10) with default thresholds instead of stock-specific filtered results",
     )
     parser.add_argument(
         "--strategy",
@@ -820,11 +811,24 @@ def main():
         default=60,
         help="Number of historical days to use as context for rolling predictions (default: 60)",
     )
+    parser.add_argument(
+        "--overwrite-if-exists",
+        action="store_true",
+        help="Overwrite existing models and re-train (default: load existing models if available)",
+    )
 
     args = parser.parse_args()
 
     covariate_cols = args.covariates if args.use_covariates else None
     fine_tune = not args.no_fine_tune
+    skip_if_exists = not args.overwrite_if_exists
+
+    if skip_if_exists:
+        print(f"Will load existing models if available (use --overwrite-if-exists to force re-training)")
+        print(f"Models will be loaded from: {args.output_dir}")
+    else:
+        print(f"Will overwrite and re-train existing models")
+        print(f"Models will be saved to: {args.output_dir}")
 
     if args.all_stocks:
         all_results = []
@@ -833,7 +837,6 @@ def main():
             results, strategy_suffix = run_finetuned_baseline_for_stock(
                 stock=stock,
                 data_dir=args.data_dir,
-                results_dir=args.results_dir,
                 output_dir=args.output_dir,
                 fine_tune=fine_tune,
                 fine_tune_lr=args.fine_tune_lr,
@@ -842,10 +845,10 @@ def main():
                 covariate_cols=covariate_cols,
                 use_multi_stock_training=args.multi_stock_training,
                 time_limit=args.time_limit,
-                use_all_horizons=args.use_all_horizons,
                 strategy=args.strategy,
                 confidence_threshold=args.confidence_threshold,
                 context_length=args.context_length,
+                skip_if_exists=skip_if_exists,
             )
             all_results.append(results)
 
@@ -877,7 +880,6 @@ def main():
         run_finetuned_baseline_for_stock(
             stock=args.stock,
             data_dir=args.data_dir,
-            results_dir=args.results_dir,
             output_dir=args.output_dir,
             fine_tune=fine_tune,
             fine_tune_lr=args.fine_tune_lr,
@@ -886,10 +888,10 @@ def main():
             covariate_cols=covariate_cols,
             use_multi_stock_training=args.multi_stock_training,
             time_limit=args.time_limit,
-            use_all_horizons=args.use_all_horizons,
             strategy=args.strategy,
             confidence_threshold=args.confidence_threshold,
             context_length=args.context_length,
+            skip_if_exists=skip_if_exists,
         )
 
 

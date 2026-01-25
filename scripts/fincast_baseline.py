@@ -107,13 +107,6 @@ def load_data(stock: str, data_dir: str) -> pd.DataFrame:
     return df
 
 
-def load_results(stock: str, results_dir: str) -> pd.DataFrame:
-    """Load hyperparameter tuning results to get thresholds and horizons."""
-    return pd.read_csv(
-        f"{results_dir}/Filtered_{stock}_hyperparameter_tuned_results.csv"
-    )
-
-
 def calculate_target(df: pd.DataFrame, horizon: int, threshold: float) -> pd.Series:
     """
     Calculate binary target variable.
@@ -366,12 +359,10 @@ def generate_predictions_for_test(
 def run_fincast_baseline_for_stock(
     stock: str,
     data_dir: str,
-    results_dir: str,
     model_path: str,
     context_length: int = 128,
     output_dir: str = ".",
     model=None,
-    use_all_horizons: bool = False,
 ) -> pd.DataFrame:
     """
     Run FinCast baseline for all horizons of a given stock.
@@ -408,21 +399,9 @@ def run_fincast_baseline_for_stock(
     train_prices = train_df.sort_values("__DateDT__")["Close"].values
     test_prices = test_df.sort_values("__DateDT__")["Close"].values
 
-    # Load existing results to get horizons and thresholds
-    if use_all_horizons:
-        print(f"Using all horizons with default thresholds")
-        horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
-    else:
-        try:
-            existing_results = load_results(stock, results_dir)
-            horizons_thresholds = existing_results[
-                ["Horizon", "BestThreshold"]
-            ].values.tolist()
-        except FileNotFoundError:
-            print(
-                f"Warning: No existing results found for {stock}. Using all horizons with default thresholds."
-            )
-            horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
+    # Use all horizons with default thresholds
+    print(f"Using all horizons with default thresholds")
+    horizons_thresholds = [(h, DEFAULT_THRESHOLDS[h]) for h in ALL_HORIZONS]
 
     results = []
 
@@ -540,28 +519,20 @@ def main():
     parser.add_argument(
         "--data-dir",
         type=str,
-        default="./data",
+        default="./dataset/training_data",
         help="Directory containing *_data_model_training.csv files",
     )
     parser.add_argument(
-        "--results-dir",
-        type=str,
-        default=".",
-        help="Directory containing Filtered_*_hyperparameter_tuned_results.csv files",
-    )
-    parser.add_argument(
-        "--output-dir", type=str, default=".", help="Directory to save output results"
+        "--output-dir", 
+        type=str, 
+        default="./results/baselines", 
+        help="Directory to save output results"
     )
     parser.add_argument(
         "--context-length",
         type=int,
         default=128,
         help="Number of historical days to use as context (default: 128)",
-    )
-    parser.add_argument(
-        "--use-all-horizons",
-        action="store_true",
-        help="Use all horizons (2-10) with default thresholds",
     )
 
     args = parser.parse_args()
@@ -613,12 +584,10 @@ def main():
             results = run_fincast_baseline_for_stock(
                 stock=stock,
                 data_dir=args.data_dir,
-                results_dir=args.results_dir,
                 model_path=args.model_path,
                 context_length=args.context_length,
                 output_dir=args.output_dir,
                 model=model,
-                use_all_horizons=args.use_all_horizons,
             )
             all_results.append(results)
 
@@ -675,12 +644,10 @@ def main():
         run_fincast_baseline_for_stock(
             stock=args.stock,
             data_dir=args.data_dir,
-            results_dir=args.results_dir,
             model_path=args.model_path,
             context_length=args.context_length,
             output_dir=args.output_dir,
             model=model,
-            use_all_horizons=args.use_all_horizons,
         )
 
 

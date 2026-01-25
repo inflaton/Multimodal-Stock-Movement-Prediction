@@ -666,11 +666,11 @@ def main():
         help="Path to FinCast model weights"
     )
     parser.add_argument(
-        "--data-dir", type=str, default="./data",
+        "--data-dir", type=str, default="./dataset/training_data",
         help="Directory containing stock data CSV files"
     )
     parser.add_argument(
-        "--output-dir", type=str, default="./finetuned_fincast",
+        "--output-dir", type=str, default="./results/baselines/finetuned_fincast",
         help="Directory to save fine-tuned models"
     )
     parser.add_argument(
