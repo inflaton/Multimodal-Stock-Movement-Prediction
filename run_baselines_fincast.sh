@@ -5,13 +5,8 @@
 
 set -e  # Exit on error
 
-# Force CPU execution if GPU is incompatible
-# NVIDIA GB10 (sm_121) is not supported by PyTorch 2.5.0
-# Set this to empty string to use GPU if compatible
-export CUDA_VISIBLE_DEVICES=""
-
 echo "========================================="
-echo "Running Foundation Model Baselines (CPU)"
+echo "Running Foundation Model Baselines (FinCast)"
 echo "========================================="
 echo ""
 
