@@ -156,6 +156,8 @@ python scripts/chronos_finetune.py --all-stocks --use-covariates
 **FinCast Baselines:**
 
 ```bash
+conda activate fincast_v1
+
 # Zero-shot
 python scripts/fincast_baseline.py --all-stocks
 
@@ -340,6 +342,7 @@ See individual training scripts for complete hyperparameter ranges.
    ./run_baselines_chronos-2.sh
 
    # Run FinCast baselines (zero-shot, fine-tuning, and inference)
+   conda activate fincast_v1
    ./run_baselines_fincast.sh
    ```
 
