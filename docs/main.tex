@@ -120,9 +120,14 @@ We propose a multimodal stock prediction framework that systematically integrate
 \label{fig:architecture}
 \end{figure*}
 
-\textbf{Stage 1: Data Collection.} The framework ingests three complementary data streams: (i) financial news articles from curated sources including Kaggle datasets, MarketWatch, and Google Search; (ii) social media posts from investor communities including Reddit (r/WallStreetBets, r/Stocks), StockTwits, and Twitter/X; and (iii) historical OHLCV (Open, High, Low, Close, Volume) price data from Yahoo Finance spanning 2020--2024.
+\textbf{Stage 1: Data Collection.} The framework ingests three complementary data streams: (i) financial news articles from curated sources;
+%including Kaggle datasets, MarketWatch, and Google Search; 
+(ii) social media posts from investor communities; % including Reddit (r/WallStreetBets, r/Stocks), StockTwits, and Twitter/X; 
+and (iii) historical OHLCV (Open, High, Low, Close, Volume) price data.% from Yahoo Finance spanning 2020--2024.
 
-\textbf{Stage 2: Feature Extraction.} Two parallel extraction pipelines process the raw data. The \textit{sentiment branch} employs FinBERT-Tone~\cite{huang2022}, a transformer model fine-tuned for financial text, to produce sentiment scores in $[-1, +1]$ for each text document. The \textit{technical branch} transforms price data into 10 signal combinations derived from exponential moving averages (EMA), simple moving averages (SMA), MACD, and RSI indicators, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
+\textbf{Stage 2: Feature Extraction.} Two parallel extraction pipelines process the raw data. The \textit{sentiment branch} employs FinBERT-Tone~\cite{huang2022}, a transformer model fine-tuned for financial text, to produce sentiment scores in $[-1, +1]$ for each text document. 
+The \textit{technical branch} transforms price data into signal combinations, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
+% The \textit{technical branch} transforms price data into 10 signal combinations derived from exponential moving averages (EMA), simple moving averages (SMA), MACD, and RSI indicators, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
 
 \textbf{Stage 3: Multimodal Fusion.} The extracted features undergo a two-stage fusion process. First, sentiment scores from news and social media are combined via weighted aggregation, with empirically-determined weights of 70\% for news and 30\% for social media based on reliability analysis~\cite{nyakurukwa2024}. The aggregated sentiment is then concatenated with technical indicators to form a unified multimodal feature vector $\mathbf{z}_t$.
 
@@ -134,7 +139,9 @@ The following subsections detail the data sources, feature extraction, fusion st
 
 \subsection{Data Collection and Preprocessing}
 
-We collected data from Jan 2020–Dec 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY—to cover varied volatility (e.g., TSLA vs. SPY) and sectors (e.g., semiconductors, social media, consumer electronics). OHLCV prices were pulled via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals came from financial news (Kaggle, MarketWatch, Google Search) and social media (Reddit, StockTwits, Twitter/X).
+We collected data from January 2020 to December 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY. Although our framework applies to any equity, we select these assets to span diverse sectors (semiconductors, social media, consumer electronics), volatility regimes (e.g., TSLA vs.\ SPY), and sentiment salience levels while ensuring high liquidity and comparability with prior financial machine learning benchmarks. OHLCV prices were obtained via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals were derived from financial news sources (Kaggle, MarketWatch, Google Search) and social media platforms (Reddit, StockTwits, Twitter/X).
+
+% We collected data from Jan 2020–Dec 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY—to cover varied volatility (e.g., TSLA vs. SPY) and sectors (e.g., semiconductors, social media, consumer electronics). OHLCV prices were pulled via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals came from financial news (Kaggle, MarketWatch, Google Search) and social media (Reddit, StockTwits, Twitter/X).
 
 \subsubsection{\todoitem{Technical Indicators}}
 We extracted features from historical OHLCV data using Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands, with multiple lookback periods for SMA and EMA to capture both short- and long-term dynamics.
