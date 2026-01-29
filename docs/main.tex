@@ -130,6 +130,8 @@ We propose a multimodal stock prediction framework that systematically integrate
 
 \textbf{Stage 5: Trading Simulation.} Model predictions are evaluated through realistic backtesting with non-overlapping trades held for $h$ days, incorporating transaction costs (10 basis points round-trip), and assessed using number of trades, win rate, and Sharpe ratio.
 
+The following subsections detail each component of the framework.
+
 \subsection{Data Collection and Preprocessing}
 
 We collected data from Jan 2020–Dec 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY—to cover varied volatility (e.g., TSLA vs. SPY) and sectors (e.g., semiconductors, social media, consumer electronics). OHLCV prices were pulled via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals came from financial news (Kaggle, MarketWatch, Google Search) and social media (Reddit, StockTwits, Twitter/X).
