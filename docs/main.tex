@@ -130,7 +130,7 @@ We propose a multimodal stock prediction framework that systematically integrate
 
 \textbf{Stage 5: Trading Simulation.} Model predictions are evaluated through realistic backtesting with non-overlapping trades held for $h$ days, incorporating transaction costs (10 basis points round-trip), and assessed using number of trades, win rate, and Sharpe ratio.
 
-The following subsections detail each component of the framework.
+The following subsections detail the data sources, feature extraction, fusion strategy, and prediction models. Trading simulation and evaluation metrics are described in Section~\ref{sec:experimental_setup}.
 
 \subsection{Data Collection and Preprocessing}
 
@@ -237,6 +237,7 @@ We evaluate six additional classifiers to compare deep learning against classica
 
 %===============================================================================
 \section{Experimental Setup}
+\label{sec:experimental_setup}
 
 \subsection{Dataset Description}
 
