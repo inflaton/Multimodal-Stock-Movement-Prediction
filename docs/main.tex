@@ -268,7 +268,7 @@ Total & -- & 56,699 & 1,184,592 \\
 
 \subsection{Evaluation Metrics}
 
-% We evaluate models using complementary metrics that capture both predictive quality and trading performance:
+We evaluate models using complementary metrics that capture both predictive quality and trading performance:
 
 \subsubsection{Classification Metrics}
 
@@ -287,7 +287,7 @@ Total & -- & 56,699 & 1,184,592 \\
 \text{Sharpe} = \frac{\bar{r}}{\sigma_r} \times \sqrt{N}
 \end{equation}
 where $\bar{r}$ is the mean return per trade, $\sigma_r$ is the standard deviation of returns, and $N$ is the number of trades.
-% A Sharpe ratio above 1.0 is generally considered good, while values above 2.0 indicate very strong risk-adjusted performance.
+A Sharpe ratio above 1.0 is generally considered good, while values above 2.0 indicate very strong risk-adjusted performance.
 
 \subsection{Baseline Methods}
 
@@ -425,7 +425,7 @@ All five stocks achieve positive Sharpe ratios, with two exceeding the 2.0 thres
 
 \textbf{Statistical Reliability of Win Rates:} The aggregate win rate of 66.8\% across 199 Sharpe-optimized trades (20/27 for AAPL, 30/50 for META, 17/25 for NVDA, 23/35 for SPY, 41/62 for TSLA) is statistically significant ($p < 0.001$, one-tailed binomial test vs.\ 50\%). At the individual stock level, AAPL ($N=27$, 74.1\%, $p < 0.01$), NVDA ($N=25$, 68.0\%, $p < 0.05$), SPY ($N=35$, 65.7\%, $p < 0.05$), and TSLA ($N=62$, 66.1\%, $p < 0.01$) show win rates significantly above chance.
 
-\textbf{Model Preferences by Objective:} The optimal model type depends on the selection criterion. For AUC optimization, Logistic Regression achieves the highest discrimination across all stocks, with NVDA reaching 0.793 AUC. For Sharpe optimization, LSTM dominates on three stocks, suggesting that temporal modeling better translates to risk-adjusted returns, while gradient boosting methods (LightGBM, Gradient Boosting) excel on other two assets.
+% \textbf{Model Preferences by Objective:} The optimal model type depends on the selection criterion. For AUC optimization, Logistic Regression achieves the highest discrimination across all stocks, with NVDA reaching 0.793 AUC. For Sharpe optimization, LSTM dominates on three stocks, suggesting that temporal modeling better translates to risk-adjusted returns, while gradient boosting methods (LightGBM, Gradient Boosting) excel on other two assets.
 
 \subsection{Ablation Studies}
 
