@@ -183,7 +183,7 @@ def generate_fincast_baseline_rows(df: pd.DataFrame) -> dict:
 
 
 def find_best_baseline_accuracy(fincast_baselines: dict, chronos_baselines: dict) -> float:
-    """Find the best (maximum) accuracy value across all baselines."""
+    """Find the best (maximum) accuracy value across all baselines (Sharpe-selected only)."""
     best_acc = -float('inf')
 
     # Collect all baseline metrics
@@ -191,99 +191,67 @@ def find_best_baseline_accuracy(fincast_baselines: dict, chronos_baselines: dict
 
     for _, metrics in all_baselines.items():
         if metrics:
-            for sel_type in ["auc", "sharpe"]:
-                if sel_type in metrics and "acc" in metrics[sel_type]:
-                    best_acc = max(best_acc, metrics[sel_type]["acc"])
+            # Only check Sharpe-selected results
+            if "sharpe" in metrics and "acc" in metrics["sharpe"]:
+                best_acc = max(best_acc, metrics["sharpe"]["acc"])
 
     return best_acc
 
 
 def format_fincast_rows(baselines: dict, best_acc: float) -> str:
-    """Format FinCast baseline rows as LaTeX table content."""
+    """Format FinCast baseline rows as LaTeX table content (Sharpe-selected only)."""
 
     lines = []
 
-    # FinCast Zero-shot section
-    lines.append("\\multicolumn{7}{l}{\\textit{FinCast~\\cite{zhu2025fincast} Zero-shot}} \\\\")
+    # FinCast section header
+    lines.append("\\multicolumn{6}{l}{\\textit{FinCast~\\cite{zhu2025fincast}}} \\\\")
 
+    # Zero-shot
     if baselines.get("fincast_zeroshot"):
-        m = baselines["fincast_zeroshot"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
         m = baselines["fincast_zeroshot"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    lines.append("\\midrule")
-
-    # FinCast Fine-tuned section
-    lines.append("\\multicolumn{7}{l}{\\textit{FinCast~\\cite{zhu2025fincast} Fine-tuned}} \\\\")
-
+    # Fine-tuned
     if baselines.get("fincast_finetuned"):
-        m = baselines["fincast_finetuned"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
         m = baselines["fincast_finetuned"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
     return "\n".join(lines)
 
 
 def format_chronos_rows(baselines: dict, best_acc: float) -> str:
-    """Format Chronos-2 baseline rows as LaTeX table content."""
+    """Format Chronos-2 baseline rows as LaTeX table content (Sharpe-selected only)."""
 
     lines = []
 
-    # Chronos-2 Zero-shot section
-    lines.append("\\multicolumn{7}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos} Zero-shot}} \\\\")
+    # Chronos-2 section header
+    lines.append("\\multicolumn{6}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos}}} \\\\")
 
-    if baselines.get("chronos_zeroshot_price"):
-        m = baselines["chronos_zeroshot_price"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
-    if baselines.get("chronos_zeroshot_cov"):
-        m = baselines["chronos_zeroshot_cov"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad + Sentiment & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
+    # Zero-shot
     if baselines.get("chronos_zeroshot_price"):
         m = baselines["chronos_zeroshot_price"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
+    # Zero-shot + Sentiment
     if baselines.get("chronos_zeroshot_cov"):
         m = baselines["chronos_zeroshot_cov"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad + Sentiment & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Zero-shot + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
-    lines.append("\\midrule")
-
-    # Chronos-2 Fine-tuned section
-    lines.append("\\multicolumn{7}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos} Fine-tuned}} \\\\")
-
-    if baselines.get("chronos_finetuned_price"):
-        m = baselines["chronos_finetuned_price"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
-    if baselines.get("chronos_finetuned_cov"):
-        m = baselines["chronos_finetuned_cov"]["auc"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad + Sentiment & AUC & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
-
+    # Fine-tuned
     if baselines.get("chronos_finetuned_price"):
         m = baselines["chronos_finetuned_price"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Price only & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
+    # Fine-tuned + Sentiment
     if baselines.get("chronos_finetuned_cov"):
         m = baselines["chronos_finetuned_cov"]["sharpe"]
         acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad + Sentiment & Sharpe & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        lines.append(f"\\quad Fine-tuned + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
 
     return "\n".join(lines)
 
@@ -299,18 +267,18 @@ def update_sota_table(tex_file: str, new_content: str) -> bool:
         content = f.read()
 
     # Pattern to match baseline sections in the SOTA table
-    # We'll replace everything from FinCast Zero-shot to the midrule before "Ours"
+    # We'll replace everything from FinCast section to the midrule before "Ours"
     pattern = (
-        r"(\\multicolumn\{7\}\{l\}\{\\textit\{FinCast.*?Zero-shot\}\} \\\\)"  # First occurrence of FinCast Zero-shot
+        r"(\\multicolumn\{6\}\{l\}\{\\textit\{FinCast.*?\}\} \\\\)"  # First occurrence of FinCast
         r"(.*?)"  # Old baseline content (FinCast + Chronos-2)
-        r"(\\midrule\s*\n\\multicolumn\{7\}\{l\}\{\\textit\{Ours)"  # Start of "Ours" section
+        r"(\\midrule\s*\n\\textbf\{Ours)"  # Start of "Ours" section
     )
 
     match = re.search(pattern, content, re.DOTALL)
 
     if not match:
         print("Error: Could not find baseline sections in SOTA table")
-        print("Looking for pattern starting with: \\multicolumn{7}{l}{\\textit{FinCast")
+        print("Looking for pattern starting with: \\multicolumn{6}{l}{\\textit{FinCast")
         return False
 
     # Replace all baseline sections, including the first header line
