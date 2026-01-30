@@ -46,7 +46,7 @@
 
 %===============================================================================
 \begin{abstract}
-Predicting short-term stock movements remains challenging due to market volatility and the interplay of quantitative and qualitative factors. We propose a multimodal fusion framework that integrates technical indicators with FinBERT-based sentiment analysis for 2--10 day stock direction prediction. Our key innovation is a reliability-weighted sentiment aggregation mechanism that assigns 70\% weight to news and 30\% to social media based on their empirical correlation with returns. Seven model families are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020--2024. Comparing ROC-AUC versus Sharpe ratio as selection criteria reveals critical trade-offs: AUC-optimized models achieve strong discrimination (0.697 average AUC, peak 0.793), while Sharpe-optimized models deliver superior risk-adjusted returns (2.05 average Sharpe, 66.8\% win rate). Ablation studies confirm that multimodal fusion is essential---technical features drive discrimination while sentiment enables profitability---and that reliability-weighted aggregation substantially outperforms equal weighting (2.05 vs.\ $-$0.25 Sharpe). Benchmarking against FinCast and Chronos-2, state-of-the-art foundation models, demonstrates that our lightweight approach achieves superior performance (2.05 vs.\ 1.12 Sharpe).
+Predicting short-term stock movements remains challenging due to market volatility and the interplay of quantitative and qualitative factors. We propose a multimodal fusion framework that integrates technical indicators with FinBERT-based sentiment analysis for 2--10 day stock direction prediction. Our key innovation is a reliability-weighted sentiment aggregation mechanism that assigns 70\% weight to news and 30\% to social media based on their empirical correlation with returns. Seven model families are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020--2024. Comparing ROC-AUC versus Sharpe ratio as selection criteria reveals critical trade-offs: AUC-optimized models achieve strong discrimination (0.700 average AUC, peak 0.791), while Sharpe-optimized models deliver superior risk-adjusted returns (2.03 average Sharpe, 67.3\% win rate). Ablation studies confirm that multimodal fusion is essential---technical features drive discrimination while sentiment enables profitability---and that reliability-weighted aggregation substantially outperforms equal weighting (2.03 vs.\ $-$0.25 Sharpe). Benchmarking against FinCast and Chronos-2, state-of-the-art foundation models, demonstrates that our lightweight approach achieves superior performance (2.03 vs.\ 1.12 Sharpe).
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -57,7 +57,9 @@ stock prediction, sentiment analysis, FinBERT, multimodal learning, foundation m
 %===============================================================================
 \section{Introduction}
 
-The global financial market, valued at over USD 127 trillion~\cite{visual_cap_2025}, represents one of the most challenging domains for predictive modeling due to non-stationarity, stochastic volatility, and low signal-to-noise ratios~\cite{stibel_2009}. While the Efficient Market Hypothesis suggests that consistent alpha generation is impossible~\cite{fama_1970}, Behavioral Finance has demonstrated that investor psychology, herd behavior, and cognitive biases create exploitable inefficiencies~\cite{kahneman_1979}. These behavioral factors have intensified in the post-2020 era: retail activity now accounts for up to 36\% of total order flow~\cite{jpmorgan_2025}, introducing sentiment-driven volatility regimes distinct from fundamental valuation dynamics.
+The global financial market, 
+%valued at over USD 127 trillion~\cite{visual_cap_2025}, 
+represents one of the most challenging domains for predictive modeling due to non-stationarity, stochastic volatility, and low signal-to-noise ratios~\cite{stibel_2009}. While the Efficient Market Hypothesis suggests that consistent alpha generation is impossible~\cite{fama_1970}, Behavioral Finance has demonstrated that investor psychology, herd behavior, and cognitive biases create exploitable inefficiencies~\cite{kahneman_1979}. These behavioral factors have intensified in the post-2020 era: retail activity now accounts for up to 36\% of total order flow~\cite{jpmorgan_2025}, introducing sentiment-driven volatility regimes distinct from fundamental valuation dynamics.
 
 % NEW PARAGRAPH: Motivation and Research Gap (addressing Comment 2)
 Stock prediction methodologies have evolved from statistical models (ARIMA, GARCH) that struggle with non-linear dependencies, through machine learning classifiers (SVM, Random Forest) that lack temporal modeling capabilities, to deep learning approaches (LSTM) that explicitly capture long-term dependencies~\cite{hochreiter_1997, hassouni_2024}. Simultaneously, sentiment analysis has progressed from lexicon-based approaches to domain-adapted transformers like FinBERT, which outperform generic models on financial text~\cite{araci_2019, huang_2022}.
@@ -72,11 +74,11 @@ Our key innovation is a reliability-weighted sentiment aggregation mechanism tha
 % REVISED CONTRIBUTIONS (addressing Comments 3 and 4 - merged and restructured)
 The main contributions are:
 \begin{itemize}
-    \item We propose a multimodal fusion framework integrating technical indicators with reliability-weighted FinBERT sentiment. Our lightweight models (LSTM, Logistic Regression) outperform foundation models (FinCast, Chronos-2) even after fine-tuning (2.05 vs.\ 1.12 Sharpe), while using 3--4 orders of magnitude fewer parameters.
+    \item We propose a multimodal fusion framework integrating technical indicators with reliability-weighted FinBERT sentiment. Our lightweight models (LSTM, Logistic Regression) outperform foundation models (FinCast, Chronos-2) even after fine-tuning (2.03 vs.\ 1.12 Sharpe), while using 3--4 orders of magnitude fewer parameters.
     
     \item We conduct systematic evaluation across seven model families, revealing critical trade-offs between ROC-AUC and Sharpe ratio as selection criteria---providing practical guidance for practitioners.
     
-    \item We perform comprehensive ablation studies demonstrating the necessity of multimodal fusion, the complementary roles of features (technical drives discrimination; sentiment drives profitability), and the importance of reliability-based weighting (2.05 vs.\ $-$0.25 Sharpe for 70:30 vs.\ equal weighting).
+    \item We perform comprehensive ablation studies demonstrating the necessity of multimodal fusion, the complementary roles of features (technical drives discrimination; sentiment drives profitability), and the importance of reliability-based weighting (2.03 vs.\ $-$0.25 Sharpe for 70:30 vs.\ equal weighting).
 \end{itemize}
 
 \noindent Upon acceptance, we will release our code, trained models, and datasets to support reproducibility.
@@ -91,10 +93,13 @@ Traditional time-series models such as ARIMA and GARCH are limited in handling c
 FinBERT \cite{araci2019} adapts BERT to financial text, with FinBERT-Tone \cite{huang2022} further fine-tuned on 10,000 annotated analyst-report sentences. Prior work shows that news sentiment effects depend on lag structure \cite{mo2016news}. Recent evidence that zero-shot, LLM-derived sentiment features can boost predictive performance \cite{samuel2025integrating} suggests similar promise for financial forecasting.
 
 \noindent\textbf{Multimodal and Deep Learning Approaches.}
-Karada\c{s} et al. \cite{karadas2025} demonstrated that multimodal models combining tweets, news, and financial metrics can outperform price-only baselines. Jaggi et al. \cite{jaggi2021} conducted text mining of StockTwits data for predicting stock prices. While LSTM networks \cite{hochreiter1997}, emerged as powerful architectures for financial time series due to their ability to capture long-term temporal dependencies \cite{fischer2018}, ensemble methods such as XGBoost \cite{chen2016xgboost} and LightGBM \cite{ke2017lightgbm} also showed strong performance on tabular financial data.
+Karada\c{s} et al.~\cite{karadas2025} demonstrated that multimodal models combining tweets, news, and financial metrics can outperform price-only baselines. Jaggi et al.~\cite{jaggi2021} conducted text mining of StockTwits data for predicting stock prices. Wang et al.~\cite{wang2023learning} proposed a 3-phase hybrid model integrating technical indicators with social media sentiment, %achieving 73.41\% accuracy across multiple learning algorithms (MLP, Random Forest, XGBoost, LSTM, CNN) and 
+demonstrating that combining both modalities enhances prediction performance. While LSTM networks~\cite{hochreiter1997} emerged as powerful architectures for financial time series due to their ability to capture long-term temporal dependencies~\cite{fischer2018}, ensemble methods such as XGBoost~\cite{chen2016xgboost} and LightGBM~\cite{ke2017lightgbm} also showed strong performance on tabular financial data.
 
 \noindent\textbf{Time-Series Foundation Models.}
-FinCast~\cite{zhu2025fincast} is the first foundation model specifically designed for financial time-series forecasting, trained on over 20 billion time points across diverse financial domains, achieving strong zero-shot performance through its Point-Quantile loss and sparse Mixture-of-Experts architecture. Chronos-2~\cite{ansari2025chronos} targets universal zero-shot forecasting across univariate, multivariate, and covariate-informed settings, reporting state-of-the-art performance on standard benchmarks. However, robustness under the noisy, non-stationary conditions typical of financial time series remains poorly characterized; we address this gap with a systematic evaluation.
+FinCast~\cite{zhu2025fincast} is the first foundation model specifically designed for financial time-series forecasting, 
+%trained on over 20 billion time points across diverse financial domains, 
+achieving strong zero-shot performance through its Point-Quantile loss and sparse Mixture-of-Experts architecture. Chronos-2~\cite{ansari2025chronos} targets universal zero-shot forecasting across univariate, multivariate, and covariate-informed settings, reporting state-of-the-art performance on standard benchmarks.% However, robustness under the noisy, non-stationary conditions typical of financial time series remains poorly characterized; we address this gap with a systematic evaluation.
 
 %===============================================================================
 \section{Methodology}
@@ -334,13 +339,13 @@ The choice of selection criterion---ROC-AUC for discriminative performance versu
 \toprule
 Stock & Model & $h$ & Acc. & AUC & $N$ & Win\% & Sharpe \\
 \midrule
-AAPL & LR & 8 & \textbf{0.566} & 0.557 & 31 & 48.4 & -1.67 \\
-META & LR & 10 & 0.490 & 0.774 & 25 & 32.0 & -1.44 \\
-NVDA & LR & 8 & 0.418 & \textbf{0.793} & 31 & 22.6 & -2.12 \\
-SPY & LR & 8 & 0.442 & 0.754 & 31 & 32.3 & -3.06 \\
-TSLA & LR & 5 & \textbf{0.566} & 0.606 & 50 & \textbf{56.0} & \textbf{1.85} \\
+AAPL & SVM & 8 & \textbf{0.602} & 0.593 & 31 & 45.2 & -1.37 \\
+META & LR & 10 & 0.490 & 0.772 & 25 & 32.0 & -1.44 \\
+NVDA & LR & 8 & 0.418 & \textbf{0.791} & 31 & 22.6 & -2.12 \\
+SPY & SVM & 9 & 0.494 & 0.739 & 27 & 25.9 & -2.05 \\
+TSLA & LR & 5 & 0.566 & 0.606 & 50 & \textbf{56.0} & \textbf{1.85} \\
 \midrule
-\multicolumn{2}{l}{Average} & 7.8 & 0.496 & 0.697 & 33.6 & 38.2 & -1.29 \\
+\multicolumn{2}{l}{Average} & 8.0 & 0.514 & 0.700 & 32.8 & 36.3 & -1.03 \\
 \bottomrule
 \multicolumn{8}{l}{\footnotesize $N$ = number of trades; LR = Logistic Regression.}
 \end{tabular}
@@ -356,22 +361,22 @@ TSLA & LR & 5 & \textbf{0.566} & 0.606 & 50 & \textbf{56.0} & \textbf{1.85} \\
 \toprule
 Stock & Model & $h$ & Acc. & AUC & $N$ & Win\% & Sharpe \\
 \midrule
-AAPL & LGBM & 9 & 0.534 & 0.500 & 27 & \textbf{74.1} & 1.40 \\
-META & LSTM & 5 & 0.538 & 0.492 & 50 & 60.0 & 1.58 \\
-NVDA & LSTM & 10 & \textbf{0.566} & 0.597 & 25 & 68.0 & 2.18 \\
-SPY & LSTM & 7 & 0.484 & \textbf{0.613} & 35 & 65.7 & 1.97 \\
+AAPL & LGBM & 9 & 0.530 & 0.508 & 27 & \textbf{74.1} & 1.40 \\
+META & LSTM & 4 & 0.502 & 0.493 & 62 & 58.1 & 1.75 \\
+NVDA & LSTM & 10 & 0.566 & 0.597 & 25 & 68.0 & 2.18 \\
+SPY & LSTM & 9 & \textbf{0.579} & \textbf{0.669} & 27 & 70.4 & 1.72 \\
 TSLA & GB & 4 & 0.530 & 0.553 & 62 & 66.1 & \textbf{3.10} \\
 \midrule
-\multicolumn{2}{l}{Average} & 7.0 & 0.530 & 0.551 & 39.8 & 66.8 & 2.05 \\
+\multicolumn{2}{l}{Average} & 7.2 & 0.541 & 0.564 & 40.6 & 67.3 & 2.03 \\
 \bottomrule
 \multicolumn{8}{l}{\footnotesize $N$ = number of trades; LGBM = LightGBM; GB = Gradient Boosting.}
 \end{tabular}
 }
 \end{table}
 
-\textbf{AUC-Optimized Results.} When selecting by AUC, Logistic Regression achieves the best discrimination across all five stocks, with NVDA reaching 0.793 AUC followed by META (0.774) and SPY (0.754). This suggests that linear models effectively capture the discriminative patterns in our multimodal feature space. However, strong discrimination does not guarantee profitable trading: four of five stocks show negative Sharpe ratios under AUC optimization.
+\textbf{AUC-Optimized Results.} When selecting by AUC, linear models (Logistic Regression and SVM) achieve the best discrimination, with NVDA reaching 0.791 AUC followed by META (0.772) and SPY (0.739). This suggests that linear models effectively capture the discriminative patterns in our multimodal feature space. However, strong discrimination does not guarantee profitable trading: four of five stocks show negative Sharpe ratios under AUC optimization.
 
-\textbf{Sharpe-Optimized Results.} When optimizing for Sharpe ratio, all five stocks achieve positive risk-adjusted returns: TSLA (3.10), NVDA (2.18), SPY (1.97), META (1.58), and AAPL (1.40). LSTM wins on three stocks (META, NVDA, SPY), while LightGBM wins on AAPL and Gradient Boosting wins on TSLA, demonstrating that different model families excel on different assets. The average horizon of 7.0 days indicates our framework captures medium-term patterns.
+\textbf{Sharpe-Optimized Results.} When optimizing for Sharpe ratio, all five stocks achieve positive risk-adjusted returns: TSLA (3.10), NVDA (2.18), META (1.75), SPY (1.72), and AAPL (1.40). LSTM wins on three stocks (META, NVDA, SPY), while LightGBM wins on AAPL and Gradient Boosting wins on TSLA, demonstrating that different model families excel on different assets. The average horizon of 7.2 days indicates our framework captures medium-term patterns.
 
 
 % \subsection{Overall Performance Comparison}
@@ -435,9 +440,9 @@ TSLA & GB & 4 & 0.530 & 0.553 & 62 & 66.1 & \textbf{3.10} \\
 The Sharpe-optimized results (Table \ref{tab:results_sharpe}) reveal important insights about translating predictive ability into profitable trading:
 
 \textbf{Positive Sharpe Configurations:}
-All five stocks achieve positive Sharpe ratios, with two exceeding the 2.0 threshold for very strong risk-adjusted performance: TSLA (3.10) and NVDA (2.18). SPY (1.97), META (1.58), and AAPL (1.40) also surpass the 1.0 threshold for good performance. LSTM wins on three stocks (META, NVDA, SPY), while LightGBM wins on AAPL and Gradient Boosting on TSLA.
+All five stocks achieve positive Sharpe ratios, with two exceeding the 2.0 threshold for very strong risk-adjusted performance: TSLA (3.10) and NVDA (2.18). META (1.75), SPY (1.72), and AAPL (1.40) also surpass the 1.0 threshold for good performance. LSTM wins on three stocks (META, NVDA, SPY), while LightGBM wins on AAPL and Gradient Boosting on TSLA.
 
-\textbf{Statistical Reliability of Win Rates:} The aggregate win rate of 66.8\% across 199 Sharpe-optimized trades (20/27 for AAPL, 30/50 for META, 17/25 for NVDA, 23/35 for SPY, 41/62 for TSLA) is statistically significant ($p < 0.001$, one-tailed binomial test vs.\ 50\%). At the individual stock level, AAPL ($N=27$, 74.1\%, $p < 0.01$), NVDA ($N=25$, 68.0\%, $p < 0.05$), SPY ($N=35$, 65.7\%, $p < 0.05$), and TSLA ($N=62$, 66.1\%, $p < 0.01$) show win rates significantly above chance.
+\textbf{Statistical Reliability of Win Rates:} The average win rate of 67.3\% across five stocks is statistically significant ($p < 0.001$, one-tailed binomial test vs.\ 50\%). At the individual stock level, AAPL ($N=27$, 74.1\%, $p < 0.01$), SPY ($N=27$, 70.4\%, $p < 0.05$), NVDA ($N=25$, 68.0\%, $p < 0.05$), and TSLA ($N=62$, 66.1\%, $p < 0.01$) show win rates significantly above chance.
 
 % \textbf{Model Preferences by Objective:} The optimal model type depends on the selection criterion. For AUC optimization, Logistic Regression achieves the highest discrimination across all stocks, with NVDA reaching 0.793 AUC. For Sharpe optimization, LSTM dominates on three stocks, suggesting that temporal modeling better translates to risk-adjusted returns, while gradient boosting methods (LightGBM, Gradient Boosting) excel on other two assets.
 
@@ -457,22 +462,22 @@ We evaluate five configurations: (1) Technical Only---using only technical indic
 \toprule
 Configuration & Sel. & Acc. & AUC & $N$ & Win\% & Sharpe & $\Delta$(\%) \\
 \midrule
-Full Model & AUC & 0.496 & \textbf{0.697} & 33.6 & 38.2 & -1.29 & -- \\
-\quad & Sharpe & 0.530 & 0.551 & 39.8 & \textbf{66.8} & \textbf{2.05} & -- \\
+Full Model & AUC & 0.514 & \textbf{0.700} & 32.8 & 36.3 & -1.03 & -- \\
+\quad & Sharpe & \textbf{0.541} & 0.564 & 40.6 & \textbf{67.3} & \textbf{2.03} & -- \\
 \midrule
-Technical Only & AUC & 0.497 & 0.667 & 25.8 & 35.5 & -1.44 & -4.3 \\
-\quad & Sharpe & 0.485 & 0.652 & 28.6 & 39.9 & -0.98 & -147.8 \\
+Technical Only & AUC & 0.497 & 0.667 & 25.8 & 35.5 & -1.44 & -4.7 \\
+\quad & Sharpe & 0.485 & 0.652 & 28.6 & 39.9 & -0.98 & -148.3 \\
 \midrule
-Sentiment Only & AUC & 0.506 & 0.619 & 32.0 & 52.7 & 0.30 & -11.2 \\
-\quad & Sharpe & \textbf{0.531} & 0.583 & 33.6 & 57.6 & 1.23 & -40.0 \\
+Sentiment Only & AUC & 0.506 & 0.619 & 32.0 & 52.7 & 0.30 & -11.6 \\
+\quad & Sharpe & 0.531 & 0.583 & 33.6 & 57.6 & 1.23 & -39.4 \\
 \midrule
-Equal Weights & AUC & 0.495 & 0.678 & 26.4 & 38.4 & -0.54 & -2.7 \\
-\quad & Sharpe & 0.474 & 0.646 & 26.2 & 46.1 & -0.25 & -112.2 \\
+Equal Weights & AUC & 0.495 & 0.678 & 26.4 & 38.4 & -0.54 & -3.1 \\
+\quad & Sharpe & 0.474 & 0.646 & 26.2 & 46.1 & -0.25 & -112.3 \\
 \midrule
-News Only & AUC & 0.481 & 0.668 & 30.4 & 38.7 & -0.70 & -4.2 \\
-\quad & Sharpe & 0.469 & 0.660 & 33.2 & 43.7 & -0.38 & -118.5 \\
+News Only & AUC & 0.481 & 0.668 & 30.4 & 38.7 & -0.70 & -4.6 \\
+\quad & Sharpe & 0.469 & 0.660 & 33.2 & 43.7 & -0.38 & -118.7 \\
 \midrule
-Social Only & AUC & 0.488 & 0.663 & 24.8 & 42.5 & -0.81 & -4.9 \\
+Social Only & AUC & 0.488 & 0.663 & 24.8 & 42.5 & -0.81 & -5.3 \\
 \quad & Sharpe & 0.491 & 0.616 & 36.4 & 47.2 & 0.08 & -96.1 \\
 \bottomrule
 \multicolumn{8}{l}{\footnotesize $\Delta$ = $\Delta$AUC when Sel.=AUC; $\Delta$Sharpe when Sel.=Sharpe.}
@@ -482,11 +487,11 @@ Social Only & AUC & 0.488 & 0.663 & 24.8 & 42.5 & -0.81 & -4.9 \\
 
 The ablation results reveal several important findings about our framework's design choices:
 
-\textbf{Multimodal fusion is essential for trading performance.} The full model achieves substantially higher Sharpe ratio (2.05) than any single-modality configuration. Technical Only produces negative Sharpe ($-$0.98), demonstrating that technical indicators alone---while useful for discrimination---fail to generate profitable trading signals. Sentiment Only achieves positive Sharpe (1.23) but still underperforms the full model by 40.0\%, confirming that combining both modalities yields the best risk-adjusted returns.
+\textbf{Multimodal fusion is essential for trading performance.} The full model achieves substantially higher Sharpe ratio (2.03) than any single-modality configuration. Technical Only produces negative Sharpe ($-$0.98), demonstrating that technical indicators alone---while useful for discrimination---fail to generate profitable trading signals. Sentiment Only achieves positive Sharpe (1.23) but still underperforms the full model by 39.4\%, confirming that combining both modalities yields the best risk-adjusted returns.
 
-\textbf{Technical features drive discrimination; sentiment drives profitability.} Technical Only achieves near-full-model AUC (0.667 vs.\ 0.697, only $-$4.3\%), indicating that technical indicators capture most discriminative information. However, Sentiment Only achieves the best trading win rate (57.6\%) among ablations and positive returns, suggesting sentiment provides actionable signals that translate to profitable trades even without technical context.
+\textbf{Technical features drive discrimination; sentiment drives profitability.} Technical Only achieves near-full-model AUC (0.667 vs.\ 0.700, only $-$4.7\%), indicating that technical indicators capture most discriminative information. However, Sentiment Only achieves the best trading win rate (57.6\%) among ablations and positive returns, suggesting sentiment provides actionable signals that translate to profitable trades even without technical context.
 
-\textbf{The 70:30 weighting scheme outperforms alternatives for trading.} Equal Weights (50:50) achieves comparable AUC (0.678 vs.\ 0.697) but substantially worse Sharpe ($-$0.25 vs.\ 2.05), a 112.2\% degradation. This validates our reliability-based weighting: news sentiment's stronger correlation with returns~\cite{nyakurukwa2024} justifies higher weight for trading applications, even if equal weighting provides similar discrimination.
+\textbf{The 70:30 weighting scheme outperforms alternatives for trading.} Equal Weights (50:50) achieves comparable AUC (0.678 vs.\ 0.700) but substantially worse Sharpe ($-$0.25 vs.\ 2.03), a 112.3\% degradation. This validates our reliability-based weighting: news sentiment's stronger correlation with returns~\cite{nyakurukwa2024} justifies higher weight for trading applications, even if equal weighting provides similar discrimination.
 
 \textbf{News sentiment contributes more than social media.} News Only (AUC: 0.668, Sharpe: $-$0.38) outperforms Social Only (AUC: 0.663, Sharpe: 0.08) on discrimination but not trading. Social Only achieves better trading performance, suggesting social media captures momentum-driven opportunities that news misses. The complementary strengths of both sources justify their weighted combination.
 
@@ -521,11 +526,11 @@ Method & Acc. & AUC & $N$ & Win\% & Sharpe \\
 }
 \end{table}
 
-\textbf{Task-specific models outperform foundation models.} Our approach achieves the highest Sharpe ratio (2.05), substantially exceeding fine-tuned Chronos-2 (1.12) and FinCast (0.16). Our win rate (66.8\%) also exceeds all baselines by at least 10 percentage points.
+\textbf{Task-specific models outperform foundation models.} Our approach achieves the highest Sharpe ratio (2.03), substantially exceeding fine-tuned Chronos-2 (1.12) and FinCast (0.16). Our win rate (66.8\%) also exceeds all baselines by at least 10 percentage points.
 
 \textbf{Zero-shot foundation models perform at or below random chance.} Chronos-2's zero-shot AUC (0.477--0.494) falls below the 0.5 random baseline, indicating no discriminative ability on financial data. Adding sentiment covariates to Chronos-2 actually degrades Sharpe ratio (0.46$\rightarrow$0.21), suggesting the model cannot effectively incorporate auxiliary signals without task-specific adaptation.
 
-\textbf{Fine-tuning helps but is insufficient.} Domain adaptation improves Chronos-2's Sharpe from 0.46 to 1.12 and FinCast's from $-$0.10 to 0.16. However, fine-tuned foundation models still fall well short of our task-specific approach (1.12 vs.\ 2.05 Sharpe).
+\textbf{Fine-tuning helps but is insufficient.} Domain adaptation improves Chronos-2's Sharpe from 0.46 to 1.12 and FinCast's from $-$0.10 to 0.16. However, fine-tuned foundation models still fall well short of our task-specific approach (1.12 vs.\ 2.03 Sharpe).
 
 %===============================================================================
 % REVISED CONCLUSION (addressing Comment 18)
@@ -533,7 +538,7 @@ Method & Acc. & AUC & $N$ & Win\% & Sharpe \\
 
 This study demonstrates that task-specific multimodal fusion with lightweight models consistently outperforms time-series foundation models for stock movement prediction. Our framework achieves this through two key innovations: (1) reliability-weighted sentiment aggregation that appropriately weights news (70\%) over social media (30\%) based on empirical return correlations, and (2) multimodal feature fusion that combines the discriminative power of technical indicators with profitability signals from sentiment.
 
-Our approach achieves 0.697 average AUC with peak performance of 0.793 and 2.05 average Sharpe ratio, substantially exceeding Chronos-2 (1.12 Sharpe) and FinCast (0.16 Sharpe) baselines. Ablation studies reveal that neither modality alone achieves optimal performance: technical features drive discrimination while sentiment features enable profitability, with the 70:30 news-to-social media weighting outperforming equal weighting by over 112\% in Sharpe ratio.
+Our approach achieves 0.700 average AUC with peak performance of 0.791 and 2.03 average Sharpe ratio, substantially exceeding Chronos-2 (1.12 Sharpe) and FinCast (0.16 Sharpe) baselines. Ablation studies reveal that neither modality alone achieves optimal performance: technical features drive discrimination while sentiment features enable profitability, with the 70:30 news-to-social media weighting outperforming equal weighting by over 112\% in Sharpe ratio.
 
 These findings challenge the assumption that foundation models' broad pretraining translates to superior financial prediction. Instead, domain-specific feature engineering combined with reliability-aware fusion provides a more effective and efficient paradigm. Future work will explore attention-based sentiment weighting, dynamic fusion strategies, and broader asset coverage.
 
