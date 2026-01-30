@@ -46,11 +46,12 @@
 
 %===============================================================================
 \begin{abstract}
-Predicting short-term stock movements remains challenging due to market volatility and the interplay of quantitative and qualitative factors. We propose a multimodal fusion framework that integrates technical indicators with FinBERT-based sentiment analysis for 2--10 day stock direction prediction. Our key innovation is a reliability-weighted sentiment aggregation mechanism that assigns 70\% weight to news and 30\% to social media based on their empirical correlation with returns. Seven model families are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020--2024. Comparing ROC-AUC versus Sharpe ratio as selection criteria reveals critical trade-offs: AUC-optimized models achieve strong discrimination (0.700 average AUC, peak 0.791), while Sharpe-optimized models deliver superior risk-adjusted returns (2.03 average Sharpe, 67.3\% win rate). Ablation studies confirm that multimodal fusion is essential---technical features drive discrimination while sentiment enables profitability---and that reliability-weighted aggregation substantially outperforms equal weighting (2.03 vs.\ $-$0.25 Sharpe). Benchmarking against FinCast and Chronos-2, state-of-the-art foundation models, demonstrates that our lightweight approach achieves superior performance (2.03 vs.\ 1.12 Sharpe).
+We propose a multimodal framework for short-term (2--10 day) stock movement prediction that integrates technical indicators with FinBERT-based sentiment analysis. Our key innovation is reliability-weighted sentiment aggregation, which assigns 70\% weight to news and 30\% to social media based on their empirical correlation with returns. Through systematic evaluation of seven model families with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020--2024, we reveal critical trade-offs between selection criteria: AUC-optimized models achieve strong discrimination (0.700 average AUC, peak 0.791), while Sharpe-optimized models deliver superior risk-adjusted returns (2.03 average Sharpe, 67.3\% win rate). Ablation studies demonstrate that multimodal fusion is essential---technical features drive discrimination while sentiment enables profitability---and that reliability-weighted aggregation substantially outperforms equal weighting (2.03 vs.\ $-$0.25 Sharpe). Notably, our lightweight task-specific models outperform state-of-the-art foundation models (FinCast, Chronos-2) even after fine-tuning (2.03 vs.\ 1.12 Sharpe), challenging the assumption that broad pretraining translates to superior financial prediction.
+% Predicting short-term stock movements remains challenging due to market volatility and the interplay of quantitative and qualitative factors. We propose a multimodal fusion framework that integrates technical indicators with FinBERT-based sentiment analysis for 2--10 day stock direction prediction. Our key innovation is a reliability-weighted sentiment aggregation mechanism that assigns 70\% weight to news and 30\% to social media based on their empirical correlation with returns. Seven model families are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020--2024. Comparing ROC-AUC versus Sharpe ratio as selection criteria reveals critical trade-offs: AUC-optimized models achieve strong discrimination (0.700 average AUC, peak 0.791), while Sharpe-optimized models deliver superior risk-adjusted returns (2.03 average Sharpe, 67.3\% win rate). Ablation studies confirm that multimodal fusion is essential---technical features drive discrimination while sentiment enables profitability---and that reliability-weighted aggregation substantially outperforms equal weighting (2.03 vs.\ $-$0.25 Sharpe). Benchmarking against FinCast and Chronos-2, state-of-the-art foundation models, demonstrates that our lightweight approach achieves superior performance (2.03 vs.\ 1.12 Sharpe).
 \end{abstract}
 
 \begin{IEEEkeywords}
-stock prediction, sentiment analysis, FinBERT, multimodal learning, foundation models, financial forecasting, deep learning
+stock movement prediction, multimodal fusion, sentiment analysis, technical indicators, FinBERT, time-series foundation models, financial forecasting, deep learning
 \end{IEEEkeywords}
 
 %===============================================================================
@@ -116,8 +117,7 @@ where $\mathbb{I}[\cdot]$ denotes the indicator function that outputs 1 if the c
 We restrict prediction horizons to $h \in \{2,3,\dots,10\}$ trading days. Next-day prediction ($h=1$) is excluded because sentiment effects typically require multiple days to be incorporated into prices as market participants process information. Horizons beyond 10 days increasingly dilute the influence of short-term sentiment and technical indicators, shifting the task toward medium-term trend forecasting where macroeconomic factors dominate.
 
 \subsection{Proposed Framework}
-
-We propose a multimodal stock prediction framework that systematically integrates quantitative signals from historical price data with qualitative signals from financial text. Figure~\ref{fig:architecture} illustrates the end-to-end pipeline, which comprises five interconnected stages:% (1) multi-source data collection, (2) parallel feature extraction, (3) multimodal fusion, (4) predictive modeling, and (5) trading simulation.
+We propose a multimodal stock prediction framework that integrates quantitative signals from historical price data with qualitative signals from financial text. Fig.~\ref{fig:architecture} outlines the end-to-end pipeline, which comprises five interconnected stages:
 
 \begin{figure*}[t]
 \centering
@@ -140,18 +140,18 @@ The \textit{technical branch} transforms price data into indicator pairs, each g
 
 \textbf{Stage 5: Trading Simulation.} Model predictions are evaluated through realistic backtesting with non-overlapping trades held for $h$ days, incorporating transaction costs (10 basis points round-trip), and assessed using number of trades, win rate, and Sharpe ratio.
 
-% The following subsections detail the data sources, feature extraction, fusion strategy, and prediction models. Trading simulation and evaluation metrics are described in Section~\ref{sec:experimental_setup}.
+The following subsections describe the data sources, feature extraction, fusion strategy, and prediction models. Section~\ref{sec:experimental_setup} details the trading simulation and evaluation metrics.
 
 \subsection{Data Collection and Preprocessing}
 
-We collected data from January 2020 to December 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY. Although our framework applies to any equity, we select these assets to span diverse sectors (semiconductors, social media, consumer electronics), volatility regimes (e.g., TSLA vs.\ SPY), and sentiment salience levels while ensuring high liquidity and comparability with prior financial machine learning benchmarks. OHLCV prices were obtained via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals were derived from financial news sources (Kaggle, MarketWatch, Google Search) and social media platforms (Reddit, StockTwits, Twitter/X). The temporal split uses 2020--2023 for training (1006 trading days) and 2024 for testing (251 trading days).
+We collected data from January 2020 to December 2024 for five assets: AAPL, META, NVDA, TSLA, and SPY. Although our framework applies to any equity, we select these assets to span diverse sectors (semiconductors, social media, consumer electronics), volatility regimes (e.g., TSLA vs.\ SPY), and varying levels of sentiment salience, while ensuring high liquidity and comparability with prior financial machine learning benchmarks. OHLCV prices were obtained via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals were derived from financial news sources (Kaggle, MarketWatch, Google Search) and social media platforms (Reddit, StockTwits, Twitter/X). The data is split temporally, with 2020--2023 used for training (1006 trading days) and 2024 reserved for testing (251 trading days).
 
 % We collected data from Jan 2020–Dec 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY—to cover varied volatility (e.g., TSLA vs. SPY) and sectors (e.g., semiconductors, social media, consumer electronics). OHLCV prices were pulled via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals came from financial news (Kaggle, MarketWatch, Google Search) and social media (Reddit, StockTwits, Twitter/X).
 
 \subsubsection{Technical Indicators}
-Following~\cite{wang2023learning}, we compute technical indicators from historical OHLCV data using the Python TA library\footnote{\url{https://github.com/bukosabino/ta}} and derive corresponding Buy/Sell/Hold signals encoded as $\{+1,-1,0\}$. Our base indicator set comprises Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands. We use multiple lookback windows for the moving averages to capture both short- and long-term momentum.
+Following~\cite{wang2023learning}, we compute base technical indicators from historical OHLCV data using the Python TA library\footnote{\url{https://github.com/bukosabino/ta}} and derive corresponding Buy/Sell/Hold signals encoded as $\{+1,-1,0\}$. Our base indicator set comprises Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands. We use multiple lookback windows for the moving averages to capture both short- and long-term momentum.
 
-Oriani and Coelho~\cite{oriani2016evaluating} demonstrated that combining different indicators as inputs to the same neural network can further improve forecasting performance. Building on this insight, we identify a compact set of robust \emph{indicator pairs} via two-stage systematic backtesting over the training period (2020--2023), conducted independently for each stock. First, all base indicators are evaluated individually across prediction horizons $h \in \{1,2,\dots,7\}$ days using a long-short trading strategy with 10~bps transaction costs, and the top 10 single indicators are selected by cumulative return. Second, all 45 pairwise combinations of these top 10 singles are evaluated across the same horizons, and the top 10 pairs are selected as the final feature set for that stock. This two-stage asset-specific selection allows each model to exploit the technical patterns most predictive for that particular security, while the multi-horizon evaluation ensures robustness across different holding periods.
+Oriani and Coelho~\cite{oriani2016evaluating} demonstrated that combining different indicators as inputs to the same neural network can further improve forecasting performance. Building on this insight, we identify a compact set of robust \emph{indicator pairs} via two-stage systematic backtesting over the training period (2020--2023), conducted independently for each stock. First, all base indicators are evaluated individually across prediction horizons, and the top 10 single indicators are selected by cumulative return. Second, all 45 pairwise combinations of these top 10 singles are evaluated across the same horizons, and the top 10 pairs are selected as the final feature set for that stock. This two-stage asset-specific selection allows each model to exploit the technical patterns most predictive for that particular security, while the multi-horizon evaluation ensures robustness across different holding periods.
 
 % We extracted features from historical OHLCV data using Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands, with multiple lookback periods for SMA and EMA to capture both short- and long-term dynamics.
 
@@ -465,17 +465,17 @@ Configuration & Sel. & Acc. & AUC & $N$ & Win\% & Sharpe & $\Delta$(\%) \\
 Full Model & AUC & 0.514 & \textbf{0.700} & 32.8 & 36.3 & -1.03 & -- \\
 \quad & Sharpe & \textbf{0.541} & 0.564 & 40.6 & \textbf{67.3} & \textbf{2.03} & -- \\
 \midrule
-Technical Only & AUC & 0.497 & 0.667 & 25.8 & 35.5 & -1.44 & -4.7 \\
-\quad & Sharpe & 0.485 & 0.652 & 28.6 & 39.9 & -0.98 & -148.3 \\
+Technical Only & AUC & 0.484 & 0.692 & 22.2 & 37.7 & -1.13 & -1.2 \\
+\quad & Sharpe & 0.477 & 0.678 & 24.6 & 41.0 & -0.70 & -134.3 \\
 \midrule
 Sentiment Only & AUC & 0.506 & 0.619 & 32.0 & 52.7 & 0.30 & -11.6 \\
-\quad & Sharpe & 0.531 & 0.583 & 33.6 & 57.6 & 1.23 & -39.4 \\
+\quad & Sharpe & 0.531 & 0.583 & 33.6 & 57.6 & 1.23 & -39.2 \\
 \midrule
 Equal Weights & AUC & 0.495 & 0.678 & 26.4 & 38.4 & -0.54 & -3.1 \\
 \quad & Sharpe & 0.474 & 0.646 & 26.2 & 46.1 & -0.25 & -112.3 \\
 \midrule
-News Only & AUC & 0.481 & 0.668 & 30.4 & 38.7 & -0.70 & -4.6 \\
-\quad & Sharpe & 0.469 & 0.660 & 33.2 & 43.7 & -0.38 & -118.7 \\
+News Only & AUC & 0.481 & 0.668 & 30.4 & 38.7 & -0.70 & -4.7 \\
+\quad & Sharpe & 0.469 & 0.660 & 33.2 & 43.7 & -0.38 & -118.9 \\
 \midrule
 Social Only & AUC & 0.488 & 0.663 & 24.8 & 42.5 & -0.81 & -5.3 \\
 \quad & Sharpe & 0.491 & 0.616 & 36.4 & 47.2 & 0.08 & -96.1 \\
@@ -487,9 +487,9 @@ Social Only & AUC & 0.488 & 0.663 & 24.8 & 42.5 & -0.81 & -5.3 \\
 
 The ablation results reveal several important findings about our framework's design choices:
 
-\textbf{Multimodal fusion is essential for trading performance.} The full model achieves substantially higher Sharpe ratio (2.03) than any single-modality configuration. Technical Only produces negative Sharpe ($-$0.98), demonstrating that technical indicators alone---while useful for discrimination---fail to generate profitable trading signals. Sentiment Only achieves positive Sharpe (1.23) but still underperforms the full model by 39.4\%, confirming that combining both modalities yields the best risk-adjusted returns.
+\textbf{Multimodal fusion is essential for trading performance.} The full model achieves substantially higher Sharpe ratio (2.03) than any single-modality configuration. Technical Only produces negative Sharpe ($-$0.70), demonstrating that technical indicators alone---while useful for discrimination---fail to generate profitable trading signals. Sentiment Only achieves positive Sharpe (1.23) but still underperforms the full model by 39.2\%, confirming that combining both modalities yields the best risk-adjusted returns.
 
-\textbf{Technical features drive discrimination; sentiment drives profitability.} Technical Only achieves near-full-model AUC (0.667 vs.\ 0.700, only $-$4.7\%), indicating that technical indicators capture most discriminative information. However, Sentiment Only achieves the best trading win rate (57.6\%) among ablations and positive returns, suggesting sentiment provides actionable signals that translate to profitable trades even without technical context.
+\textbf{Technical features drive discrimination; sentiment drives profitability.} Technical Only achieves near-full-model AUC (0.692 vs.\ 0.700, only $-$1.2\%), indicating that technical indicators capture most discriminative information. However, Sentiment Only achieves the best trading win rate (57.6\%) among ablations and positive returns, suggesting sentiment provides actionable signals that translate to profitable trades even without technical context.
 
 \textbf{The 70:30 weighting scheme outperforms alternatives for trading.} Equal Weights (50:50) achieves comparable AUC (0.678 vs.\ 0.700) but substantially worse Sharpe ($-$0.25 vs.\ 2.03), a 112.3\% degradation. This validates our reliability-based weighting: news sentiment's stronger correlation with returns~\cite{nyakurukwa2024} justifies higher weight for trading applications, even if equal weighting provides similar discrimination.
 
@@ -519,14 +519,14 @@ Method & Acc. & AUC & $N$ & Win\% & Sharpe \\
 \quad Fine-tuned & 0.493 & 0.483 & 87.2 & 54.5 & 1.12 \\
 \quad Fine-tuned + Sent. & 0.508 & 0.523 & 63.0 & 56.6 & 0.90 \\
 \midrule
-\textbf{Ours (Multimodal)} & 0.530 & \textbf{0.551} & 39.8 & \textbf{66.8} & \textbf{2.05} \\
+\textbf{Ours (Multimodal)} & 0.541 & \textbf{0.564} & 40.6 & \textbf{67.3} & \textbf{2.03} \\
 \bottomrule
 \multicolumn{6}{l}{\footnotesize Results averaged across five stocks.}
 \end{tabular}
 }
 \end{table}
 
-\textbf{Task-specific models outperform foundation models.} Our approach achieves the highest Sharpe ratio (2.03), substantially exceeding fine-tuned Chronos-2 (1.12) and FinCast (0.16). Our win rate (66.8\%) also exceeds all baselines by at least 10 percentage points.
+\textbf{Task-specific models outperform foundation models.} Our approach achieves the highest Sharpe ratio (2.03), substantially exceeding fine-tuned Chronos-2 (1.12) and FinCast (0.16). Our win rate (67.3\%) also exceeds all baselines by at least 10 percentage points.
 
 \textbf{Zero-shot foundation models perform at or below random chance.} Chronos-2's zero-shot AUC (0.477--0.494) falls below the 0.5 random baseline, indicating no discriminative ability on financial data. Adding sentiment covariates to Chronos-2 actually degrades Sharpe ratio (0.46$\rightarrow$0.21), suggesting the model cannot effectively incorporate auxiliary signals without task-specific adaptation.
 
@@ -567,7 +567,7 @@ These findings challenge the assumption that foundation models' broad pretrainin
     \item[$\checkmark$] Shortened to 6 pages.
     \item[$\checkmark$] Added statistical reliability notes for Win Rate.
     \item[$\checkmark$] Fixed N to show decimal for averages in Table V.
-    \item[$\checkmark$] Review/refine the architecture diagram (Figure~1) - remove Bayesian Optimization from ML Models; align box titles with main text.
+    \item[$\checkmark$] Review/refine the architecture diagram (Fig.~1) - remove Bayesian Optimization from ML Models; align box titles with main text.
     \item[$\checkmark$] Updated statistical analysis with correct N values per stock.
     \item[$\checkmark$] Added FinCast citation and baseline results.
     \item[$\checkmark$] Run ablation studies and write full ablation section.
