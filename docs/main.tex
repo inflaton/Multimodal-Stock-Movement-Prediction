@@ -102,12 +102,13 @@ FinCast~\cite{zhu2025fincast} is the first foundation model specifically designe
 \subsection{Problem Formulation}
 
 % REVISED: Added definition of T (Comment 5) and indicator function (Comment 6)
-Let $s$ denote a stock with historical price sequence $\mathbf{P}_t = \{p_{t-T+1}, \ldots, p_t\}$ of length $T$ trading days, where $p_t$ is the closing price at time $t$. We define technical indicators $\mathbf{X}_t \in \mathbb{R}^{d_x}$ (where $d_x=10$ signal combinations) and aggregated sentiment score $S_t \in \mathbb{R}$. Our objective is to predict the binary price direction:
+Let $s$ denote a stock with historical price sequence $\mathbf{P}_t = \{p_{t-T+1}, \ldots, p_t\}$ of length $T$ trading days, where $p_t$ is the closing price at time $t$. We define technical indicators $\mathbf{X}_t \in \mathbb{R}^{d_x}$ (where $d_x=10$ indicator pairs) and aggregated sentiment score $S_t \in \mathbb{R}$. Our objective is to predict the binary price direction:
 \begin{equation}
 y_{t+h} = \mathbb{I}\left[\frac{p_{t+h} - p_t}{p_t} > \theta\right]
 \end{equation}
 where $\mathbb{I}[\cdot]$ denotes the indicator function that outputs 1 if the condition holds and 0 otherwise, $h \in \{2, 3, \ldots, 10\}$ is the prediction horizon in days, and $\theta$ is a threshold selected to achieve balanced classes (approximately 50/50 split between positive and negative labels). This balancing criterion prevents model bias toward the majority class, ensures meaningful ROC-AUC evaluation, and provides equal learning opportunities for both bullish and bearish market movements—critical for the long/short trading strategy employed in our evaluation.
 
+We restrict prediction horizons to $h \in \{2,3,\dots,10\}$ trading days. Next-day prediction ($h=1$) is excluded because sentiment effects typically require multiple days to be incorporated into prices as market participants process information. Horizons beyond 10 days increasingly dilute the influence of short-term sentiment and technical indicators, shifting the task toward medium-term trend forecasting where macroeconomic factors dominate.
 
 \subsection{Proposed Framework}
 
@@ -126,8 +127,7 @@ We propose a multimodal stock prediction framework that systematically integrate
 and (iii) historical OHLCV (Open, High, Low, Close, Volume) price data.% from Yahoo Finance spanning 2020--2024.
 
 \textbf{Stage 2: Feature Extraction.} Two parallel extraction pipelines process the raw data. The \textit{sentiment branch} employs FinBERT-Tone~\cite{huang2022}, a transformer model fine-tuned for financial text, to produce sentiment scores in $[-1, +1]$ for each text document. 
-The \textit{technical branch} transforms price data into signal combinations, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
-% The \textit{technical branch} transforms price data into 10 signal combinations derived from exponential moving averages (EMA), simple moving averages (SMA), MACD, and RSI indicators, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
+The \textit{technical branch} transforms price data into indicator pairs, each generating categorical Buy/Sell/Hold signals encoded as $\{+1, -1, 0\}$.
 
 \textbf{Stage 3: Multimodal Fusion.} The extracted features undergo a two-stage fusion process. First, sentiment scores from news and social media are combined via weighted aggregation, with empirically-determined weights of 70\% for news and 30\% for social media based on reliability analysis~\cite{nyakurukwa2024}. The aggregated sentiment is then concatenated with technical indicators to form a unified multimodal feature vector $\mathbf{z}_t$.
 
@@ -139,20 +139,24 @@ The \textit{technical branch} transforms price data into signal combinations, ea
 
 \subsection{Data Collection and Preprocessing}
 
-We collected data from January 2020 to December 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY. Although our framework applies to any equity, we select these assets to span diverse sectors (semiconductors, social media, consumer electronics), volatility regimes (e.g., TSLA vs.\ SPY), and sentiment salience levels while ensuring high liquidity and comparability with prior financial machine learning benchmarks. OHLCV prices were obtained via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals were derived from financial news sources (Kaggle, MarketWatch, Google Search) and social media platforms (Reddit, StockTwits, Twitter/X).
+We collected data from January 2020 to December 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY. Although our framework applies to any equity, we select these assets to span diverse sectors (semiconductors, social media, consumer electronics), volatility regimes (e.g., TSLA vs.\ SPY), and sentiment salience levels while ensuring high liquidity and comparability with prior financial machine learning benchmarks. OHLCV prices were obtained via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals were derived from financial news sources (Kaggle, MarketWatch, Google Search) and social media platforms (Reddit, StockTwits, Twitter/X). The temporal split uses 2020--2023 for training (1006 trading days) and 2024 for testing (251 trading days).
 
 % We collected data from Jan 2020–Dec 2024 for five assets—AAPL, META, NVDA, TSLA, and SPY—to cover varied volatility (e.g., TSLA vs. SPY) and sectors (e.g., semiconductors, social media, consumer electronics). OHLCV prices were pulled via the Yahoo Finance API\footnote{\url{https://pypi.org/project/yfinance/}}. Sentiment signals came from financial news (Kaggle, MarketWatch, Google Search) and social media (Reddit, StockTwits, Twitter/X).
 
-\subsubsection{\todoitem{Technical Indicators}}
-We extracted features from historical OHLCV data using Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands, with multiple lookback periods for SMA and EMA to capture both short- and long-term dynamics.
+\subsubsection{Technical Indicators}
+Following~\cite{wang2023learning}, we compute technical indicators from historical OHLCV data using the Python TA library\footnote{\url{https://github.com/bukosabino/ta}} and derive corresponding Buy/Sell/Hold signals encoded as $\{+1,-1,0\}$. Our base indicator set comprises Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands. We use multiple lookback windows for the moving averages to capture both short- and long-term momentum.
 
-Technical indicators are inherently lagging and often generate asynchronous signals due to differences in smoothing windows and sensitivities~\cite{wang2023learning}. Requiring strict same-day agreement between indicators can therefore suppress valid trading opportunities. To address this limitation, we adopt a rolling confirmation window: when a primary indicator generates a Buy or Sell signal, the model searches for confirming signals within the subsequent 7 trading days. The choice of a 7-day window is motivated by both financial practice and empirical stability. One trading week represents a natural temporal unit in which momentum and trend-following signals typically consolidate, while remaining short enough to preserve causal relevance between indicator agreement and subsequent price movement. 
+Oriani and Coelho~\cite{oriani2016evaluating} demonstrated that combining different indicators as inputs to the same neural network can further improve forecasting performance. Building on this insight, we identify a compact set of robust \emph{indicator pairs} via systematic backtesting over the training period (2020--2023). For each stock independently, we evaluate all pairwise combinations of base indicators across prediction horizons $h \in \{2,\dots,10\}$ days using a long-short trading strategy with 10~bps transaction costs. Pairs are ranked by cumulative return, and the top 10 combinations are selected as features for that stock. This asset-specific selection allows each model to exploit the technical patterns most predictive for that particular security, while the multi-horizon evaluation ensures robustness across different holding periods.
+
+% We extracted features from historical OHLCV data using Simple Moving Averages (SMA), Exponential Moving Averages (EMA), Moving Average Convergence Divergence (MACD), Relative Strength Index (RSI), and Bollinger Bands, with multiple lookback periods for SMA and EMA to capture both short- and long-term dynamics.
+
+% Technical indicators are inherently lagging and often generate asynchronous signals due to differences in smoothing windows and sensitivities~\cite{wang2023learning}. Requiring strict same-day agreement between indicators can therefore suppress valid trading opportunities. To address this limitation, we adopt a rolling confirmation window: when a primary indicator generates a Buy or Sell signal, the model searches for confirming signals within the subsequent 7 trading days. The choice of a 7-day window is motivated by both financial practice and empirical stability. One trading week represents a natural temporal unit in which momentum and trend-following signals typically consolidate, while remaining short enough to preserve causal relevance between indicator agreement and subsequent price movement. 
 
 % Table~\ref{tab:signals} summarizes the 10 signal combinations used as input features. All combinations employ multi-indicator confirmation, pairing a primary signal with a confirming indicator to reduce false signals. For example, combinations 2--6 pair price/EMA crossovers with different confirming indicators (EMA crossovers or SMA crossovers), while combinations 7 and 10 use MACD for confirmation.
 
-Indicator combinations and prediction horizons were selected to balance signal reliability and trading feasibility. We consider the prediction horizons $h \in \{2,3,\dots,10\}$ trading days rather than the next-day prediction ($h=1$) %One-day horizons are dominated by market microstructure noise and transaction costs, and 
-as sentiment effects typically require multiple trading days to be reflected in the prices as market participants process new information. Horizons %shorter than two days produced unstable Sharpe ratios and high-variance returns in preliminary experiments, whereas horizons 
-longer than ten days increasingly diluted the influence of both sentiment and technical indicators and approached medium-term trend forecasting. Restricting the horizon to 2 to 10 days therefore focuses the task on short-term directional movements where behavioral and sentiment-driven inefficiencies are most pronounced, while allowing a realistic non-overlapping trading strategy with sufficient sample size for evaluation.
+% Indicator combinations and prediction horizons were selected to balance signal reliability and trading feasibility. We consider the prediction horizons $h \in \{2,3,\dots,10\}$ trading days rather than the next-day prediction ($h=1$) %One-day horizons are dominated by market microstructure noise and transaction costs, and 
+% as sentiment effects typically require multiple trading days to be reflected in the prices as market participants process new information. Horizons %shorter than two days produced unstable Sharpe ratios and high-variance returns in preliminary experiments, whereas horizons 
+% longer than ten days increasingly diluted the influence of both sentiment and technical indicators and approached medium-term trend forecasting. Restricting the horizon to 2 to 10 days therefore focuses the task on short-term directional movements where behavioral and sentiment-driven inefficiencies are most pronounced, while allowing a realistic non-overlapping trading strategy with sufficient sample size for evaluation.
 
 
 % % NEW TABLE: Signal Combinations (addressing Comment 7)
@@ -194,7 +198,8 @@ The multimodal feature vector for each trading day combines technical indicators
 \begin{equation}
 \mathbf{z}_t = [\mathbf{X}_t \| S_{t}] \in \mathbb{R}^{d_x + 1}
 \end{equation}
-where $\|$ denotes concatenation, $\mathbf{X}_t$ contains the 10 technical signal features, and $S_{t}$ is the weighted sentiment score.
+where $\|$ denotes concatenation, $\mathbf{X}_t$ contains the 10 indicator pair features, and $S_{t}$ is the weighted sentiment score.
+
 
 \subsection{Prediction Models}
 
@@ -251,9 +256,9 @@ We evaluate six additional classifiers to compare deep learning against classica
 \section{Experimental Setup}
 \label{sec:experimental_setup}
 
-\subsection{\todoitem{Dataset Description}}
+% \subsection{\todoitem{Dataset Description}}
 
-Table \ref{tab:dataset} summarizes our dataset characteristics. The temporal split uses 2020--2023 for training (1006 trading days) and 2024 for testing (251 trading days).
+% Table \ref{tab:dataset} summarizes our dataset characteristics. The temporal split uses 2020--2023 for training (1006 trading days) and 2024 for testing (251 trading days).
 
 % \begin{table}[h]
 % \caption{Dataset Statistics}
@@ -296,7 +301,7 @@ Table \ref{tab:dataset} summarizes our dataset characteristics. The temporal spl
 \text{Sharpe} = \frac{\bar{r}}{\sigma_r} \times \sqrt{N}
 \end{equation}
 where $\bar{r}$ is the mean return per trade, $\sigma_r$ is the standard deviation of returns, and $N$ is the number of trades.
-A Sharpe ratio above 1.0 is generally considered good, while values above 2.0 indicate very strong risk-adjusted performance.
+% A Sharpe ratio above 1.0 is generally considered good, while values above 2.0 indicate very strong risk-adjusted performance.
 
 \subsection{Baseline Methods}
 
