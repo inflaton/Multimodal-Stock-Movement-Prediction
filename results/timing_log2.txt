@@ -1,0 +1,2086 @@
+Training single stock: TSLA
+Training all models (including LSTM)
+=========================================
+Starting Hyperparameter Tuning
+=========================================
+Stocks: TSLA
+Models: xgboost lightgbm random_forest logistic_regression gradient_boosting svm lstm
+=========================================
+
+=========================================
+Training Stock: TSLA
+=========================================
+
+-----------------------------------------
+Training xgboost for TSLA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+XGBOOST HYPERPARAMETER TUNING: TSLA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0025 (balance score: 0.999)
+  Horizon 3d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 4d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 5d -> Best threshold = 0.0100 (balance score: 0.998)
+  Horizon 6d -> Best threshold = 0.0100 (balance score: 1.000)
+  Horizon 7d -> Best threshold = 0.0125 (balance score: 0.997)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0225 (balance score: 0.996)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.996)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0025
+--------------------------------------------------
+  AUC: 0.5718 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5738 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.5730 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.5000 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5472 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.5466 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.5000 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5042 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.5429 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.5000 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.5466 | n_est=488, depth=8, lr=0.0151
+  AUC: 0.5594 | n_est=462, depth=4, lr=0.1925
+  AUC: 0.5428 | n_est=328, depth=11, lr=0.2541
+  AUC: 0.5503 | n_est=62, depth=12, lr=0.3000
+  AUC: 0.5715 | n_est=500, depth=3, lr=0.0107
+  AUC: 0.5542 | n_est=349, depth=3, lr=0.0440
+  AUC: 0.5632 | n_est=102, depth=6, lr=0.0496
+  AUC: 0.5680 | n_est=150, depth=11, lr=0.0186
+  AUC: 0.5482 | n_est=428, depth=12, lr=0.0236
+  AUC: 0.5638 | n_est=478, depth=5, lr=0.3000
+  AUC: 0.5419 | n_est=284, depth=9, lr=0.2675
+  AUC: 0.5745 | n_est=500, depth=3, lr=0.0725
+  AUC: 0.5608 | n_est=500, depth=5, lr=0.0100
+  AUC: 0.5635 | n_est=220, depth=12, lr=0.0100
+  AUC: 0.5683 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5814 | n_est=500, depth=6, lr=0.0100
+  AUC: 0.5723 | n_est=500, depth=6, lr=0.0100
+  AUC: 0.5600 | n_est=500, depth=7, lr=0.0100
+  AUC: 0.5710 | n_est=500, depth=3, lr=0.3000
+  AUC: 0.5783 | n_est=50, depth=9, lr=0.0100
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(6), 'learning_rate': 0.01, 'subsample': 0.8147052416599537, 'colsample_bytree': 0.5360065117708155, 'gamma': 10.0, 'reg_alpha': 0.0, 'reg_lambda': 0.0}
+Validation AUC: 0.5814
+
+Test Results:
+  Accuracy: 0.494
+  AUC: 0.523
+  Sharpe: 1.11
+  Win Rate: 53.6%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5434 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5392 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.5534 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.5000 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5600 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.5227 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.5247 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5339 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.5434 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.5000 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.5299 | n_est=184, depth=5, lr=0.0220
+  AUC: 0.5129 | n_est=59, depth=7, lr=0.1167
+  AUC: 0.5568 | n_est=82, depth=3, lr=0.1317
+  AUC: 0.5339 | n_est=94, depth=4, lr=0.2691
+  AUC: 0.5163 | n_est=370, depth=11, lr=0.0101
+  AUC: 0.5553 | n_est=179, depth=5, lr=0.0830
+  AUC: 0.5474 | n_est=210, depth=11, lr=0.0820
+  AUC: 0.5433 | n_est=387, depth=5, lr=0.0264
+  AUC: 0.5335 | n_est=125, depth=8, lr=0.0385
+  AUC: 0.5607 | n_est=50, depth=12, lr=0.0793
+  AUC: 0.5402 | n_est=413, depth=3, lr=0.1244
+  AUC: 0.5523 | n_est=83, depth=7, lr=0.0234
+  AUC: 0.5234 | n_est=453, depth=12, lr=0.1878
+  AUC: 0.5659 | n_est=50, depth=12, lr=0.1497
+  AUC: 0.5676 | n_est=279, depth=12, lr=0.0224
+  AUC: 0.5339 | n_est=500, depth=12, lr=0.0271
+  AUC: 0.5419 | n_est=500, depth=12, lr=0.3000
+  AUC: 0.5356 | n_est=183, depth=12, lr=0.0159
+  AUC: 0.5653 | n_est=67, depth=12, lr=0.0549
+  AUC: 0.5630 | n_est=369, depth=12, lr=0.0708
+
+Best hyperparameters: {'n_estimators': np.int64(279), 'max_depth': np.int64(12), 'learning_rate': 0.02244702487837493, 'subsample': 1.0, 'colsample_bytree': 0.9858599192960082, 'gamma': 2.555992553163749, 'reg_alpha': 1.3841667948613976, 'reg_lambda': 9.531668354428046}
+Validation AUC: 0.5676
+
+Test Results:
+  Accuracy: 0.490
+  AUC: 0.494
+  Sharpe: 1.26
+  Win Rate: 54.2%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5246 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.6055 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.6245 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.5816 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5510 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6193 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.5824 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6101 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.5788 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6101 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.6215 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5655 | n_est=500, depth=12, lr=0.0100
+  AUC: 0.6086 | n_est=423, depth=3, lr=0.0267
+  AUC: 0.6123 | n_est=155, depth=10, lr=0.0558
+  AUC: 0.5991 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5905 | n_est=50, depth=3, lr=0.0298
+  AUC: 0.6113 | n_est=257, depth=4, lr=0.0153
+  AUC: 0.5567 | n_est=381, depth=5, lr=0.2826
+  AUC: 0.6067 | n_est=100, depth=6, lr=0.0198
+  AUC: 0.5919 | n_est=484, depth=6, lr=0.1754
+  AUC: 0.6267 | n_est=478, depth=8, lr=0.0121
+  AUC: 0.5869 | n_est=113, depth=6, lr=0.2226
+  AUC: 0.6086 | n_est=370, depth=7, lr=0.0100
+  AUC: 0.5812 | n_est=52, depth=5, lr=0.0100
+  AUC: 0.6031 | n_est=500, depth=7, lr=0.0235
+  AUC: 0.6121 | n_est=230, depth=6, lr=0.0100
+  AUC: 0.6247 | n_est=482, depth=12, lr=0.0100
+  AUC: 0.6341 | n_est=64, depth=12, lr=0.0152
+  AUC: 0.6106 | n_est=408, depth=3, lr=0.0132
+  AUC: 0.5984 | n_est=256, depth=12, lr=0.0753
+
+Best hyperparameters: {'n_estimators': np.int64(64), 'max_depth': np.int64(12), 'learning_rate': 0.015213462419735167, 'subsample': 0.5, 'colsample_bytree': 1.0, 'gamma': 10.0, 'reg_alpha': 0.0, 'reg_lambda': 1.4739886894140775}
+Validation AUC: 0.6341
+
+Test Results:
+  Accuracy: 0.546
+  AUC: 0.549
+  Sharpe: 1.82
+  Win Rate: 58.1%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.4497 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5671 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.5939 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.5934 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5427 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6070 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.5914 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5934 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.5960 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.5934 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.6194 | n_est=237, depth=12, lr=0.0100
+  AUC: 0.6031 | n_est=50, depth=9, lr=0.0100
+  AUC: 0.6078 | n_est=193, depth=4, lr=0.0100
+  AUC: 0.5934 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5867 | n_est=217, depth=10, lr=0.0210
+  AUC: 0.6194 | n_est=450, depth=5, lr=0.0160
+  AUC: 0.6097 | n_est=307, depth=3, lr=0.2096
+  AUC: 0.6091 | n_est=500, depth=6, lr=0.0100
+  AUC: 0.5842 | n_est=50, depth=4, lr=0.0327
+  AUC: 0.6114 | n_est=106, depth=12, lr=0.0100
+  AUC: 0.5720 | n_est=471, depth=12, lr=0.3000
+  AUC: 0.5934 | n_est=299, depth=9, lr=0.0165
+  AUC: 0.6172 | n_est=380, depth=3, lr=0.0800
+  AUC: 0.5954 | n_est=109, depth=3, lr=0.1417
+  AUC: 0.6378 | n_est=500, depth=12, lr=0.0100
+  AUC: 0.5946 | n_est=50, depth=12, lr=0.0100
+  AUC: 0.6190 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5344 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6273 | n_est=500, depth=12, lr=0.0273
+  AUC: 0.4798 | n_est=500, depth=3, lr=0.0100
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(12), 'learning_rate': 0.01, 'subsample': 0.5, 'colsample_bytree': 1.0, 'gamma': 5.596740379649984, 'reg_alpha': 10.0, 'reg_lambda': 0.0}
+Validation AUC: 0.6378
+
+Test Results:
+  Accuracy: 0.538
+  AUC: 0.549
+  Sharpe: 1.74
+  Win Rate: 54.0%
+
+--------------------------------------------------
+Horizon: 6 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.4907 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5765 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.6285 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.6067 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5000 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6391 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.6067 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6067 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.6185 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6418 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.5108 | n_est=103, depth=8, lr=0.0100
+  AUC: 0.6536 | n_est=87, depth=3, lr=0.3000
+  AUC: 0.5999 | n_est=255, depth=8, lr=0.2284
+  AUC: 0.6501 | n_est=191, depth=3, lr=0.0620
+  AUC: 0.6368 | n_est=204, depth=5, lr=0.0432
+  AUC: 0.6067 | n_est=480, depth=6, lr=0.0264
+  AUC: 0.6486 | n_est=500, depth=3, lr=0.0143
+  AUC: 0.6067 | n_est=50, depth=3, lr=0.0376
+  AUC: 0.6044 | n_est=500, depth=4, lr=0.1120
+  AUC: 0.6532 | n_est=500, depth=3, lr=0.0112
+  AUC: 0.6485 | n_est=334, depth=3, lr=0.0123
+  AUC: 0.6067 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6466 | n_est=50, depth=12, lr=0.0171
+  AUC: 0.6390 | n_est=50, depth=9, lr=0.0491
+  AUC: 0.6536 | n_est=50, depth=3, lr=0.3000
+  AUC: 0.6420 | n_est=50, depth=3, lr=0.0383
+  AUC: 0.6470 | n_est=68, depth=12, lr=0.0100
+  AUC: 0.6354 | n_est=500, depth=12, lr=0.0118
+  AUC: 0.5419 | n_est=500, depth=3, lr=0.0404
+  AUC: 0.6536 | n_est=50, depth=12, lr=0.0757
+
+Best hyperparameters: {'n_estimators': np.int64(87), 'max_depth': np.int64(3), 'learning_rate': 0.29999999999999993, 'subsample': 0.7272156228292854, 'colsample_bytree': 0.8421673892499475, 'gamma': 9.73761899036183, 'reg_alpha': 5.872339953201129, 'reg_lambda': 10.0}
+Validation AUC: 0.6536
+
+Test Results:
+  Accuracy: 0.534
+  AUC: 0.549
+  Sharpe: 2.08
+  Win Rate: 58.5%
+
+--------------------------------------------------
+Horizon: 7 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.4240 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.4734 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.5936 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.6042 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4315 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.5841 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.6477 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6042 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.5939 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6042 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.5795 | n_est=396, depth=3, lr=0.3000
+  AUC: 0.6376 | n_est=500, depth=3, lr=0.0465
+  AUC: 0.6013 | n_est=206, depth=3, lr=0.0100
+  AUC: 0.6507 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6452 | n_est=500, depth=12, lr=0.0560
+  AUC: 0.6042 | n_est=113, depth=3, lr=0.2580
+  AUC: 0.6440 | n_est=500, depth=12, lr=0.3000
+  AUC: 0.6376 | n_est=500, depth=3, lr=0.0206
+  AUC: 0.4168 | n_est=500, depth=4, lr=0.2658
+  AUC: 0.6405 | n_est=276, depth=3, lr=0.0343
+  AUC: 0.6042 | n_est=500, depth=3, lr=0.0154
+  AUC: 0.6525 | n_est=162, depth=3, lr=0.3000
+  AUC: 0.6381 | n_est=439, depth=7, lr=0.0162
+  AUC: 0.5149 | n_est=500, depth=3, lr=0.3000
+  AUC: 0.6525 | n_est=329, depth=5, lr=0.3000
+  AUC: 0.6395 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6485 | n_est=500, depth=12, lr=0.3000
+  AUC: 0.6349 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5945 | n_est=50, depth=3, lr=0.3000
+  AUC: 0.6345 | n_est=491, depth=3, lr=0.0116
+
+Best hyperparameters: {'n_estimators': np.int64(162), 'max_depth': np.int64(3), 'learning_rate': 0.29999999999999993, 'subsample': 0.692444625771272, 'colsample_bytree': 1.0, 'gamma': 10.0, 'reg_alpha': 7.7250195458216995, 'reg_lambda': 2.686642597976385}
+Validation AUC: 0.6525
+
+Test Results:
+  Accuracy: 0.502
+  AUC: 0.498
+  Sharpe: 1.69
+  Win Rate: 51.4%
+
+--------------------------------------------------
+Horizon: 8 days, Threshold: 0.0175
+--------------------------------------------------
+  AUC: 0.4419 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5347 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.6442 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.6289 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5002 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6366 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.6264 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6289 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.6490 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6306 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.6289 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.6403 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.5987 | n_est=285, depth=5, lr=0.0622
+  AUC: 0.6653 | n_est=181, depth=12, lr=0.0100
+  AUC: 0.6264 | n_est=484, depth=7, lr=0.3000
+  AUC: 0.6552 | n_est=488, depth=3, lr=0.0179
+  AUC: 0.6639 | n_est=283, depth=10, lr=0.0100
+  AUC: 0.6281 | n_est=386, depth=3, lr=0.0100
+  AUC: 0.6699 | n_est=335, depth=12, lr=0.0103
+  AUC: 0.5674 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.6817 | n_est=101, depth=6, lr=0.0136
+  AUC: 0.6465 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.6289 | n_est=124, depth=12, lr=0.3000
+  AUC: 0.6382 | n_est=179, depth=12, lr=0.0103
+  AUC: 0.6716 | n_est=50, depth=8, lr=0.0153
+  AUC: 0.5885 | n_est=498, depth=11, lr=0.3000
+  AUC: 0.6824 | n_est=397, depth=3, lr=0.0100
+  AUC: 0.6737 | n_est=281, depth=3, lr=0.0100
+  AUC: 0.6695 | n_est=407, depth=4, lr=0.0359
+  AUC: 0.6701 | n_est=481, depth=4, lr=0.0177
+
+Best hyperparameters: {'n_estimators': np.int64(397), 'max_depth': np.int64(3), 'learning_rate': 0.01, 'subsample': 0.6402250967787683, 'colsample_bytree': 0.5742486582295565, 'gamma': 2.5014925751712784, 'reg_alpha': 6.948593242350187, 'reg_lambda': 3.602206569761082}
+Validation AUC: 0.6824
+
+Test Results:
+  Accuracy: 0.490
+  AUC: 0.490
+  Sharpe: 2.50
+  Win Rate: 64.5%
+
+--------------------------------------------------
+Horizon: 9 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4286 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5053 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.6652 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.6289 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4842 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6603 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.6263 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6299 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.6559 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6264 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.6559 | n_est=486, depth=3, lr=0.0100
+  AUC: 0.6651 | n_est=402, depth=3, lr=0.0100
+  AUC: 0.6436 | n_est=489, depth=5, lr=0.0783
+  AUC: 0.6529 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.6289 | n_est=472, depth=10, lr=0.0219
+  AUC: 0.6274 | n_est=138, depth=5, lr=0.0946
+  AUC: 0.6299 | n_est=500, depth=12, lr=0.3000
+  AUC: 0.6588 | n_est=428, depth=8, lr=0.0112
+  AUC: 0.5934 | n_est=292, depth=3, lr=0.0264
+  AUC: 0.6619 | n_est=460, depth=10, lr=0.0100
+  AUC: 0.5205 | n_est=433, depth=7, lr=0.0285
+  AUC: 0.6696 | n_est=459, depth=3, lr=0.0105
+  AUC: 0.6567 | n_est=52, depth=5, lr=0.0100
+  AUC: 0.6626 | n_est=500, depth=3, lr=0.0244
+  AUC: 0.6556 | n_est=500, depth=12, lr=0.0100
+  AUC: 0.6086 | n_est=497, depth=12, lr=0.3000
+  AUC: 0.6157 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6644 | n_est=50, depth=6, lr=0.0100
+  AUC: 0.6382 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6110 | n_est=112, depth=3, lr=0.0100
+
+Best hyperparameters: {'n_estimators': np.int64(459), 'max_depth': np.int64(3), 'learning_rate': 0.01052357322531602, 'subsample': 0.5, 'colsample_bytree': 0.801682019271723, 'gamma': 4.980767087009807, 'reg_alpha': 10.0, 'reg_lambda': 3.382893371732836}
+Validation AUC: 0.6696
+
+Test Results:
+  Accuracy: 0.518
+  AUC: 0.494
+  Sharpe: 2.26
+  Win Rate: 66.7%
+
+--------------------------------------------------
+Horizon: 10 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.3979 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5622 | n_est=114, depth=9, lr=0.0121
+  AUC: 0.6655 | n_est=325, depth=3, lr=0.0108
+  AUC: 0.6265 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5225 | n_est=56, depth=11, lr=0.0679
+  AUC: 0.6276 | n_est=324, depth=10, lr=0.0180
+  AUC: 0.6265 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.6290 | n_est=307, depth=8, lr=0.2629
+  AUC: 0.6706 | n_est=323, depth=5, lr=0.0274
+  AUC: 0.6290 | n_est=56, depth=5, lr=0.1124
+  AUC: 0.5751 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6716 | n_est=389, depth=3, lr=0.0100
+  AUC: 0.6592 | n_est=162, depth=3, lr=0.0181
+  AUC: 0.4099 | n_est=164, depth=12, lr=0.0202
+  AUC: 0.5542 | n_est=292, depth=3, lr=0.1052
+  AUC: 0.5662 | n_est=248, depth=7, lr=0.0100
+  AUC: 0.6601 | n_est=219, depth=12, lr=0.3000
+  AUC: 0.6673 | n_est=131, depth=3, lr=0.0180
+  AUC: 0.7052 | n_est=176, depth=5, lr=0.0280
+  AUC: 0.7063 | n_est=500, depth=5, lr=0.0253
+  AUC: 0.6665 | n_est=109, depth=5, lr=0.0104
+  AUC: 0.7029 | n_est=191, depth=7, lr=0.0282
+  AUC: 0.7086 | n_est=500, depth=7, lr=0.0837
+  AUC: 0.7061 | n_est=500, depth=12, lr=0.0210
+  AUC: 0.6383 | n_est=500, depth=12, lr=0.0478
+  AUC: 0.6537 | n_est=222, depth=6, lr=0.3000
+  AUC: 0.3755 | n_est=487, depth=12, lr=0.2362
+  AUC: 0.7041 | n_est=500, depth=9, lr=0.0676
+  AUC: 0.7064 | n_est=500, depth=12, lr=0.0100
+  AUC: 0.5830 | n_est=60, depth=3, lr=0.0155
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(7), 'learning_rate': 0.08366897043791115, 'subsample': 0.5, 'colsample_bytree': 0.5, 'gamma': 6.697871838702708, 'reg_alpha': 7.364333583126385, 'reg_lambda': 10.0}
+Validation AUC: 0.7086
+
+Test Results:
+  Accuracy: 0.514
+  AUC: 0.472
+  Sharpe: 2.40
+  Win Rate: 60.0%
+
+Results saved to: results/ours/XGBoost_tuned_TSLA_results.csv
+✓ xgboost training completed for TSLA
+
+-----------------------------------------
+Training lightgbm for TSLA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+LIGHTGBM HYPERPARAMETER TUNING: TSLA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0025 (balance score: 0.999)
+  Horizon 3d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 4d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 5d -> Best threshold = 0.0100 (balance score: 0.998)
+  Horizon 6d -> Best threshold = 0.0100 (balance score: 1.000)
+  Horizon 7d -> Best threshold = 0.0125 (balance score: 0.997)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0225 (balance score: 0.996)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.996)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0025
+--------------------------------------------------
+  AUC: 0.5512 | n_est=408, depth=5, leaves=68
+  AUC: 0.5433 | n_est=114, depth=9, leaves=78
+  AUC: 0.5547 | n_est=325, depth=3, leaves=62
+  AUC: 0.5613 | n_est=91, depth=9, leaves=99
+  AUC: 0.5763 | n_est=56, depth=11, leaves=51
+  AUC: 0.5701 | n_est=324, depth=10, leaves=51
+  AUC: 0.5703 | n_est=305, depth=3, leaves=56
+  AUC: 0.5611 | n_est=307, depth=8, leaves=88
+  AUC: 0.5508 | n_est=323, depth=5, leaves=33
+  AUC: 0.5696 | n_est=56, depth=5, leaves=83
+  AUC: 0.5872 | n_est=251, depth=6, leaves=78
+  AUC: 0.5410 | n_est=342, depth=12, leaves=55
+  AUC: 0.5670 | n_est=314, depth=7, leaves=93
+  AUC: 0.5799 | n_est=344, depth=5, leaves=94
+  AUC: 0.5932 | n_est=441, depth=3, leaves=76
+  AUC: 0.5804 | n_est=488, depth=3, leaves=20
+  AUC: 0.5567 | n_est=253, depth=12, leaves=35
+  AUC: 0.5736 | n_est=443, depth=12, leaves=25
+  AUC: 0.5755 | n_est=489, depth=3, leaves=41
+  AUC: 0.5728 | n_est=109, depth=9, leaves=55
+  AUC: 0.5580 | n_est=345, depth=3, leaves=78
+  AUC: 0.5717 | n_est=265, depth=3, leaves=78
+  AUC: 0.5851 | n_est=55, depth=3, leaves=100
+  AUC: 0.5988 | n_est=362, depth=5, leaves=35
+  AUC: 0.5954 | n_est=346, depth=5, leaves=63
+  AUC: 0.5867 | n_est=95, depth=10, leaves=38
+  AUC: 0.5865 | n_est=228, depth=4, leaves=20
+  AUC: 0.5764 | n_est=147, depth=3, leaves=54
+  AUC: 0.5814 | n_est=181, depth=3, leaves=21
+  AUC: 0.5620 | n_est=197, depth=3, leaves=37
+
+Best hyperparameters: {'n_estimators': np.int64(362), 'max_depth': np.int64(5), 'learning_rate': 0.29999999999999993, 'num_leaves': np.int64(35), 'subsample': 0.9823355158396698, 'colsample_bytree': 1.0, 'reg_alpha': 2.5154847181559497, 'reg_lambda': 0.42727162143698877}
+Validation AUC: 0.5988
+
+Test Results:
+  Accuracy: 0.526
+  AUC: 0.525
+  Sharpe: 1.25
+  Win Rate: 52.0%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5083 | n_est=408, depth=5, leaves=68
+  AUC: 0.5324 | n_est=114, depth=9, leaves=78
+  AUC: 0.5392 | n_est=325, depth=3, leaves=62
+  AUC: 0.5199 | n_est=91, depth=9, leaves=99
+  AUC: 0.5179 | n_est=56, depth=11, leaves=51
+  AUC: 0.5039 | n_est=324, depth=10, leaves=51
+  AUC: 0.5340 | n_est=305, depth=3, leaves=56
+  AUC: 0.5226 | n_est=307, depth=8, leaves=88
+  AUC: 0.5138 | n_est=323, depth=5, leaves=33
+  AUC: 0.5157 | n_est=56, depth=5, leaves=83
+  AUC: 0.5342 | n_est=500, depth=8, leaves=72
+  AUC: 0.5477 | n_est=318, depth=6, leaves=39
+  AUC: 0.5468 | n_est=72, depth=11, leaves=20
+  AUC: 0.5401 | n_est=500, depth=3, leaves=20
+  AUC: 0.5241 | n_est=50, depth=4, leaves=20
+  AUC: 0.5427 | n_est=253, depth=8, leaves=28
+  AUC: 0.5188 | n_est=419, depth=9, leaves=20
+  AUC: 0.5073 | n_est=69, depth=6, leaves=56
+  AUC: 0.5252 | n_est=50, depth=11, leaves=50
+  AUC: 0.5414 | n_est=50, depth=3, leaves=20
+  AUC: 0.5466 | n_est=222, depth=6, leaves=91
+  AUC: 0.5339 | n_est=50, depth=12, leaves=20
+  AUC: 0.5426 | n_est=421, depth=7, leaves=43
+  AUC: 0.5237 | n_est=93, depth=3, leaves=78
+  AUC: 0.5408 | n_est=205, depth=5, leaves=64
+  AUC: 0.5285 | n_est=377, depth=7, leaves=72
+  AUC: 0.4869 | n_est=411, depth=12, leaves=45
+  AUC: 0.5233 | n_est=208, depth=3, leaves=61
+  AUC: 0.5245 | n_est=316, depth=5, leaves=21
+  AUC: 0.5376 | n_est=121, depth=9, leaves=78
+
+Best hyperparameters: {'n_estimators': np.int64(318), 'max_depth': np.int64(6), 'learning_rate': 0.2751670824830765, 'num_leaves': np.int64(39), 'subsample': 0.7036097395295258, 'colsample_bytree': 0.6729883715945, 'reg_alpha': 8.880124178326787, 'reg_lambda': 5.653778048194081}
+Validation AUC: 0.5477
+
+Test Results:
+  Accuracy: 0.482
+  AUC: 0.471
+  Sharpe: 1.83
+  Win Rate: 60.2%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5020 | n_est=408, depth=5, leaves=68
+  AUC: 0.5315 | n_est=114, depth=9, leaves=78
+  AUC: 0.5358 | n_est=325, depth=3, leaves=62
+  AUC: 0.4968 | n_est=91, depth=9, leaves=99
+  AUC: 0.5193 | n_est=56, depth=11, leaves=51
+  AUC: 0.4948 | n_est=324, depth=10, leaves=51
+  AUC: 0.5507 | n_est=305, depth=3, leaves=56
+  AUC: 0.5155 | n_est=307, depth=8, leaves=88
+  AUC: 0.4968 | n_est=323, depth=5, leaves=33
+  AUC: 0.5051 | n_est=56, depth=5, leaves=83
+  AUC: 0.5266 | n_est=351, depth=5, leaves=30
+  AUC: 0.5130 | n_est=289, depth=3, leaves=85
+  AUC: 0.4896 | n_est=500, depth=11, leaves=51
+  AUC: 0.4936 | n_est=160, depth=10, leaves=24
+  AUC: 0.5318 | n_est=87, depth=3, leaves=64
+  AUC: 0.4984 | n_est=328, depth=3, leaves=96
+  AUC: 0.5170 | n_est=148, depth=3, leaves=20
+  AUC: 0.5109 | n_est=73, depth=3, leaves=78
+  AUC: 0.5517 | n_est=266, depth=3, leaves=83
+  AUC: 0.5408 | n_est=170, depth=3, leaves=42
+  AUC: 0.5221 | n_est=50, depth=3, leaves=86
+  AUC: 0.5063 | n_est=284, depth=3, leaves=27
+  AUC: 0.5633 | n_est=217, depth=3, leaves=58
+  AUC: 0.5644 | n_est=240, depth=9, leaves=81
+  AUC: 0.5648 | n_est=237, depth=6, leaves=44
+  AUC: 0.5094 | n_est=500, depth=8, leaves=57
+  AUC: 0.5319 | n_est=224, depth=10, leaves=66
+  AUC: 0.5621 | n_est=300, depth=4, leaves=36
+  AUC: 0.5650 | n_est=281, depth=3, leaves=20
+  AUC: 0.5527 | n_est=101, depth=8, leaves=21
+
+Best hyperparameters: {'n_estimators': np.int64(281), 'max_depth': np.int64(3), 'learning_rate': 0.19483923829861924, 'num_leaves': np.int64(20), 'subsample': 0.8566051257014156, 'colsample_bytree': 1.0, 'reg_alpha': 10.0, 'reg_lambda': 9.61210810159914}
+Validation AUC: 0.5650
+
+Test Results:
+  Accuracy: 0.514
+  AUC: 0.546
+  Sharpe: 1.34
+  Win Rate: 54.8%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.4265 | n_est=408, depth=5, leaves=68
+  AUC: 0.5513 | n_est=114, depth=9, leaves=78
+  AUC: 0.5477 | n_est=325, depth=3, leaves=62
+  AUC: 0.4465 | n_est=91, depth=9, leaves=99
+  AUC: 0.4385 | n_est=56, depth=11, leaves=51
+  AUC: 0.3949 | n_est=324, depth=10, leaves=51
+  AUC: 0.4102 | n_est=305, depth=3, leaves=56
+  AUC: 0.4586 | n_est=307, depth=8, leaves=88
+  AUC: 0.4335 | n_est=323, depth=5, leaves=33
+  AUC: 0.4173 | n_est=56, depth=5, leaves=83
+  AUC: 0.5506 | n_est=127, depth=8, leaves=100
+  AUC: 0.5260 | n_est=489, depth=3, leaves=100
+  AUC: 0.5544 | n_est=50, depth=12, leaves=100
+  AUC: 0.5544 | n_est=50, depth=12, leaves=20
+  AUC: 0.4680 | n_est=464, depth=12, leaves=73
+  AUC: 0.5439 | n_est=50, depth=3, leaves=93
+  AUC: 0.5525 | n_est=50, depth=12, leaves=100
+  AUC: 0.5258 | n_est=341, depth=12, leaves=57
+  AUC: 0.5503 | n_est=50, depth=8, leaves=32
+  AUC: 0.5159 | n_est=50, depth=12, leaves=100
+  AUC: 0.4670 | n_est=329, depth=3, leaves=68
+  AUC: 0.5561 | n_est=58, depth=9, leaves=75
+  AUC: 0.5424 | n_est=50, depth=3, leaves=100
+  AUC: 0.5512 | n_est=251, depth=7, leaves=100
+  AUC: 0.4932 | n_est=308, depth=12, leaves=86
+  AUC: 0.5373 | n_est=500, depth=12, leaves=95
+  AUC: 0.5249 | n_est=500, depth=12, leaves=20
+  AUC: 0.5734 | n_est=50, depth=12, leaves=100
+  AUC: 0.5763 | n_est=50, depth=12, leaves=100
+  AUC: 0.4997 | n_est=50, depth=3, leaves=91
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(12), 'learning_rate': 0.01, 'num_leaves': np.int64(100), 'subsample': 1.0, 'colsample_bytree': 1.0, 'reg_alpha': 10.0, 'reg_lambda': 10.0}
+Validation AUC: 0.5763
+
+Test Results:
+  Accuracy: 0.522
+  AUC: 0.535
+  Sharpe: 1.74
+  Win Rate: 54.0%
+
+--------------------------------------------------
+Horizon: 6 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.4911 | n_est=408, depth=5, leaves=68
+  AUC: 0.4942 | n_est=114, depth=9, leaves=78
+  AUC: 0.4933 | n_est=325, depth=3, leaves=62
+  AUC: 0.4367 | n_est=91, depth=9, leaves=99
+  AUC: 0.5074 | n_est=56, depth=11, leaves=51
+  AUC: 0.4616 | n_est=324, depth=10, leaves=51
+  AUC: 0.4045 | n_est=305, depth=3, leaves=56
+  AUC: 0.4751 | n_est=307, depth=8, leaves=88
+  AUC: 0.4830 | n_est=323, depth=5, leaves=33
+  AUC: 0.4584 | n_est=56, depth=5, leaves=83
+  AUC: 0.4921 | n_est=281, depth=12, leaves=57
+  AUC: 0.4937 | n_est=50, depth=8, leaves=64
+  AUC: 0.4570 | n_est=50, depth=8, leaves=66
+  AUC: 0.5176 | n_est=183, depth=12, leaves=100
+  AUC: 0.4476 | n_est=108, depth=12, leaves=75
+  AUC: 0.5174 | n_est=299, depth=12, leaves=48
+  AUC: 0.4983 | n_est=498, depth=12, leaves=80
+  AUC: 0.5170 | n_est=50, depth=10, leaves=89
+  AUC: 0.5262 | n_est=500, depth=8, leaves=36
+  AUC: 0.4949 | n_est=50, depth=3, leaves=100
+  AUC: 0.5022 | n_est=91, depth=12, leaves=22
+  AUC: 0.4474 | n_est=415, depth=11, leaves=63
+  AUC: 0.4915 | n_est=304, depth=6, leaves=93
+  AUC: 0.5180 | n_est=50, depth=3, leaves=20
+  AUC: 0.5131 | n_est=367, depth=4, leaves=100
+  AUC: 0.5162 | n_est=173, depth=4, leaves=83
+  AUC: 0.5030 | n_est=379, depth=9, leaves=97
+  AUC: 0.4784 | n_est=50, depth=6, leaves=31
+  AUC: 0.5087 | n_est=500, depth=11, leaves=24
+  AUC: 0.5132 | n_est=333, depth=5, leaves=88
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(8), 'learning_rate': 0.016334424486429414, 'num_leaves': np.int64(36), 'subsample': 0.5, 'colsample_bytree': 0.5, 'reg_alpha': 0.6484365640272536, 'reg_lambda': 0.0}
+Validation AUC: 0.5262
+
+Test Results:
+  Accuracy: 0.502
+  AUC: 0.522
+  Sharpe: -0.30
+  Win Rate: 41.5%
+
+--------------------------------------------------
+Horizon: 7 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.4612 | n_est=408, depth=5, leaves=68
+  AUC: 0.4894 | n_est=114, depth=9, leaves=78
+  AUC: 0.4959 | n_est=325, depth=3, leaves=62
+  AUC: 0.4127 | n_est=91, depth=9, leaves=99
+  AUC: 0.4563 | n_est=56, depth=11, leaves=51
+  AUC: 0.4260 | n_est=324, depth=10, leaves=51
+  AUC: 0.4135 | n_est=305, depth=3, leaves=56
+  AUC: 0.4368 | n_est=307, depth=8, leaves=88
+  AUC: 0.4579 | n_est=323, depth=5, leaves=33
+  AUC: 0.4232 | n_est=56, depth=5, leaves=83
+  AUC: 0.5269 | n_est=500, depth=3, leaves=20
+  AUC: 0.4063 | n_est=50, depth=3, leaves=20
+  AUC: 0.4555 | n_est=425, depth=6, leaves=100
+  AUC: 0.5058 | n_est=50, depth=12, leaves=20
+  AUC: 0.5131 | n_est=500, depth=3, leaves=35
+  AUC: 0.4989 | n_est=207, depth=4, leaves=100
+  AUC: 0.4907 | n_est=50, depth=12, leaves=20
+  AUC: 0.4593 | n_est=500, depth=6, leaves=20
+  AUC: 0.4690 | n_est=311, depth=12, leaves=100
+  AUC: 0.4672 | n_est=222, depth=3, leaves=20
+  AUC: 0.4631 | n_est=472, depth=4, leaves=59
+  AUC: 0.4308 | n_est=50, depth=11, leaves=45
+  AUC: 0.4674 | n_est=362, depth=6, leaves=20
+  AUC: 0.4840 | n_est=268, depth=12, leaves=100
+  AUC: 0.4651 | n_est=500, depth=3, leaves=89
+  AUC: 0.5270 | n_est=315, depth=12, leaves=27
+  AUC: 0.5256 | n_est=241, depth=7, leaves=57
+  AUC: 0.5047 | n_est=319, depth=3, leaves=28
+  AUC: 0.5270 | n_est=500, depth=8, leaves=81
+  AUC: 0.5278 | n_est=293, depth=12, leaves=26
+
+Best hyperparameters: {'n_estimators': np.int64(293), 'max_depth': np.int64(12), 'learning_rate': 0.29999999999999993, 'num_leaves': np.int64(26), 'subsample': 0.5081935399717155, 'colsample_bytree': 0.9102125555683178, 'reg_alpha': 10.0, 'reg_lambda': 0.0}
+Validation AUC: 0.5278
+
+Test Results:
+  Accuracy: 0.506
+  AUC: 0.456
+  Sharpe: 1.43
+  Win Rate: 48.6%
+
+--------------------------------------------------
+Horizon: 8 days, Threshold: 0.0175
+--------------------------------------------------
+  AUC: 0.4958 | n_est=408, depth=5, leaves=68
+  AUC: 0.5597 | n_est=114, depth=9, leaves=78
+  AUC: 0.5734 | n_est=325, depth=3, leaves=62
+  AUC: 0.4741 | n_est=91, depth=9, leaves=99
+  AUC: 0.4710 | n_est=56, depth=11, leaves=51
+  AUC: 0.4509 | n_est=324, depth=10, leaves=51
+  AUC: 0.5317 | n_est=305, depth=3, leaves=56
+  AUC: 0.4841 | n_est=307, depth=8, leaves=88
+  AUC: 0.4645 | n_est=323, depth=5, leaves=33
+  AUC: 0.4703 | n_est=56, depth=5, leaves=83
+  AUC: 0.5683 | n_est=500, depth=12, leaves=20
+  AUC: 0.5962 | n_est=500, depth=3, leaves=23
+  AUC: 0.5550 | n_est=500, depth=9, leaves=20
+  AUC: 0.5531 | n_est=500, depth=3, leaves=100
+  AUC: 0.5824 | n_est=151, depth=3, leaves=20
+  AUC: 0.5682 | n_est=500, depth=12, leaves=20
+  AUC: 0.5765 | n_est=500, depth=3, leaves=20
+  AUC: 0.5661 | n_est=50, depth=3, leaves=100
+  AUC: 0.4505 | n_est=432, depth=3, leaves=100
+  AUC: 0.5619 | n_est=50, depth=7, leaves=20
+  AUC: 0.5976 | n_est=500, depth=3, leaves=100
+  AUC: 0.6137 | n_est=500, depth=3, leaves=20
+  AUC: 0.4746 | n_est=50, depth=12, leaves=20
+  AUC: 0.5616 | n_est=500, depth=3, leaves=20
+  AUC: 0.5487 | n_est=500, depth=7, leaves=36
+  AUC: 0.6044 | n_est=53, depth=4, leaves=35
+  AUC: 0.5824 | n_est=50, depth=3, leaves=99
+  AUC: 0.5577 | n_est=50, depth=12, leaves=80
+  AUC: 0.5735 | n_est=62, depth=3, leaves=29
+  AUC: 0.5624 | n_est=493, depth=12, leaves=41
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(3), 'learning_rate': 0.01024300164293376, 'num_leaves': np.int64(20), 'subsample': 0.7119825838674942, 'colsample_bytree': 1.0, 'reg_alpha': 8.533149414857622, 'reg_lambda': 10.0}
+Validation AUC: 0.6137
+
+Test Results:
+  Accuracy: 0.466
+  AUC: 0.466
+  Sharpe: 2.81
+  Win Rate: 67.7%
+
+--------------------------------------------------
+Horizon: 9 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4190 | n_est=408, depth=5, leaves=68
+  AUC: 0.5658 | n_est=114, depth=9, leaves=78
+  AUC: 0.5783 | n_est=325, depth=3, leaves=62
+  AUC: 0.4673 | n_est=91, depth=9, leaves=99
+  AUC: 0.4398 | n_est=56, depth=11, leaves=51
+  AUC: 0.4581 | n_est=324, depth=10, leaves=51
+  AUC: 0.4677 | n_est=305, depth=3, leaves=56
+  AUC: 0.4503 | n_est=307, depth=8, leaves=88
+  AUC: 0.4433 | n_est=323, depth=5, leaves=33
+  AUC: 0.4431 | n_est=56, depth=5, leaves=83
+  AUC: 0.5657 | n_est=500, depth=12, leaves=100
+  AUC: 0.5642 | n_est=57, depth=3, leaves=99
+  AUC: 0.5547 | n_est=412, depth=12, leaves=98
+  AUC: 0.4945 | n_est=500, depth=3, leaves=70
+  AUC: 0.5741 | n_est=500, depth=3, leaves=100
+  AUC: 0.4449 | n_est=71, depth=6, leaves=78
+  AUC: 0.5724 | n_est=50, depth=3, leaves=20
+  AUC: 0.5748 | n_est=500, depth=3, leaves=100
+  AUC: 0.5852 | n_est=249, depth=4, leaves=71
+  AUC: 0.5797 | n_est=55, depth=12, leaves=20
+  AUC: 0.5792 | n_est=50, depth=3, leaves=20
+  AUC: 0.5682 | n_est=81, depth=3, leaves=20
+  AUC: 0.5684 | n_est=500, depth=12, leaves=100
+  AUC: 0.5759 | n_est=50, depth=3, leaves=20
+  AUC: 0.5411 | n_est=500, depth=7, leaves=27
+  AUC: 0.5547 | n_est=500, depth=8, leaves=47
+  AUC: 0.5751 | n_est=50, depth=4, leaves=100
+  AUC: 0.5753 | n_est=50, depth=3, leaves=100
+  AUC: 0.5730 | n_est=494, depth=4, leaves=94
+  AUC: 0.5683 | n_est=50, depth=11, leaves=57
+
+Best hyperparameters: {'n_estimators': np.int64(249), 'max_depth': np.int64(4), 'learning_rate': 0.1290870928787394, 'num_leaves': np.int64(71), 'subsample': 0.8356714338737486, 'colsample_bytree': 0.7843435638923624, 'reg_alpha': 10.0, 'reg_lambda': 2.2349446259771875}
+Validation AUC: 0.5852
+
+Test Results:
+  Accuracy: 0.514
+  AUC: 0.495
+  Sharpe: 2.23
+  Win Rate: 63.0%
+
+--------------------------------------------------
+Horizon: 10 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4357 | n_est=408, depth=5, leaves=68
+  AUC: 0.5876 | n_est=114, depth=9, leaves=78
+  AUC: 0.5857 | n_est=325, depth=3, leaves=62
+  AUC: 0.4184 | n_est=91, depth=9, leaves=99
+  AUC: 0.4150 | n_est=56, depth=11, leaves=51
+  AUC: 0.4054 | n_est=324, depth=10, leaves=51
+  AUC: 0.4824 | n_est=305, depth=3, leaves=56
+  AUC: 0.4321 | n_est=307, depth=8, leaves=88
+  AUC: 0.3857 | n_est=323, depth=5, leaves=33
+  AUC: 0.4354 | n_est=56, depth=5, leaves=83
+  AUC: 0.6358 | n_est=50, depth=12, leaves=20
+  AUC: 0.5876 | n_est=50, depth=12, leaves=20
+  AUC: 0.6358 | n_est=500, depth=8, leaves=52
+  AUC: 0.5884 | n_est=500, depth=12, leaves=20
+  AUC: 0.5913 | n_est=177, depth=3, leaves=87
+  AUC: 0.3526 | n_est=290, depth=12, leaves=84
+  AUC: 0.5945 | n_est=500, depth=3, leaves=100
+  AUC: 0.5921 | n_est=50, depth=3, leaves=47
+  AUC: 0.5753 | n_est=420, depth=4, leaves=60
+  AUC: 0.5858 | n_est=500, depth=3, leaves=100
+  AUC: 0.5743 | n_est=500, depth=12, leaves=100
+  AUC: 0.5877 | n_est=202, depth=9, leaves=39
+  AUC: 0.6005 | n_est=398, depth=3, leaves=76
+  AUC: 0.6006 | n_est=83, depth=3, leaves=51
+  AUC: 0.5712 | n_est=500, depth=3, leaves=100
+  AUC: 0.6151 | n_est=343, depth=12, leaves=35
+  AUC: 0.6194 | n_est=392, depth=9, leaves=20
+  AUC: 0.5371 | n_est=500, depth=12, leaves=20
+  AUC: 0.5791 | n_est=426, depth=7, leaves=20
+  AUC: 0.5889 | n_est=303, depth=11, leaves=22
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(12), 'learning_rate': 0.29999999999999993, 'num_leaves': np.int64(20), 'subsample': 1.0, 'colsample_bytree': 1.0, 'reg_alpha': 10.0, 'reg_lambda': 10.0}
+Validation AUC: 0.6358
+
+Test Results:
+  Accuracy: 0.518
+  AUC: 0.468
+  Sharpe: 2.40
+  Win Rate: 60.0%
+
+Results saved to: results/ours/LightGBM_tuned_TSLA_results.csv
+✓ lightgbm training completed for TSLA
+
+-----------------------------------------
+Training random_forest for TSLA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+RANDOM FOREST HYPERPARAMETER TUNING: TSLA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0025 (balance score: 0.999)
+  Horizon 3d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 4d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 5d -> Best threshold = 0.0100 (balance score: 0.998)
+  Horizon 6d -> Best threshold = 0.0100 (balance score: 1.000)
+  Horizon 7d -> Best threshold = 0.0125 (balance score: 0.997)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0225 (balance score: 0.996)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.996)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0025
+--------------------------------------------------
+  AUC: 0.5768 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5680 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5752 | n_est=472, depth=3, criterion=gini
+  AUC: 0.5542 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5741 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5752 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5655 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5704 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5742 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.5593 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5720 | n_est=500, depth=20, criterion=gini
+  AUC: 0.5684 | n_est=69, depth=10, criterion=gini
+  AUC: 0.5692 | n_est=499, depth=20, criterion=entropy
+  AUC: 0.5631 | n_est=50, depth=20, criterion=gini
+  AUC: 0.5807 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5687 | n_est=438, depth=20, criterion=gini
+  AUC: 0.5571 | n_est=50, depth=20, criterion=gini
+  AUC: 0.5633 | n_est=494, depth=14, criterion=gini
+  AUC: 0.5543 | n_est=483, depth=20, criterion=entropy
+  AUC: 0.5744 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5703 | n_est=496, depth=3, criterion=entropy
+  AUC: 0.5724 | n_est=72, depth=3, criterion=entropy
+  AUC: 0.5714 | n_est=481, depth=7, criterion=gini
+  AUC: 0.5732 | n_est=52, depth=3, criterion=entropy
+  AUC: 0.5639 | n_est=53, depth=6, criterion=entropy
+  AUC: 0.5529 | n_est=55, depth=20, criterion=gini
+  AUC: 0.5733 | n_est=499, depth=3, criterion=entropy
+  AUC: 0.5559 | n_est=500, depth=15, criterion=gini
+  AUC: 0.5670 | n_est=51, depth=3, criterion=entropy
+  AUC: 0.5753 | n_est=500, depth=3, criterion=entropy
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(3), 'min_samples_split': np.int64(4), 'min_samples_leaf': np.int64(1), 'max_features': np.str_('log2'), 'criterion': np.str_('gini')}
+Validation AUC: 0.5807
+
+Test Results:
+  Accuracy: 0.518
+  AUC: 0.533
+  Sharpe: 1.16
+  Win Rate: 52.8%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5477 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5351 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5527 | n_est=472, depth=3, criterion=gini
+  AUC: 0.5014 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5411 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5441 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5380 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5414 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5337 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.5072 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5088 | n_est=500, depth=20, criterion=gini
+  AUC: 0.5572 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5306 | n_est=408, depth=4, criterion=gini
+  AUC: 0.5639 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5499 | n_est=436, depth=3, criterion=entropy
+  AUC: 0.5639 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5527 | n_est=500, depth=6, criterion=gini
+  AUC: 0.4993 | n_est=496, depth=20, criterion=gini
+  AUC: 0.5619 | n_est=67, depth=3, criterion=gini
+  AUC: 0.5639 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5492 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5315 | n_est=482, depth=19, criterion=entropy
+  AUC: 0.5440 | n_est=128, depth=3, criterion=gini
+  AUC: 0.5447 | n_est=70, depth=3, criterion=entropy
+  AUC: 0.5495 | n_est=50, depth=20, criterion=gini
+  AUC: 0.5353 | n_est=126, depth=3, criterion=entropy
+  AUC: 0.5189 | n_est=51, depth=19, criterion=entropy
+  AUC: 0.5565 | n_est=66, depth=3, criterion=gini
+  AUC: 0.5378 | n_est=70, depth=7, criterion=gini
+  AUC: 0.5581 | n_est=202, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(3), 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('log2'), 'criterion': np.str_('gini')}
+Validation AUC: 0.5639
+
+Test Results:
+  Accuracy: 0.478
+  AUC: 0.510
+  Sharpe: 1.61
+  Win Rate: 56.6%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5719 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5605 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5887 | n_est=472, depth=3, criterion=gini
+  AUC: 0.5282 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5690 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5615 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5770 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5628 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5747 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.5275 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5607 | n_est=498, depth=20, criterion=gini
+  AUC: 0.5982 | n_est=192, depth=3, criterion=entropy
+  AUC: 0.5541 | n_est=448, depth=20, criterion=entropy
+  AUC: 0.5575 | n_est=50, depth=7, criterion=gini
+  AUC: 0.5936 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5908 | n_est=95, depth=3, criterion=entropy
+  AUC: 0.5893 | n_est=460, depth=3, criterion=gini
+  AUC: 0.5134 | n_est=496, depth=20, criterion=gini
+  AUC: 0.5512 | n_est=238, depth=3, criterion=gini
+  AUC: 0.5936 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5936 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5602 | n_est=168, depth=3, criterion=entropy
+  AUC: 0.6014 | n_est=65, depth=3, criterion=entropy
+  AUC: 0.5891 | n_est=485, depth=3, criterion=entropy
+  AUC: 0.5989 | n_est=60, depth=3, criterion=gini
+  AUC: 0.5965 | n_est=491, depth=3, criterion=entropy
+  AUC: 0.5798 | n_est=54, depth=3, criterion=gini
+  AUC: 0.5955 | n_est=356, depth=3, criterion=entropy
+  AUC: 0.5509 | n_est=64, depth=16, criterion=gini
+  AUC: 0.5990 | n_est=457, depth=3, criterion=entropy
+
+Best hyperparameters: {'n_estimators': np.int64(65), 'max_depth': np.int64(3), 'min_samples_split': np.int64(19), 'min_samples_leaf': np.int64(1), 'max_features': np.str_('log2'), 'criterion': np.str_('entropy')}
+Validation AUC: 0.6014
+
+Test Results:
+  Accuracy: 0.510
+  AUC: 0.566
+  Sharpe: 1.56
+  Win Rate: 58.1%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.5641 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5486 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5933 | n_est=472, depth=3, criterion=gini
+  AUC: 0.4339 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5625 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5466 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5763 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5445 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5809 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.4440 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5953 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5582 | n_est=50, depth=20, criterion=gini
+  AUC: 0.5953 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5935 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5897 | n_est=500, depth=3, criterion=gini
+  AUC: 0.4976 | n_est=500, depth=19, criterion=entropy
+  AUC: 0.5900 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5903 | n_est=488, depth=3, criterion=gini
+  AUC: 0.4316 | n_est=172, depth=20, criterion=entropy
+  AUC: 0.5852 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5857 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5679 | n_est=89, depth=3, criterion=gini
+  AUC: 0.5955 | n_est=224, depth=3, criterion=entropy
+  AUC: 0.4354 | n_est=171, depth=18, criterion=gini
+  AUC: 0.5789 | n_est=205, depth=5, criterion=gini
+  AUC: 0.5859 | n_est=50, depth=5, criterion=entropy
+  AUC: 0.5588 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5582 | n_est=50, depth=16, criterion=gini
+  AUC: 0.5897 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5423 | n_est=500, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(224), 'max_depth': np.int64(3), 'min_samples_split': np.int64(2), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('log2'), 'criterion': np.str_('entropy')}
+Validation AUC: 0.5955
+
+Test Results:
+  Accuracy: 0.538
+  AUC: 0.581
+  Sharpe: 1.66
+  Win Rate: 54.0%
+
+--------------------------------------------------
+Horizon: 6 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.5477 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5400 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5898 | n_est=472, depth=3, criterion=gini
+  AUC: 0.4792 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5601 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5458 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5413 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5332 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5814 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.5007 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5651 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5269 | n_est=450, depth=20, criterion=gini
+  AUC: 0.5999 | n_est=206, depth=3, criterion=entropy
+  AUC: 0.5969 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5904 | n_est=63, depth=3, criterion=entropy
+  AUC: 0.4939 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4999 | n_est=417, depth=20, criterion=entropy
+  AUC: 0.5198 | n_est=60, depth=14, criterion=entropy
+  AUC: 0.5600 | n_est=209, depth=20, criterion=entropy
+  AUC: 0.6023 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5969 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4831 | n_est=486, depth=3, criterion=gini
+  AUC: 0.5911 | n_est=54, depth=3, criterion=gini
+  AUC: 0.6023 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.4718 | n_est=429, depth=20, criterion=gini
+  AUC: 0.4932 | n_est=489, depth=14, criterion=gini
+  AUC: 0.5988 | n_est=477, depth=3, criterion=gini
+  AUC: 0.5561 | n_est=430, depth=18, criterion=gini
+  AUC: 0.5858 | n_est=461, depth=3, criterion=entropy
+  AUC: 0.5984 | n_est=395, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(3), 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('log2'), 'criterion': np.str_('entropy')}
+Validation AUC: 0.6023
+
+Test Results:
+  Accuracy: 0.526
+  AUC: 0.557
+  Sharpe: 1.96
+  Win Rate: 56.1%
+
+--------------------------------------------------
+Horizon: 7 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.5639 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5450 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.6030 | n_est=472, depth=3, criterion=gini
+  AUC: 0.5052 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5564 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5534 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5627 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5492 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5851 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.4712 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.5263 | n_est=364, depth=20, criterion=gini
+  AUC: 0.5932 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.4594 | n_est=110, depth=20, criterion=gini
+  AUC: 0.5697 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.5990 | n_est=492, depth=3, criterion=gini
+  AUC: 0.5824 | n_est=50, depth=3, criterion=entropy
+  AUC: 0.4585 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5461 | n_est=117, depth=20, criterion=entropy
+  AUC: 0.5643 | n_est=485, depth=17, criterion=gini
+  AUC: 0.6139 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.6128 | n_est=493, depth=3, criterion=gini
+  AUC: 0.4809 | n_est=465, depth=20, criterion=gini
+  AUC: 0.5311 | n_est=468, depth=14, criterion=gini
+  AUC: 0.4790 | n_est=460, depth=3, criterion=entropy
+  AUC: 0.4588 | n_est=488, depth=15, criterion=entropy
+  AUC: 0.6139 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.6149 | n_est=427, depth=3, criterion=entropy
+  AUC: 0.6187 | n_est=353, depth=3, criterion=entropy
+  AUC: 0.6103 | n_est=231, depth=3, criterion=entropy
+  AUC: 0.6174 | n_est=367, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(353), 'max_depth': np.int64(3), 'min_samples_split': np.int64(2), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('sqrt'), 'criterion': np.str_('entropy')}
+Validation AUC: 0.6187
+
+Test Results:
+  Accuracy: 0.514
+  AUC: 0.560
+  Sharpe: 1.69
+  Win Rate: 51.4%
+
+--------------------------------------------------
+Horizon: 8 days, Threshold: 0.0175
+--------------------------------------------------
+  AUC: 0.5746 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5526 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.6139 | n_est=472, depth=3, criterion=gini
+  AUC: 0.4308 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5684 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5720 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5720 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5495 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5896 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.4669 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.6258 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.6195 | n_est=50, depth=3, criterion=gini
+  AUC: 0.4783 | n_est=487, depth=20, criterion=gini
+  AUC: 0.6258 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4615 | n_est=500, depth=20, criterion=entropy
+  AUC: 0.6277 | n_est=500, depth=3, criterion=gini
+  AUC: 0.6277 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5675 | n_est=500, depth=20, criterion=gini
+  AUC: 0.6259 | n_est=342, depth=3, criterion=gini
+  AUC: 0.5989 | n_est=500, depth=5, criterion=gini
+  AUC: 0.5258 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5665 | n_est=50, depth=3, criterion=gini
+  AUC: 0.6277 | n_est=500, depth=3, criterion=gini
+  AUC: 0.6217 | n_est=50, depth=3, criterion=gini
+  AUC: 0.6109 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5655 | n_est=51, depth=7, criterion=entropy
+  AUC: 0.5676 | n_est=499, depth=16, criterion=gini
+  AUC: 0.5014 | n_est=500, depth=13, criterion=gini
+  AUC: 0.4269 | n_est=127, depth=20, criterion=gini
+  AUC: 0.6277 | n_est=500, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(3), 'min_samples_split': np.int64(2), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('sqrt'), 'criterion': np.str_('gini')}
+Validation AUC: 0.6277
+
+Test Results:
+  Accuracy: 0.502
+  AUC: 0.520
+  Sharpe: 2.81
+  Win Rate: 67.7%
+
+--------------------------------------------------
+Horizon: 9 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.5511 | n_est=408, depth=6, criterion=gini
+  AUC: 0.5281 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.6181 | n_est=472, depth=3, criterion=gini
+  AUC: 0.4300 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5554 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5550 | n_est=356, depth=11, criterion=gini
+  AUC: 0.5194 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.5188 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5965 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.4327 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.4991 | n_est=500, depth=20, criterion=entropy
+  AUC: 0.5934 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5360 | n_est=500, depth=20, criterion=gini
+  AUC: 0.6172 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4252 | n_est=500, depth=20, criterion=entropy
+  AUC: 0.6172 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.5606 | n_est=500, depth=15, criterion=gini
+  AUC: 0.4946 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5771 | n_est=51, depth=3, criterion=entropy
+  AUC: 0.6328 | n_est=500, depth=3, criterion=gini
+  AUC: 0.6241 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.6241 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4916 | n_est=499, depth=13, criterion=entropy
+  AUC: 0.6088 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.6308 | n_est=344, depth=3, criterion=gini
+  AUC: 0.5438 | n_est=50, depth=20, criterion=gini
+  AUC: 0.6183 | n_est=312, depth=3, criterion=gini
+  AUC: 0.5435 | n_est=50, depth=20, criterion=entropy
+  AUC: 0.6118 | n_est=499, depth=3, criterion=gini
+  AUC: 0.6317 | n_est=430, depth=3, criterion=gini
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(3), 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('sqrt'), 'criterion': np.str_('gini')}
+Validation AUC: 0.6328
+
+Test Results:
+  Accuracy: 0.506
+  AUC: 0.530
+  Sharpe: 2.23
+  Win Rate: 63.0%
+
+--------------------------------------------------
+Horizon: 10 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4902 | n_est=408, depth=6, criterion=gini
+  AUC: 0.4501 | n_est=257, depth=9, criterion=entropy
+  AUC: 0.5727 | n_est=472, depth=3, criterion=gini
+  AUC: 0.3714 | n_est=60, depth=12, criterion=gini
+  AUC: 0.5181 | n_est=91, depth=14, criterion=entropy
+  AUC: 0.5031 | n_est=356, depth=11, criterion=gini
+  AUC: 0.4262 | n_est=57, depth=7, criterion=entropy
+  AUC: 0.4649 | n_est=128, depth=10, criterion=gini
+  AUC: 0.5460 | n_est=305, depth=4, criterion=entropy
+  AUC: 0.3921 | n_est=377, depth=9, criterion=entropy
+  AUC: 0.4442 | n_est=333, depth=20, criterion=entropy
+  AUC: 0.5648 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5351 | n_est=377, depth=18, criterion=entropy
+  AUC: 0.5693 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.4470 | n_est=500, depth=14, criterion=gini
+  AUC: 0.5723 | n_est=500, depth=3, criterion=gini
+  AUC: 0.4419 | n_est=50, depth=20, criterion=entropy
+  AUC: 0.6119 | n_est=316, depth=3, criterion=gini
+  AUC: 0.4767 | n_est=257, depth=3, criterion=entropy
+  AUC: 0.5893 | n_est=500, depth=3, criterion=entropy
+  AUC: 0.3998 | n_est=500, depth=20, criterion=gini
+  AUC: 0.4000 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5595 | n_est=50, depth=3, criterion=gini
+  AUC: 0.5882 | n_est=485, depth=3, criterion=entropy
+  AUC: 0.3912 | n_est=50, depth=20, criterion=entropy
+  AUC: 0.5266 | n_est=52, depth=20, criterion=entropy
+  AUC: 0.3954 | n_est=58, depth=14, criterion=entropy
+  AUC: 0.6011 | n_est=500, depth=3, criterion=gini
+  AUC: 0.5856 | n_est=383, depth=4, criterion=entropy
+  AUC: 0.5906 | n_est=366, depth=3, criterion=entropy
+
+Best hyperparameters: {'n_estimators': np.int64(316), 'max_depth': np.int64(3), 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(10), 'max_features': np.str_('log2'), 'criterion': np.str_('gini')}
+Validation AUC: 0.6119
+
+Test Results:
+  Accuracy: 0.490
+  AUC: 0.553
+  Sharpe: 2.14
+  Win Rate: 60.0%
+
+Results saved to: results/ours/RandomForest_tuned_TSLA_results.csv
+✓ random_forest training completed for TSLA
+
+-----------------------------------------
+Training logistic_regression for TSLA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+LOGISTIC REGRESSION HYPERPARAMETER TUNING: TSLA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0025 (balance score: 0.999)
+  Horizon 3d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 4d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 5d -> Best threshold = 0.0100 (balance score: 0.998)
+  Horizon 6d -> Best threshold = 0.0100 (balance score: 1.000)
+  Horizon 7d -> Best threshold = 0.0125 (balance score: 0.997)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0225 (balance score: 0.996)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.996)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0025
+--------------------------------------------------
+  AUC: 0.5869 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.5872 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.5874 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.5861 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.5872 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.5871 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.5908 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.5846 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.5868 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.01
+  AUC: 0.5868 | C=15.6992, penalty=l2, l1_ratio=1.00
+  AUC: 0.5918 | C=0.0010, penalty=l2, l1_ratio=1.00
+  AUC: 0.5918 | C=0.0010, penalty=l2, l1_ratio=0.00
+  AUC: 0.5872 | C=100.0000, penalty=l1, l1_ratio=0.00
+  AUC: 0.5729 | C=0.2390, penalty=l1, l1_ratio=0.07
+  AUC: 0.5872 | C=100.0000, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.5805 | C=0.0353, penalty=l2, l1_ratio=0.97
+  AUC: 0.5868 | C=4.9127, penalty=l2, l1_ratio=0.99
+  AUC: 0.5739 | C=0.0437, penalty=l1, l1_ratio=0.97
+  AUC: 0.5872 | C=4.0468, penalty=elasticnet, l1_ratio=0.05
+  AUC: 0.5868 | C=39.0785, penalty=l2, l1_ratio=0.00
+  AUC: 0.5783 | C=0.0113, penalty=l2, l1_ratio=0.00
+  AUC: 0.5870 | C=21.9436, penalty=elasticnet, l1_ratio=0.02
+  AUC: 0.5869 | C=0.7376, penalty=elasticnet, l1_ratio=0.07
+  AUC: 0.5863 | C=0.0908, penalty=l2, l1_ratio=0.02
+  AUC: 0.5781 | C=0.0155, penalty=elasticnet, l1_ratio=0.01
+  AUC: 0.5871 | C=0.4133, penalty=l2, l1_ratio=0.85
+  AUC: 0.5872 | C=11.7028, penalty=elasticnet, l1_ratio=0.91
+  AUC: 0.5709 | C=0.0734, penalty=elasticnet, l1_ratio=0.94
+
+Best hyperparameters: {'C': 0.001, 'penalty': np.str_('l2'), 'l1_ratio': 1.0}
+Validation AUC: 0.5918
+
+Test Results:
+  Accuracy: 0.530
+  AUC: 0.550
+  Sharpe: 0.55
+  Win Rate: 53.6%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5691 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.5695 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.5698 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.5703 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.5690 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.5695 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.6121 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.6092 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.5693 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.29
+  AUC: 0.6130 | C=0.0010, penalty=l2, l1_ratio=1.00
+  AUC: 0.6130 | C=0.0010, penalty=l2, l1_ratio=0.00
+  AUC: 0.6052 | C=0.1178, penalty=l1, l1_ratio=0.99
+  AUC: 0.5871 | C=0.0105, penalty=l2, l1_ratio=1.00
+  AUC: 0.5693 | C=0.2839, penalty=elasticnet, l1_ratio=0.10
+  AUC: 0.6039 | C=0.0481, penalty=l1, l1_ratio=0.33
+  AUC: 0.5695 | C=100.0000, penalty=elasticnet, l1_ratio=0.24
+  AUC: 0.6040 | C=0.0452, penalty=elasticnet, l1_ratio=0.95
+  AUC: 0.5692 | C=12.0734, penalty=l2, l1_ratio=0.31
+  AUC: 0.5705 | C=0.0430, penalty=l2, l1_ratio=0.12
+  AUC: 0.6073 | C=0.0770, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.5437 | C=0.0161, penalty=l1, l1_ratio=0.82
+  AUC: 0.5694 | C=4.0467, penalty=elasticnet, l1_ratio=0.24
+  AUC: 0.5694 | C=22.3753, penalty=elasticnet, l1_ratio=0.01
+  AUC: 0.5692 | C=32.3282, penalty=l2, l1_ratio=0.79
+  AUC: 0.6030 | C=0.0051, penalty=l2, l1_ratio=0.03
+  AUC: 0.5693 | C=4.2867, penalty=l2, l1_ratio=0.98
+  AUC: 0.5688 | C=0.5761, penalty=l1, l1_ratio=0.90
+  AUC: 0.6068 | C=0.0737, penalty=l1, l1_ratio=0.07
+
+Best hyperparameters: {'C': 0.001, 'penalty': np.str_('l2'), 'l1_ratio': 1.0}
+Validation AUC: 0.6130
+
+Test Results:
+  Accuracy: 0.538
+  AUC: 0.548
+  Sharpe: 1.36
+  Win Rate: 59.0%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.6535 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.6524 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.6516 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.6559 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.6529 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.6524 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.6539 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.6561 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.6531 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.00
+  AUC: 0.6530 | C=100.0000, penalty=l1, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0013, penalty=elasticnet, l1_ratio=0.36
+  AUC: 0.6530 | C=0.0010, penalty=l2, l1_ratio=1.00
+  AUC: 0.6530 | C=16.1651, penalty=l2, l1_ratio=1.00
+  AUC: 0.6525 | C=0.0190, penalty=l2, l1_ratio=0.00
+  AUC: 0.6530 | C=7.6388, penalty=l2, l1_ratio=1.00
+  AUC: 0.6530 | C=9.6954, penalty=l2, l1_ratio=1.00
+  AUC: 0.6530 | C=17.0954, penalty=l2, l1_ratio=1.00
+  AUC: 0.6535 | C=22.5993, penalty=l1, l1_ratio=1.00
+  AUC: 0.6530 | C=21.9710, penalty=l2, l1_ratio=1.00
+  AUC: 0.6530 | C=100.0000, penalty=l1, l1_ratio=1.00
+  AUC: 0.6532 | C=100.0000, penalty=l2, l1_ratio=1.00
+  AUC: 0.6535 | C=21.6999, penalty=elasticnet, l1_ratio=0.99
+  AUC: 0.6612 | C=0.4338, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=1.00
+  AUC: 0.6666 | C=0.1562, penalty=l1, l1_ratio=0.01
+  AUC: 0.6789 | C=0.0725, penalty=elasticnet, l1_ratio=0.98
+  AUC: 0.6730 | C=0.0435, penalty=l1, l1_ratio=0.01
+  AUC: 0.6497 | C=0.0582, penalty=l2, l1_ratio=0.94
+
+Best hyperparameters: {'C': 0.07249103689513073, 'penalty': np.str_('elasticnet'), 'l1_ratio': 0.9812739008122408}
+Validation AUC: 0.6789
+
+Test Results:
+  Accuracy: 0.574
+  AUC: 0.585
+  Sharpe: 2.02
+  Win Rate: 58.1%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.6506 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.6511 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.6541 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.6530 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.6514 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.6512 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.6749 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.6869 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.6512 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=1.00
+  AUC: 0.6860 | C=0.0091, penalty=l2, l1_ratio=1.00
+  AUC: 0.6861 | C=0.1922, penalty=l1, l1_ratio=0.99
+  AUC: 0.6529 | C=0.3571, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.6868 | C=0.0790, penalty=l1, l1_ratio=0.00
+  AUC: 0.6913 | C=0.0051, penalty=l2, l1_ratio=0.00
+  AUC: 0.6513 | C=100.0000, penalty=elasticnet, l1_ratio=0.10
+  AUC: 0.6512 | C=15.5311, penalty=l2, l1_ratio=0.96
+  AUC: 0.6858 | C=0.1875, penalty=l1, l1_ratio=0.00
+  AUC: 0.6866 | C=0.0704, penalty=elasticnet, l1_ratio=0.96
+  AUC: 0.6815 | C=0.0301, penalty=elasticnet, l1_ratio=0.72
+  AUC: 0.6666 | C=0.0354, penalty=l2, l1_ratio=0.00
+  AUC: 0.6910 | C=0.0048, penalty=l2, l1_ratio=1.00
+  AUC: 0.6513 | C=17.6240, penalty=elasticnet, l1_ratio=0.90
+  AUC: 0.6787 | C=0.0280, penalty=l1, l1_ratio=1.00
+  AUC: 0.6513 | C=5.0493, penalty=l2, l1_ratio=0.76
+  AUC: 0.6513 | C=3.7187, penalty=elasticnet, l1_ratio=0.99
+  AUC: 0.6898 | C=0.1250, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.6928 | C=0.0060, penalty=l2, l1_ratio=1.00
+  AUC: 0.6588 | C=0.0789, penalty=l2, l1_ratio=0.91
+
+Best hyperparameters: {'C': 0.006030774027001902, 'penalty': np.str_('l2'), 'l1_ratio': 1.0}
+Validation AUC: 0.6928
+
+Test Results:
+  Accuracy: 0.566
+  AUC: 0.606
+  Sharpe: 1.85
+  Win Rate: 56.0%
+
+--------------------------------------------------
+Horizon: 6 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.6276 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.6275 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.6291 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.6289 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.6269 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.6276 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.6769 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.6739 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.6266 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.6266 | C=100.0000, penalty=elasticnet, l1_ratio=0.69
+  AUC: 0.6285 | C=2.1920, penalty=elasticnet, l1_ratio=0.92
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=1.00
+  AUC: 0.6760 | C=0.0010, penalty=l2, l1_ratio=1.00
+  AUC: 0.6760 | C=0.0010, penalty=l2, l1_ratio=0.00
+  AUC: 0.6461 | C=0.0156, penalty=l2, l1_ratio=0.99
+  AUC: 0.6776 | C=0.0016, penalty=l2, l1_ratio=1.00
+  AUC: 0.6579 | C=0.1349, penalty=elasticnet, l1_ratio=0.95
+  AUC: 0.6268 | C=13.9149, penalty=l2, l1_ratio=0.91
+  AUC: 0.6684 | C=0.0437, penalty=l1, l1_ratio=0.07
+  AUC: 0.6583 | C=0.1389, penalty=l1, l1_ratio=0.00
+  AUC: 0.6783 | C=0.0017, penalty=l2, l1_ratio=0.00
+  AUC: 0.6765 | C=0.0012, penalty=l2, l1_ratio=0.00
+  AUC: 0.6643 | C=0.0199, penalty=l1, l1_ratio=0.93
+  AUC: 0.6280 | C=0.3976, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.6352 | C=0.0508, penalty=l2, l1_ratio=0.25
+  AUC: 0.6270 | C=4.7435, penalty=l2, l1_ratio=0.89
+  AUC: 0.6615 | C=0.0060, penalty=l2, l1_ratio=0.01
+  AUC: 0.6786 | C=0.0019, penalty=l2, l1_ratio=0.00
+  AUC: 0.6963 | C=0.0099, penalty=l1, l1_ratio=0.03
+
+Best hyperparameters: {'C': 0.009902372727124189, 'penalty': np.str_('l1'), 'l1_ratio': 0.03150423969521488}
+Validation AUC: 0.6963
+
+Test Results:
+  Accuracy: 0.546
+  AUC: 0.567
+  Sharpe: 2.93
+  Win Rate: 68.3%
+
+--------------------------------------------------
+Horizon: 7 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.6670 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.6671 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.6691 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.6696 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.6669 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.6671 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.7038 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.7090 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.6671 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0068, penalty=l1, l1_ratio=0.54
+  AUC: 0.6961 | C=0.0103, penalty=l2, l1_ratio=1.00
+  AUC: 0.7087 | C=0.0027, penalty=l2, l1_ratio=1.00
+  AUC: 0.7087 | C=0.0034, penalty=l2, l1_ratio=0.00
+  AUC: 0.7087 | C=0.0026, penalty=l2, l1_ratio=0.00
+  AUC: 0.6669 | C=14.8826, penalty=l2, l1_ratio=0.97
+  AUC: 0.7088 | C=0.0031, penalty=l2, l1_ratio=1.00
+  AUC: 0.6698 | C=0.2741, penalty=elasticnet, l1_ratio=0.11
+  AUC: 0.6671 | C=4.8942, penalty=elasticnet, l1_ratio=0.03
+  AUC: 0.6782 | C=0.0393, penalty=l2, l1_ratio=0.11
+  AUC: 0.6666 | C=99.9717, penalty=elasticnet, l1_ratio=0.22
+  AUC: 0.7090 | C=0.0030, penalty=l2, l1_ratio=0.00
+  AUC: 0.7086 | C=0.0821, penalty=l1, l1_ratio=0.95
+  AUC: 0.5000 | C=0.0022, penalty=l1, l1_ratio=0.00
+  AUC: 0.6721 | C=0.0877, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7023 | C=0.1529, penalty=l1, l1_ratio=1.00
+  AUC: 0.6672 | C=22.6583, penalty=elasticnet, l1_ratio=0.88
+  AUC: 0.6779 | C=0.4842, penalty=l1, l1_ratio=0.09
+  AUC: 0.7110 | C=0.0998, penalty=l1, l1_ratio=0.00
+  AUC: 0.7112 | C=0.1009, penalty=l1, l1_ratio=1.00
+
+Best hyperparameters: {'C': 0.10087899387631988, 'penalty': np.str_('l1'), 'l1_ratio': 1.0}
+Validation AUC: 0.7112
+
+Test Results:
+  Accuracy: 0.574
+  AUC: 0.588
+  Sharpe: 2.16
+  Win Rate: 60.0%
+
+--------------------------------------------------
+Horizon: 8 days, Threshold: 0.0175
+--------------------------------------------------
+  AUC: 0.7065 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.7067 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.7086 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.7088 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.7060 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.7066 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.7085 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.7119 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.7061 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.00
+  AUC: 0.7061 | C=100.0000, penalty=l1, l1_ratio=1.00
+  AUC: 0.7061 | C=100.0000, penalty=l2, l1_ratio=1.00
+  AUC: 0.7176 | C=0.0251, penalty=l2, l1_ratio=0.11
+  AUC: 0.7061 | C=100.0000, penalty=l1, l1_ratio=0.03
+  AUC: 0.7061 | C=100.0000, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.7061 | C=10.5603, penalty=l2, l1_ratio=1.00
+  AUC: 0.7172 | C=0.3453, penalty=l1, l1_ratio=0.00
+  AUC: 0.7195 | C=0.0102, penalty=l2, l1_ratio=1.00
+  AUC: 0.7209 | C=0.1267, penalty=elasticnet, l1_ratio=0.92
+  AUC: 0.7155 | C=0.0320, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.7088 | C=1.6568, penalty=l1, l1_ratio=0.00
+  AUC: 0.7104 | C=1.2178, penalty=l1, l1_ratio=1.00
+  AUC: 0.7236 | C=0.0607, penalty=l1, l1_ratio=0.00
+  AUC: 0.7236 | C=0.0600, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.7113 | C=0.0681, penalty=l2, l1_ratio=0.97
+  AUC: 0.7075 | C=4.0016, penalty=elasticnet, l1_ratio=0.96
+  AUC: 0.7225 | C=0.0157, penalty=l1, l1_ratio=0.85
+  AUC: 0.7170 | C=0.0370, penalty=l1, l1_ratio=1.00
+  AUC: 0.7065 | C=4.0697, penalty=l2, l1_ratio=0.96
+
+Best hyperparameters: {'C': 0.06073719762701968, 'penalty': np.str_('l1'), 'l1_ratio': 0.0}
+Validation AUC: 0.7236
+
+Test Results:
+  Accuracy: 0.522
+  AUC: 0.544
+  Sharpe: 2.34
+  Win Rate: 54.8%
+
+--------------------------------------------------
+Horizon: 9 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.7028 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.7026 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.7050 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.7052 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.7025 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.7029 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.7053 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.7113 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.7027 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.00
+  AUC: 0.7169 | C=0.0162, penalty=l2, l1_ratio=1.00
+  AUC: 0.7157 | C=0.0221, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7099 | C=0.0430, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7026 | C=13.3007, penalty=l2, l1_ratio=0.96
+  AUC: 0.5000 | C=0.0010, penalty=elasticnet, l1_ratio=1.00
+  AUC: 0.7099 | C=0.0433, penalty=l2, l1_ratio=0.11
+  AUC: 0.7143 | C=0.3838, penalty=elasticnet, l1_ratio=0.98
+  AUC: 0.7193 | C=0.0073, penalty=l2, l1_ratio=0.22
+  AUC: 0.7024 | C=100.0000, penalty=elasticnet, l1_ratio=0.16
+  AUC: 0.7028 | C=4.6185, penalty=l2, l1_ratio=0.99
+  AUC: 0.7048 | C=0.5267, penalty=elasticnet, l1_ratio=0.15
+  AUC: 0.7306 | C=0.1579, penalty=l1, l1_ratio=1.00
+  AUC: 0.7027 | C=35.4540, penalty=l2, l1_ratio=0.33
+  AUC: 0.7292 | C=0.1648, penalty=l1, l1_ratio=0.47
+  AUC: 0.7031 | C=4.1863, penalty=elasticnet, l1_ratio=0.15
+  AUC: 0.7343 | C=0.1036, penalty=elasticnet, l1_ratio=0.99
+  AUC: 0.7326 | C=0.1336, penalty=l1, l1_ratio=1.00
+  AUC: 0.7061 | C=0.0930, penalty=l2, l1_ratio=0.99
+  AUC: 0.7277 | C=0.0112, penalty=l1, l1_ratio=0.96
+
+Best hyperparameters: {'C': 0.1036184910711247, 'penalty': np.str_('elasticnet'), 'l1_ratio': 0.9869086124023448}
+Validation AUC: 0.7343
+
+Test Results:
+  Accuracy: 0.538
+  AUC: 0.556
+  Sharpe: 2.23
+  Win Rate: 66.7%
+
+--------------------------------------------------
+Horizon: 10 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.7150 | C=9.6098, penalty=l1, l1_ratio=0.78
+  AUC: 0.7149 | C=0.9644, penalty=l2, l1_ratio=0.10
+  AUC: 0.7174 | C=0.1978, penalty=l2, l1_ratio=0.14
+  AUC: 0.7189 | C=1.7966, penalty=l1, l1_ratio=0.72
+  AUC: 0.7145 | C=49.2905, penalty=l1, l1_ratio=0.99
+  AUC: 0.7150 | C=1.2229, penalty=l2, l1_ratio=0.01
+  AUC: 0.7070 | C=0.0013, penalty=l2, l1_ratio=0.40
+  AUC: 0.5000 | C=0.0017, penalty=elasticnet, l1_ratio=0.23
+  AUC: 0.7112 | C=0.0028, penalty=l2, l1_ratio=0.38
+  AUC: 0.7145 | C=82.4431, penalty=l2, l1_ratio=0.86
+  AUC: 0.5000 | C=0.0010, penalty=l1, l1_ratio=0.00
+  AUC: 0.7145 | C=100.0000, penalty=l2, l1_ratio=1.00
+  AUC: 0.7202 | C=0.1104, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7162 | C=0.3521, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7306 | C=0.1685, penalty=l1, l1_ratio=1.00
+  AUC: 0.7246 | C=0.0262, penalty=l2, l1_ratio=1.00
+  AUC: 0.7144 | C=100.0000, penalty=elasticnet, l1_ratio=0.00
+  AUC: 0.7145 | C=10.0295, penalty=l2, l1_ratio=0.98
+  AUC: 0.7289 | C=0.0619, penalty=l1, l1_ratio=0.05
+  AUC: 0.7149 | C=22.9949, penalty=elasticnet, l1_ratio=0.98
+  AUC: 0.7160 | C=3.2582, penalty=elasticnet, l1_ratio=0.98
+  AUC: 0.7318 | C=0.1248, penalty=l1, l1_ratio=0.01
+  AUC: 0.7222 | C=0.8319, penalty=l1, l1_ratio=1.00
+  AUC: 0.7234 | C=0.0110, penalty=l2, l1_ratio=0.03
+  AUC: 0.7325 | C=0.0973, penalty=l1, l1_ratio=1.00
+  AUC: 0.7145 | C=99.4387, penalty=l1, l1_ratio=0.90
+  AUC: 0.7216 | C=0.0638, penalty=l2, l1_ratio=0.01
+  AUC: 0.7269 | C=0.4664, penalty=l1, l1_ratio=0.00
+  AUC: 0.7285 | C=0.0211, penalty=l1, l1_ratio=0.98
+  AUC: 0.7256 | C=0.0323, penalty=elasticnet, l1_ratio=0.96
+
+Best hyperparameters: {'C': 0.09725827409064644, 'penalty': np.str_('l1'), 'l1_ratio': 1.0}
+Validation AUC: 0.7325
+
+Test Results:
+  Accuracy: 0.518
+  AUC: 0.568
+  Sharpe: 0.91
+  Win Rate: 52.0%
+
+Results saved to: results/ours/LogisticRegression_tuned_TSLA_results.csv
+✓ logistic_regression training completed for TSLA
+
+-----------------------------------------
+Training gradient_boosting for TSLA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+GRADIENT BOOSTING HYPERPARAMETER TUNING: TSLA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0025 (balance score: 0.999)
+  Horizon 3d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 4d -> Best threshold = 0.0050 (balance score: 0.994)
+  Horizon 5d -> Best threshold = 0.0100 (balance score: 0.998)
+  Horizon 6d -> Best threshold = 0.0100 (balance score: 1.000)
+  Horizon 7d -> Best threshold = 0.0125 (balance score: 0.997)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0225 (balance score: 0.996)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.996)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0025
+--------------------------------------------------
+  AUC: 0.5526 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5664 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.5794 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.5484 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.5562 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5777 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5811 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.5697 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.5634 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5627 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.5515 | n_est=102, depth=10, lr=0.2453
+  AUC: 0.5713 | n_est=50, depth=5, lr=0.0126
+  AUC: 0.5754 | n_est=409, depth=3, lr=0.0260
+  AUC: 0.5684 | n_est=405, depth=11, lr=0.0100
+  AUC: 0.5557 | n_est=235, depth=3, lr=0.0208
+  AUC: 0.5811 | n_est=50, depth=6, lr=0.1362
+  AUC: 0.5705 | n_est=500, depth=4, lr=0.2562
+  AUC: 0.5520 | n_est=494, depth=4, lr=0.2213
+  AUC: 0.5576 | n_est=407, depth=11, lr=0.0406
+  AUC: 0.5651 | n_est=463, depth=6, lr=0.0182
+  AUC: 0.5713 | n_est=73, depth=7, lr=0.0201
+  AUC: 0.5661 | n_est=374, depth=3, lr=0.1338
+  AUC: 0.5484 | n_est=50, depth=5, lr=0.1930
+  AUC: 0.5852 | n_est=246, depth=6, lr=0.2240
+  AUC: 0.5552 | n_est=205, depth=6, lr=0.2315
+  AUC: 0.5805 | n_est=440, depth=6, lr=0.1996
+  AUC: 0.5614 | n_est=50, depth=6, lr=0.2100
+  AUC: 0.5698 | n_est=451, depth=6, lr=0.2787
+  AUC: 0.5690 | n_est=425, depth=5, lr=0.0324
+  AUC: 0.5687 | n_est=463, depth=5, lr=0.0199
+
+Best hyperparameters: {'n_estimators': np.int64(246), 'max_depth': np.int64(6), 'learning_rate': 0.22395638128094816, 'subsample': 0.9103874319394664, 'min_samples_split': np.int64(16), 'min_samples_leaf': np.int64(1)}
+Validation AUC: 0.5852
+
+Test Results:
+  Accuracy: 0.526
+  AUC: 0.512
+  Sharpe: 1.56
+  Win Rate: 52.8%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5033 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5278 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.5074 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.5061 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.5138 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5301 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5035 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.5209 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.5442 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5162 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.5193 | n_est=311, depth=12, lr=0.0218
+  AUC: 0.5401 | n_est=324, depth=3, lr=0.0100
+  AUC: 0.5229 | n_est=183, depth=12, lr=0.0524
+  AUC: 0.5185 | n_est=308, depth=5, lr=0.0329
+  AUC: 0.5253 | n_est=500, depth=4, lr=0.3000
+  AUC: 0.5277 | n_est=66, depth=5, lr=0.2603
+  AUC: 0.5179 | n_est=500, depth=6, lr=0.1268
+  AUC: 0.5194 | n_est=267, depth=3, lr=0.3000
+  AUC: 0.5285 | n_est=349, depth=5, lr=0.2095
+  AUC: 0.5240 | n_est=151, depth=4, lr=0.2662
+  AUC: 0.5327 | n_est=151, depth=4, lr=0.1457
+  AUC: 0.5211 | n_est=494, depth=10, lr=0.0102
+  AUC: 0.5115 | n_est=86, depth=4, lr=0.0100
+  AUC: 0.4952 | n_est=282, depth=11, lr=0.1335
+  AUC: 0.5327 | n_est=287, depth=3, lr=0.0965
+  AUC: 0.5324 | n_est=441, depth=3, lr=0.0134
+  AUC: 0.5278 | n_est=380, depth=3, lr=0.1449
+  AUC: 0.5239 | n_est=77, depth=3, lr=0.0199
+  AUC: 0.5310 | n_est=363, depth=3, lr=0.2668
+  AUC: 0.5199 | n_est=126, depth=4, lr=0.0588
+
+Best hyperparameters: {'n_estimators': np.int64(305), 'max_depth': np.int64(3), 'learning_rate': 0.17545136166066816, 'subsample': 0.7248770666848829, 'min_samples_split': np.int64(9), 'min_samples_leaf': np.int64(9)}
+Validation AUC: 0.5442
+
+Test Results:
+  Accuracy: 0.494
+  AUC: 0.480
+  Sharpe: 1.63
+  Win Rate: 59.0%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.5153 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5236 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.5239 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.5216 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.5476 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5267 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5372 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.5336 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.5092 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.5202 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.5415 | n_est=50, depth=6, lr=0.0954
+  AUC: 0.5409 | n_est=50, depth=10, lr=0.0934
+  AUC: 0.5211 | n_est=465, depth=4, lr=0.0110
+  AUC: 0.5132 | n_est=172, depth=6, lr=0.1155
+  AUC: 0.5166 | n_est=120, depth=10, lr=0.0369
+  AUC: 0.5330 | n_est=50, depth=5, lr=0.0397
+  AUC: 0.5045 | n_est=90, depth=5, lr=0.2349
+  AUC: 0.5317 | n_est=50, depth=12, lr=0.0100
+  AUC: 0.5208 | n_est=103, depth=8, lr=0.0418
+  AUC: 0.5270 | n_est=315, depth=7, lr=0.0207
+  AUC: 0.5301 | n_est=217, depth=5, lr=0.2954
+  AUC: 0.5278 | n_est=494, depth=8, lr=0.0128
+  AUC: 0.5169 | n_est=494, depth=6, lr=0.2830
+  AUC: 0.5041 | n_est=497, depth=7, lr=0.2891
+  AUC: 0.5306 | n_est=65, depth=11, lr=0.1616
+  AUC: 0.5344 | n_est=65, depth=4, lr=0.0100
+  AUC: 0.5161 | n_est=61, depth=9, lr=0.0100
+  AUC: 0.5402 | n_est=492, depth=3, lr=0.0126
+  AUC: 0.5284 | n_est=97, depth=11, lr=0.0102
+  AUC: 0.5404 | n_est=50, depth=6, lr=0.0100
+
+Best hyperparameters: {'n_estimators': np.int64(91), 'max_depth': np.int64(9), 'learning_rate': 0.03672338759552655, 'subsample': 0.9916154429033942, 'min_samples_split': np.int64(10), 'min_samples_leaf': np.int64(9)}
+Validation AUC: 0.5476
+
+Test Results:
+  Accuracy: 0.530
+  AUC: 0.553
+  Sharpe: 3.10
+  Win Rate: 66.1%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.4361 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.4621 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4409 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.4497 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.4673 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4761 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.4522 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.4773 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.4553 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.4383 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.4728 | n_est=396, depth=9, lr=0.0100
+  AUC: 0.4566 | n_est=224, depth=7, lr=0.0100
+  AUC: 0.4521 | n_est=470, depth=10, lr=0.0100
+  AUC: 0.4572 | n_est=163, depth=9, lr=0.0136
+  AUC: 0.4971 | n_est=90, depth=3, lr=0.0283
+  AUC: 0.4698 | n_est=252, depth=6, lr=0.0282
+  AUC: 0.5040 | n_est=50, depth=3, lr=0.0158
+  AUC: 0.5148 | n_est=273, depth=3, lr=0.0100
+  AUC: 0.4693 | n_est=321, depth=12, lr=0.3000
+  AUC: 0.4768 | n_est=500, depth=3, lr=0.0155
+  AUC: 0.5327 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5071 | n_est=372, depth=3, lr=0.0100
+  AUC: 0.4335 | n_est=250, depth=12, lr=0.0103
+  AUC: 0.4707 | n_est=66, depth=12, lr=0.2309
+  AUC: 0.5028 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5249 | n_est=85, depth=3, lr=0.0120
+  AUC: 0.4772 | n_est=99, depth=12, lr=0.0137
+  AUC: 0.4775 | n_est=50, depth=4, lr=0.0100
+  AUC: 0.5287 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.4945 | n_est=500, depth=3, lr=0.0100
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(3), 'learning_rate': 0.01, 'subsample': 0.8188217235965052, 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(1)}
+Validation AUC: 0.5327
+
+Test Results:
+  Accuracy: 0.518
+  AUC: 0.530
+  Sharpe: 1.74
+  Win Rate: 54.0%
+
+--------------------------------------------------
+Horizon: 6 days, Threshold: 0.0100
+--------------------------------------------------
+  AUC: 0.5008 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5086 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4879 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.4953 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.5008 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.5132 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5298 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.5077 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.5238 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.4885 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.5075 | n_est=257, depth=3, lr=0.0122
+  AUC: 0.5338 | n_est=112, depth=3, lr=0.0128
+  AUC: 0.4989 | n_est=294, depth=6, lr=0.0300
+  AUC: 0.5534 | n_est=50, depth=3, lr=0.0243
+  AUC: 0.5094 | n_est=50, depth=3, lr=0.2499
+  AUC: 0.4836 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5084 | n_est=108, depth=4, lr=0.0445
+  AUC: 0.4918 | n_est=499, depth=3, lr=0.0856
+  AUC: 0.5011 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5059 | n_est=58, depth=4, lr=0.0557
+  AUC: 0.4913 | n_est=51, depth=8, lr=0.0744
+  AUC: 0.5354 | n_est=50, depth=3, lr=0.0241
+  AUC: 0.5188 | n_est=50, depth=3, lr=0.0321
+  AUC: 0.5152 | n_est=50, depth=5, lr=0.0267
+  AUC: 0.5248 | n_est=50, depth=3, lr=0.0172
+  AUC: 0.5172 | n_est=72, depth=3, lr=0.0215
+  AUC: 0.5114 | n_est=50, depth=3, lr=0.0254
+  AUC: 0.5152 | n_est=217, depth=3, lr=0.0256
+  AUC: 0.5079 | n_est=286, depth=12, lr=0.2828
+  AUC: 0.5376 | n_est=50, depth=3, lr=0.0258
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(3), 'learning_rate': 0.024319914957769244, 'subsample': 0.7110864120197197, 'min_samples_split': np.int64(6), 'min_samples_leaf': np.int64(8)}
+Validation AUC: 0.5534
+
+Test Results:
+  Accuracy: 0.506
+  AUC: 0.549
+  Sharpe: 2.08
+  Win Rate: 58.5%
+
+--------------------------------------------------
+Horizon: 7 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.4480 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.5057 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4841 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.4831 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.4963 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4966 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5102 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.4882 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.5042 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.4836 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.4330 | n_est=53, depth=5, lr=0.0142
+  AUC: 0.5030 | n_est=183, depth=6, lr=0.0144
+  AUC: 0.5076 | n_est=439, depth=4, lr=0.0100
+  AUC: 0.4888 | n_est=91, depth=6, lr=0.0193
+  AUC: 0.5243 | n_est=322, depth=4, lr=0.3000
+  AUC: 0.4710 | n_est=144, depth=7, lr=0.3000
+  AUC: 0.5015 | n_est=490, depth=8, lr=0.3000
+  AUC: 0.4665 | n_est=472, depth=3, lr=0.3000
+  AUC: 0.4752 | n_est=65, depth=7, lr=0.3000
+  AUC: 0.5153 | n_est=191, depth=4, lr=0.3000
+  AUC: 0.5050 | n_est=441, depth=12, lr=0.3000
+  AUC: 0.5034 | n_est=268, depth=6, lr=0.0380
+  AUC: 0.4863 | n_est=160, depth=12, lr=0.3000
+  AUC: 0.5080 | n_est=208, depth=4, lr=0.0100
+  AUC: 0.4806 | n_est=247, depth=3, lr=0.2362
+  AUC: 0.4819 | n_est=483, depth=7, lr=0.0310
+  AUC: 0.5015 | n_est=466, depth=6, lr=0.0100
+  AUC: 0.4720 | n_est=119, depth=12, lr=0.3000
+  AUC: 0.5007 | n_est=500, depth=3, lr=0.0291
+  AUC: 0.4684 | n_est=64, depth=4, lr=0.2594
+
+Best hyperparameters: {'n_estimators': np.int64(322), 'max_depth': np.int64(4), 'learning_rate': 0.29999999999999993, 'subsample': 0.6164869862462465, 'min_samples_split': np.int64(13), 'min_samples_leaf': np.int64(10)}
+Validation AUC: 0.5243
+
+Test Results:
+  Accuracy: 0.542
+  AUC: 0.528
+  Sharpe: 0.91
+  Win Rate: 45.7%
+
+--------------------------------------------------
+Horizon: 8 days, Threshold: 0.0175
+--------------------------------------------------
+  AUC: 0.4290 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.4653 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4301 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.4645 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.4498 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4545 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.5226 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.4616 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.4379 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.4329 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.5682 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5115 | n_est=50, depth=3, lr=0.0550
+  AUC: 0.5070 | n_est=500, depth=3, lr=0.0100
+  AUC: 0.6175 | n_est=105, depth=3, lr=0.0100
+  AUC: 0.4220 | n_est=50, depth=12, lr=0.3000
+  AUC: 0.6402 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.5516 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.4462 | n_est=500, depth=12, lr=0.0100
+  AUC: 0.6312 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.6402 | n_est=50, depth=3, lr=0.0100
+  AUC: 0.4573 | n_est=86, depth=3, lr=0.2047
+  AUC: 0.4289 | n_est=500, depth=12, lr=0.3000
+  AUC: 0.6127 | n_est=83, depth=3, lr=0.0225
+  AUC: 0.5153 | n_est=485, depth=3, lr=0.0106
+  AUC: 0.6376 | n_est=50, depth=3, lr=0.0117
+  AUC: 0.4580 | n_est=61, depth=12, lr=0.0103
+  AUC: 0.4588 | n_est=477, depth=12, lr=0.1183
+  AUC: 0.4479 | n_est=56, depth=12, lr=0.0125
+  AUC: 0.4359 | n_est=69, depth=12, lr=0.2507
+  AUC: 0.4484 | n_est=467, depth=4, lr=0.2491
+
+Best hyperparameters: {'n_estimators': np.int64(50), 'max_depth': np.int64(3), 'learning_rate': 0.01, 'subsample': 1.0, 'min_samples_split': np.int64(20), 'min_samples_leaf': np.int64(10)}
+Validation AUC: 0.6402
+
+Test Results:
+  Accuracy: 0.474
+  AUC: 0.467
+  Sharpe: 1.89
+  Win Rate: 58.1%
+
+--------------------------------------------------
+Horizon: 9 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4890 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.4622 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4687 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.4583 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.4492 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4623 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.4698 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.4696 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.4314 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.4410 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.4630 | n_est=318, depth=4, lr=0.0368
+  AUC: 0.4582 | n_est=81, depth=6, lr=0.3000
+  AUC: 0.4607 | n_est=438, depth=9, lr=0.0111
+  AUC: 0.4737 | n_est=306, depth=5, lr=0.2701
+  AUC: 0.4505 | n_est=451, depth=5, lr=0.0531
+  AUC: 0.4451 | n_est=92, depth=10, lr=0.0444
+  AUC: 0.4657 | n_est=336, depth=12, lr=0.1415
+  AUC: 0.4648 | n_est=465, depth=3, lr=0.2877
+  AUC: 0.4540 | n_est=258, depth=3, lr=0.1397
+  AUC: 0.4558 | n_est=221, depth=5, lr=0.0946
+  AUC: 0.4947 | n_est=486, depth=5, lr=0.2521
+  AUC: 0.4613 | n_est=468, depth=3, lr=0.2066
+  AUC: 0.4728 | n_est=500, depth=6, lr=0.1884
+  AUC: 0.4680 | n_est=435, depth=6, lr=0.0103
+  AUC: 0.4591 | n_est=443, depth=5, lr=0.1510
+  AUC: 0.4898 | n_est=460, depth=6, lr=0.1474
+  AUC: 0.4553 | n_est=500, depth=5, lr=0.1884
+  AUC: 0.4865 | n_est=455, depth=5, lr=0.3000
+  AUC: 0.4784 | n_est=496, depth=5, lr=0.3000
+  AUC: 0.5200 | n_est=500, depth=6, lr=0.3000
+
+Best hyperparameters: {'n_estimators': np.int64(500), 'max_depth': np.int64(6), 'learning_rate': 0.29999999999999993, 'subsample': 1.0, 'min_samples_split': np.int64(4), 'min_samples_leaf': np.int64(2)}
+Validation AUC: 0.5200
+
+Test Results:
+  Accuracy: 0.522
+  AUC: 0.531
+  Sharpe: 0.36
+  Win Rate: 63.0%
+
+--------------------------------------------------
+Horizon: 10 days, Threshold: 0.0225
+--------------------------------------------------
+  AUC: 0.4184 | n_est=408, depth=5, lr=0.1418
+  AUC: 0.3914 | n_est=257, depth=6, lr=0.0163
+  AUC: 0.4158 | n_est=472, depth=3, lr=0.2922
+  AUC: 0.3839 | n_est=60, depth=8, lr=0.0390
+  AUC: 0.3925 | n_est=91, depth=9, lr=0.0367
+  AUC: 0.4095 | n_est=356, depth=7, lr=0.0105
+  AUC: 0.3887 | n_est=57, depth=5, lr=0.0227
+  AUC: 0.4000 | n_est=128, depth=7, lr=0.0186
+  AUC: 0.3559 | n_est=305, depth=3, lr=0.1755
+  AUC: 0.3811 | n_est=377, depth=6, lr=0.0696
+  AUC: 0.4020 | n_est=500, depth=7, lr=0.0690
+  AUC: 0.4568 | n_est=98, depth=3, lr=0.0145
+  AUC: 0.4408 | n_est=432, depth=3, lr=0.0100
+  AUC: 0.3852 | n_est=500, depth=3, lr=0.0352
+  AUC: 0.4090 | n_est=50, depth=3, lr=0.0137
+  AUC: 0.3938 | n_est=167, depth=6, lr=0.0543
+  AUC: 0.3933 | n_est=64, depth=3, lr=0.0736
+  AUC: 0.3971 | n_est=488, depth=11, lr=0.0100
+  AUC: 0.3886 | n_est=255, depth=12, lr=0.0557
+  AUC: 0.4068 | n_est=387, depth=12, lr=0.0258
+  AUC: 0.3820 | n_est=453, depth=12, lr=0.0105
+  AUC: 0.4358 | n_est=73, depth=12, lr=0.0205
+  AUC: 0.4531 | n_est=160, depth=7, lr=0.0678
+  AUC: 0.4421 | n_est=500, depth=6, lr=0.2226
+  AUC: 0.4116 | n_est=414, depth=7, lr=0.0144
+  AUC: 0.3902 | n_est=166, depth=7, lr=0.0127
+  AUC: 0.4138 | n_est=219, depth=6, lr=0.1967
+  AUC: 0.3845 | n_est=500, depth=8, lr=0.0120
+  AUC: 0.4517 | n_est=459, depth=4, lr=0.1639
+  AUC: 0.4200 | n_est=423, depth=3, lr=0.0366
+
+Best hyperparameters: {'n_estimators': np.int64(98), 'max_depth': np.int64(3), 'learning_rate': 0.014472043765220877, 'subsample': 1.0, 'min_samples_split': np.int64(19), 'min_samples_leaf': np.int64(1)}
+Validation AUC: 0.4568
+
+Test Results:
+  Accuracy: 0.506
+  AUC: 0.500
+  Sharpe: 2.17
+  Win Rate: 64.0%
+
+Results saved to: results/ours/GradientBoosting_tuned_TSLA_results.csv
+✓ gradient_boosting training completed for TSLA
+
+-----------------------------------------
+Training svm for TSLA
+-----------------------------------------
