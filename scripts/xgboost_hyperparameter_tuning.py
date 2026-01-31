@@ -579,15 +579,6 @@ def main():
                     horizons=args.horizons,
                 )
                 all_results.append(results)
-
-            # Combine and save all results
-            combined = pd.concat(all_results, ignore_index=True)
-            combined.to_csv(
-                f"{args.output_dir}/XGBoost_tuned_all_stocks_results{strategy_suffix}.csv", index=False
-            )
-            print(
-                f"\nCombined results saved to: {args.output_dir}/XGBoost_tuned_all_stocks_results{strategy_suffix}.csv"
-            )
         else:
             run_tuning_for_stock(
                 stock=args.stock,
