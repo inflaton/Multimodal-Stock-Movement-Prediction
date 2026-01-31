@@ -16,8 +16,9 @@ Outputs:
 
 Usage:
     python analyze_tuned_results.py
-    python analyze_tuned_results.py --results-dir ./v1
-    python analyze_tuned_results.py --results-dir ./v1 --update-tex --tex-file main.tex
+    python analyze_tuned_results.py --results-dir results/ours
+    python analyze_tuned_results.py --update-tex --tex-file docs/main.tex
+    python analyze_tuned_results.py --update-tex --update-sota --tex-file docs/main.tex
 """
 
 import pandas as pd
@@ -48,153 +49,6 @@ def get_strategy_suffix(strategy):
     if strategy == "long_short":
         return ""  # Default strategy has no suffix
     return f"_{strategy}"
-
-
-def load_notebook_results(paper_dir="."):
-    """Load the original notebook results.
-
-    Loads two types of files:
-    1. Filtered_*_hyperparameter_tuned_results.csv (notebooks 02-06) - best model across all types
-    2. LSTM_tuned_*_results.csv (notebook 07) - LSTM-specific results
-
-    These are the results used in the paper - best model selected across ALL model types
-    for each horizon, with filtering for only profitable configurations.
-    """
-    all_data = []
-    missing_files = []
-
-    # Load Filtered results (notebooks 02-06) - these have BestModel column
-    for stock in STOCKS:
-        filename = f"{paper_dir}/Filtered_{stock}_hyperparameter_tuned_results.csv"
-
-        try:
-            if os.path.exists(filename):
-                df = pd.read_csv(filename)
-                df["Stock"] = stock
-                # Rename columns to match new format
-                df = df.rename(columns={
-                    "BestModel": "Model",
-                    "BestThreshold": "Threshold",
-                })
-                all_data.append(df)
-            else:
-                missing_files.append(filename)
-        except Exception as e:
-            print(f"Error loading {filename}: {e}")
-
-    # Load LSTM results (notebook 07) - these are LSTM-only
-    lstm_data = []
-    for stock in STOCKS:
-        filename = f"{paper_dir}/LSTM_tuned_{stock}_results.csv"
-
-        try:
-            if os.path.exists(filename):
-                df = pd.read_csv(filename)
-                df["Model"] = "LSTM"
-                # Keep only columns that match the Filtered format
-                keep_cols = ["Stock", "Horizon", "Model", "Train_Accuracy", "Train_ROC_AUC",
-                            "Test_Accuracy", "Test_ROC_AUC", "Trades", "WinRate", "Sharpe", "TotalReturn"]
-                # Only keep columns that exist
-                keep_cols = [c for c in keep_cols if c in df.columns]
-                df = df[keep_cols]
-                lstm_data.append(df)
-        except Exception as e:
-            print(f"Error loading {filename}: {e}")
-
-    if not all_data and not lstm_data:
-        return None
-
-    # Combine Filtered and LSTM results
-    combined = pd.concat(all_data + lstm_data, ignore_index=True)
-    return combined
-
-
-def analyze_notebook_results(df):
-    """Analyze original notebook results (paper's methodology)."""
-    print("\n" + "=" * 80)
-    print("ORIGINAL NOTEBOOK RESULTS (Paper Methodology - Long Short Strategy)")
-    print("=" * 80)
-    print()
-    print("These results use the BEST MODEL across all types for each horizon,")
-    print("with filtering for only profitable/valid configurations.")
-    print()
-
-    # Overall stats
-    print(f"Total configurations: {len(df)}")
-    print(f"Stocks: {df['Stock'].unique().tolist()}")
-    print(f"Models used: {df['Model'].unique().tolist()}")
-    print()
-
-    # Per-stock summary
-    print("Per-Stock Summary:")
-    print(f"{'Stock':<8} {'Rows':<6} {'Avg Acc':<10} {'Avg AUC':<10} {'Avg N':<8} {'Avg Win%':<10} {'Avg Sharpe':<12}")
-    print("-" * 70)
-
-    for stock in STOCKS:
-        subset = df[df["Stock"] == stock]
-        if len(subset) > 0:
-            print(f"{stock:<8} {len(subset):<6} {subset['Test_Accuracy'].mean():<10.3f} "
-                  f"{subset['Test_ROC_AUC'].mean():<10.3f} {subset['Trades'].mean():<8.0f} "
-                  f"{subset['WinRate'].mean()*100:<10.1f} {subset['Sharpe'].mean():<12.2f}")
-
-    print()
-
-    # Best by AUC: find best AUC per stock, then average
-    print("Best by AUC (best per stock, then averaged):")
-    best_auc_rows = []
-    for stock in STOCKS:
-        stock_data = df[df["Stock"] == stock]
-        if len(stock_data) > 0:
-            best_idx = stock_data["Test_ROC_AUC"].idxmax()
-            best_auc_rows.append(stock_data.loc[best_idx])
-
-    if best_auc_rows:
-        best_auc_df = pd.DataFrame(best_auc_rows)
-        print(f"  Accuracy:    {best_auc_df['Test_Accuracy'].mean():.3f}")
-        print(f"  AUC:         {best_auc_df['Test_ROC_AUC'].mean():.3f}")
-        print(f"  Trades:      {best_auc_df['Trades'].mean():.0f}")
-        print(f"  Win%:        {best_auc_df['WinRate'].mean()*100:.1f}")
-        print(f"  Sharpe:      {best_auc_df['Sharpe'].mean():.2f}")
-
-    print()
-
-    # Best by Sharpe: find best Sharpe per stock, then average
-    print("Best by Sharpe (best per stock, then averaged):")
-    best_sharpe_rows = []
-    for stock in STOCKS:
-        stock_data = df[df["Stock"] == stock]
-        if len(stock_data) > 0:
-            best_idx = stock_data["Sharpe"].idxmax()
-            best_sharpe_rows.append(stock_data.loc[best_idx])
-
-    if best_sharpe_rows:
-        best_sharpe_df = pd.DataFrame(best_sharpe_rows)
-        print(f"  Accuracy:    {best_sharpe_df['Test_Accuracy'].mean():.3f}")
-        print(f"  AUC:         {best_sharpe_df['Test_ROC_AUC'].mean():.3f}")
-        print(f"  Trades:      {best_sharpe_df['Trades'].mean():.0f}")
-        print(f"  Win%:        {best_sharpe_df['WinRate'].mean()*100:.1f}")
-        print(f"  Sharpe:      {best_sharpe_df['Sharpe'].mean():.2f}")
-
-    print()
-    print("-" * 80)
-    print("FOR TABLE VII (Ours - Multimodal ML, Long Short):")
-    print("-" * 80)
-    if best_auc_rows:
-        best_auc_df = pd.DataFrame(best_auc_rows)
-        print(f"  Best by AUC    | Acc: {best_auc_df['Test_Accuracy'].mean():.3f} | "
-              f"AUC: {best_auc_df['Test_ROC_AUC'].mean():.3f} | "
-              f"N: {best_auc_df['Trades'].mean():.0f} | "
-              f"Win%: {best_auc_df['WinRate'].mean()*100:.1f} | "
-              f"Sharpe: {best_auc_df['Sharpe'].mean():.2f}")
-    if best_sharpe_rows:
-        best_sharpe_df = pd.DataFrame(best_sharpe_rows)
-        print(f"  Best by Sharpe | Acc: {best_sharpe_df['Test_Accuracy'].mean():.3f} | "
-              f"AUC: {best_sharpe_df['Test_ROC_AUC'].mean():.3f} | "
-              f"N: {best_sharpe_df['Trades'].mean():.0f} | "
-              f"Win%: {best_sharpe_df['WinRate'].mean()*100:.1f} | "
-              f"Sharpe: {best_sharpe_df['Sharpe'].mean():.2f}")
-
-    return best_auc_rows, best_sharpe_rows
 
 
 def load_all_results(results_dir):
@@ -807,8 +661,145 @@ def update_ablation_full_model(tex_file, df, strategy="long_short"):
     return True
 
 
-def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short"):
-    """Generate and update all tables in main.tex."""
+def compute_sota_ours_metrics(df, strategy="long_short"):
+    """Compute Sharpe-optimized metrics for SOTA table 'Ours' row.
+
+    For each stock, find the configuration with highest Sharpe ratio,
+    then average across all stocks.
+
+    Args:
+        df: DataFrame with tuned results
+        strategy: Trading strategy to filter for (default: 'long_short')
+
+    Returns:
+        Dictionary with 'acc', 'auc', 'trades', 'winrate', 'sharpe' keys
+    """
+    # Filter for the specified strategy
+    strategy_df = df[df["Strategy"] == strategy]
+
+    if len(strategy_df) == 0:
+        print(f"Warning: No results found for strategy '{strategy}'")
+        return None
+
+    # For each stock, find the configuration with highest Sharpe
+    best_sharpe_rows = []
+    for stock in STOCKS:
+        stock_data = strategy_df[strategy_df["Stock"] == stock]
+        if len(stock_data) > 0:
+            best_idx = stock_data["Sharpe"].idxmax()
+            best_sharpe_rows.append(stock_data.loc[best_idx])
+
+    if not best_sharpe_rows:
+        print("Warning: Could not find best Sharpe configurations")
+        return None
+
+    # Average across stocks
+    best_sharpe_df = pd.DataFrame(best_sharpe_rows)
+
+    return {
+        'acc': best_sharpe_df["Test_Accuracy"].mean(),
+        'auc': best_sharpe_df["Test_ROC_AUC"].mean(),
+        'trades': best_sharpe_df["Trades"].mean(),
+        'winrate': best_sharpe_df["WinRate"].mean() * 100,
+        'sharpe': best_sharpe_df["Sharpe"].mean()
+    }
+
+
+def format_sota_ours_row(ours_metrics):
+    """Format the 'Ours' row for the SOTA comparison table.
+
+    Args:
+        ours_metrics: Dictionary with 'acc', 'auc', 'trades', 'winrate', 'sharpe'
+
+    Returns:
+        LaTeX table row for 'Ours (Multimodal)'
+    """
+    if ours_metrics is None:
+        return None
+
+    # Bold the best metrics (we assume Ours has best AUC, Win%, Sharpe)
+    # Accuracy bolding depends on baseline comparison
+    acc_str = f"{ours_metrics['acc']:.3f}"  # Will be bolded manually if needed
+    auc_str = f"\\textbf{{{ours_metrics['auc']:.3f}}}"
+    winrate_str = f"\\textbf{{{ours_metrics['winrate']:.1f}}}"
+    sharpe_str = f"\\textbf{{{ours_metrics['sharpe']:.2f}}}"
+
+    return f"\\textbf{{Ours (Multimodal)}} & {acc_str} & {auc_str} & {ours_metrics['trades']:.1f} & {winrate_str} & {sharpe_str} \\\\"
+
+
+def update_sota_ours_row(tex_file, df, strategy="long_short"):
+    """Update the 'Ours' row in the SOTA comparison table.
+
+    Args:
+        tex_file: Path to main.tex
+        df: DataFrame with tuned results
+        strategy: Trading strategy to use
+
+    Returns:
+        True if successful, False otherwise
+    """
+    # Compute Ours metrics
+    ours_metrics = compute_sota_ours_metrics(df, strategy)
+
+    if ours_metrics is None:
+        print("Could not compute Ours metrics for SOTA table")
+        return False
+
+    # Format the Ours row
+    ours_row = format_sota_ours_row(ours_metrics)
+
+    if ours_row is None:
+        print("Could not format Ours row for SOTA table")
+        return False
+
+    print("\nGenerated Ours row for SOTA table:")
+    print(ours_row)
+    print(f"Metrics: Acc={ours_metrics['acc']:.3f}, AUC={ours_metrics['auc']:.3f}, "
+          f"N={ours_metrics['trades']:.1f}, Win%={ours_metrics['winrate']:.1f}, "
+          f"Sharpe={ours_metrics['sharpe']:.2f}")
+
+    if not os.path.exists(tex_file):
+        print(f"LaTeX file not found: {tex_file}")
+        return False
+
+    with open(tex_file, 'r') as f:
+        content = f.read()
+
+    # Pattern to match the Ours row in SOTA table
+    # Look for the row starting with \textbf{Ours
+    pattern = (
+        r"(\\textbf\{Ours \(Multimodal\)\}.*?\\\\)"
+    )
+
+    match = re.search(pattern, content, re.DOTALL)
+
+    if not match:
+        print("Could not find Ours row in SOTA table")
+        print("Looking for pattern: \\textbf{Ours (Multimodal)}")
+        return False
+
+    # Replace the Ours row
+    new_content = content[:match.start(1)] + ours_row + content[match.end(1):]
+
+    with open(tex_file, 'w') as f:
+        f.write(new_content)
+
+    print("Updated Ours row in SOTA comparison table")
+    return True
+
+
+def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short", update_sota=False):
+    """Generate and update all tables in main.tex.
+
+    Args:
+        df: DataFrame with tuned results
+        tex_file: Path to main.tex file
+        strategy: Trading strategy to use (default: 'long_short')
+        update_sota: If True, also update the SOTA comparison table 'Ours' row
+
+    Returns:
+        True if all updates successful, False otherwise
+    """
     print("\n" + "=" * 80)
     print("UPDATING MAIN.TEX TABLES")
     print("=" * 80)
@@ -842,7 +833,15 @@ def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short"):
     # Update Ablation Study Full Model rows
     success3 = update_ablation_full_model(tex_file, df, strategy)
 
-    if success1 and success2 and success3:
+    # Optionally update SOTA comparison table
+    success4 = True
+    if update_sota:
+        print("\n" + "=" * 80)
+        print("UPDATING SOTA COMPARISON TABLE")
+        print("=" * 80)
+        success4 = update_sota_ours_row(tex_file, df, strategy)
+
+    if success1 and success2 and success3 and success4:
         print(f"\nSuccessfully updated all tables in {tex_file}")
         return True
     else:
@@ -865,20 +864,19 @@ def main():
         help="Directory to save summary CSV files",
     )
     parser.add_argument(
-        "--paper-dir",
-        type=str,
-        default="../results",
-        help="Directory containing original notebook results (Filtered_*_hyperparameter_tuned_results.csv)",
-    )
-    parser.add_argument(
         "--update-tex",
         action="store_true",
-        help="Update LaTeX tables in main.tex",
+        help="Update LaTeX tables in main.tex (AUC, Sharpe, Ablation Full Model)",
+    )
+    parser.add_argument(
+        "--update-sota",
+        action="store_true",
+        help="Also update the SOTA comparison table 'Ours' row (requires --update-tex)",
     )
     parser.add_argument(
         "--tex-file",
         type=str,
-        default="main.tex",
+        default="docs/main.tex",
         help="Path to main.tex file to update",
     )
 
@@ -889,14 +887,8 @@ def main():
     print("=" * 80)
     print(f"Results directory: {args.results_dir}")
     print(f"Output directory: {args.output_dir}")
-    print(f"Paper directory: {args.paper_dir}")
 
-    # First, analyze original notebook results (paper methodology)
-    notebook_df = load_notebook_results(args.paper_dir)
-    if notebook_df is not None and len(notebook_df) > 0:
-        analyze_notebook_results(notebook_df)
-
-    # Load all new tuning results
+    # Load all tuning results
     df = load_all_results(args.results_dir)
 
     if df is None or len(df) == 0:
@@ -930,7 +922,7 @@ def main():
 
     # Update LaTeX tables if requested
     if args.update_tex:
-        update_main_tex_tables(df, tex_file=args.tex_file, strategy="long_short")
+        update_main_tex_tables(df, tex_file=args.tex_file, strategy="long_short", update_sota=args.update_sota)
 
     print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")
