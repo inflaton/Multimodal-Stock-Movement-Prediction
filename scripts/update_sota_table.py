@@ -39,9 +39,15 @@ def load_fincast_results(results_dir: str) -> pd.DataFrame:
     fincast_zeroshot_file = Path(results_dir) / "fincast_all_stocks_results.csv"
 
     # Try newer filename first, then fall back to older one
-    fincast_finetuned_file = Path(results_dir) / "finetuned_fincast" / "fincast_finetuned_all_results.csv"
+    fincast_finetuned_file = (
+        Path(results_dir) / "finetuned_fincast" / "fincast_finetuned_all_results.csv"
+    )
     if not fincast_finetuned_file.exists():
-        fincast_finetuned_file = Path(results_dir) / "finetuned_fincast" / "fincast_finetuned_all_stocks_results.csv"
+        fincast_finetuned_file = (
+            Path(results_dir)
+            / "finetuned_fincast"
+            / "fincast_finetuned_all_stocks_results.csv"
+        )
 
     dfs = []
 
@@ -59,7 +65,10 @@ def load_fincast_results(results_dir: str) -> pd.DataFrame:
         df_finetuned = pd.read_csv(fincast_finetuned_file)
         df_finetuned["ModelType"] = "finetuned"
         # Align column names (fine-tuned has "Threshold", zero-shot has "BestThreshold")
-        if "Threshold" in df_finetuned.columns and "BestThreshold" not in df_finetuned.columns:
+        if (
+            "Threshold" in df_finetuned.columns
+            and "BestThreshold" not in df_finetuned.columns
+        ):
             df_finetuned = df_finetuned.rename(columns={"Threshold": "BestThreshold"})
         dfs.append(df_finetuned)
         print(f"  Loaded {len(df_finetuned)} fine-tuned results")
@@ -128,7 +137,7 @@ def calculate_baseline_metrics(df: pd.DataFrame, model_types: list) -> dict:
             "trades": best_sharpe_df["Trades"].mean(),
             "winrate": best_sharpe_df["WinRate"].mean() * 100,
             "sharpe": best_sharpe_df["Sharpe"].mean(),
-        }
+        },
     }
 
     return metrics
@@ -182,9 +191,11 @@ def generate_fincast_baseline_rows(df: pd.DataFrame) -> dict:
     return baselines
 
 
-def find_best_baseline_accuracy(fincast_baselines: dict, chronos_baselines: dict) -> float:
+def find_best_baseline_accuracy(
+    fincast_baselines: dict, chronos_baselines: dict
+) -> float:
     """Find the best (maximum) accuracy value across all baselines (Sharpe-selected only)."""
-    best_acc = -float('inf')
+    best_acc = -float("inf")
 
     # Collect all baseline metrics
     all_baselines = {**fincast_baselines, **chronos_baselines}
@@ -209,14 +220,26 @@ def format_fincast_rows(baselines: dict, best_acc: float) -> str:
     # Zero-shot
     if baselines.get("fincast_zeroshot"):
         m = baselines["fincast_zeroshot"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     # Fine-tuned
     if baselines.get("fincast_finetuned"):
         m = baselines["fincast_finetuned"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     return "\n".join(lines)
 
@@ -227,36 +250,64 @@ def format_chronos_rows(baselines: dict, best_acc: float) -> str:
     lines = []
 
     # Chronos-2 section header
-    lines.append("\\multicolumn{6}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos}}} \\\\")
+    lines.append(
+        "\\multicolumn{6}{l}{\\textit{Chronos-2~\\cite{ansari2025chronos}}} \\\\"
+    )
 
     # Zero-shot
     if baselines.get("chronos_zeroshot_price"):
         m = baselines["chronos_zeroshot_price"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Zero-shot & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     # Zero-shot + Sentiment
     if baselines.get("chronos_zeroshot_cov"):
         m = baselines["chronos_zeroshot_cov"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Zero-shot + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Zero-shot + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     # Fine-tuned
     if baselines.get("chronos_finetuned_price"):
         m = baselines["chronos_finetuned_price"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Fine-tuned & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     # Fine-tuned + Sentiment
     if baselines.get("chronos_finetuned_cov"):
         m = baselines["chronos_finetuned_cov"]["sharpe"]
-        acc_str = f"\\textbf{{{m['acc']:.3f}}}" if abs(m['acc'] - best_acc) < 0.0005 else f"{m['acc']:.3f}"
-        lines.append(f"\\quad Fine-tuned + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\")
+        acc_str = (
+            f"\\textbf{{{m['acc']:.3f}}}"
+            if abs(m["acc"] - best_acc) < 0.0005
+            else f"{m['acc']:.3f}"
+        )
+        lines.append(
+            f"\\quad Fine-tuned + Sent. & {acc_str} & {m['auc']:.3f} & {m['trades']:.1f} & {m['winrate']:.1f} & {m['sharpe']:.2f} \\\\"
+        )
 
     return "\n".join(lines)
 
 
-def compute_sharpe_optimized_metrics(results_file: str, strategy: str = "long_short") -> dict:
+def compute_sharpe_optimized_metrics(
+    results_file: str, strategy: str = "long_short"
+) -> dict:
     """Compute Sharpe-optimized metrics from tuned results CSV.
 
     For each stock, find the configuration with highest Sharpe ratio,
@@ -287,11 +338,11 @@ def compute_sharpe_optimized_metrics(results_file: str, strategy: str = "long_sh
     best_sharpe_df = pd.DataFrame(best_sharpe_rows)
 
     return {
-        'acc': best_sharpe_df["Test_Accuracy"].mean(),
-        'auc': best_sharpe_df["Test_ROC_AUC"].mean(),
-        'trades': best_sharpe_df["Trades"].mean(),
-        'winrate': best_sharpe_df["WinRate"].mean() * 100,
-        'sharpe': best_sharpe_df["Sharpe"].mean()
+        "acc": best_sharpe_df["Test_Accuracy"].mean(),
+        "auc": best_sharpe_df["Test_ROC_AUC"].mean(),
+        "trades": best_sharpe_df["Trades"].mean(),
+        "winrate": best_sharpe_df["WinRate"].mean() * 100,
+        "sharpe": best_sharpe_df["Sharpe"].mean(),
     }
 
 
@@ -304,7 +355,11 @@ def format_ours_row(best_acc: float, ours_metrics: dict = None) -> str:
     """
 
     # Check if "Ours" accuracy should be bolded
-    acc_str = f"\\textbf{{{ours_metrics['acc']:.3f}}}" if abs(ours_metrics['acc'] - best_acc) < 0.0005 else f"{ours_metrics['acc']:.3f}"
+    acc_str = (
+        f"\\textbf{{{ours_metrics['acc']:.3f}}}"
+        if abs(ours_metrics["acc"] - best_acc) < 0.0005
+        else f"{ours_metrics['acc']:.3f}"
+    )
 
     # Bold the best metrics (AUC, Win%, Sharpe)
     auc_str = f"\\textbf{{{ours_metrics['auc']:.3f}}}"
@@ -369,11 +424,11 @@ def compute_ablation_metrics(df: pd.DataFrame, selection_criterion: str) -> dict
     best_df = pd.DataFrame(best_rows)
 
     return {
-        'acc': best_df["Test_Accuracy"].mean(),
-        'auc': best_df["Test_ROC_AUC"].mean(),
-        'trades': best_df["Trades"].mean(),
-        'winrate': best_df["WinRate"].mean() * 100,
-        'sharpe': best_df["Sharpe"].mean()
+        "acc": best_df["Test_Accuracy"].mean(),
+        "auc": best_df["Test_ROC_AUC"].mean(),
+        "trades": best_df["Trades"].mean(),
+        "winrate": best_df["WinRate"].mean() * 100,
+        "sharpe": best_df["Sharpe"].mean(),
     }
 
 
@@ -390,14 +445,18 @@ def format_ablation_table(full_model_metrics: dict, ablation_results: dict) -> s
     lines = []
 
     # Full Model rows
-    fm_auc = full_model_metrics['auc']
-    fm_sharpe = full_model_metrics['sharpe']
+    fm_auc = full_model_metrics["auc"]
+    fm_sharpe = full_model_metrics["sharpe"]
 
     # Find best AUC for bolding
-    best_auc = fm_auc['auc']
+    best_auc = fm_auc["auc"]
 
-    lines.append(f"Full Model & AUC & {fm_auc['acc']:.3f} & \\textbf{{{fm_auc['auc']:.3f}}} & {fm_auc['trades']:.1f} & {fm_auc['winrate']:.1f} & {fm_auc['sharpe']:.2f} & -- \\\\")
-    lines.append(f"\\quad & Sharpe & \\textbf{{{fm_sharpe['acc']:.3f}}} & {fm_sharpe['auc']:.3f} & {fm_sharpe['trades']:.1f} & \\textbf{{{fm_sharpe['winrate']:.1f}}} & \\textbf{{{fm_sharpe['sharpe']:.2f}}} & -- \\\\")
+    lines.append(
+        f"Full Model & AUC & {fm_auc['acc']:.3f} & \\textbf{{{fm_auc['auc']:.3f}}} & {fm_auc['trades']:.1f} & {fm_auc['winrate']:.1f} & {fm_auc['sharpe']:.2f} & -- \\\\"
+    )
+    lines.append(
+        f"\\quad & Sharpe & \\textbf{{{fm_sharpe['acc']:.3f}}} & {fm_sharpe['auc']:.3f} & {fm_sharpe['trades']:.1f} & \\textbf{{{fm_sharpe['winrate']:.1f}}} & \\textbf{{{fm_sharpe['sharpe']:.2f}}} & -- \\\\"
+    )
 
     # Configuration display names
     config_names = {
@@ -405,11 +464,17 @@ def format_ablation_table(full_model_metrics: dict, ablation_results: dict) -> s
         "sentiment_only": "Sentiment Only",
         "equal_weights": "Equal Weights",
         "news_only": "News Only",
-        "social_only": "Social Only"
+        "social_only": "Social Only",
     }
 
     # Add ablation configuration rows
-    for config_key in ["technical_only", "sentiment_only", "equal_weights", "news_only", "social_only"]:
+    for config_key in [
+        "technical_only",
+        "sentiment_only",
+        "equal_weights",
+        "news_only",
+        "social_only",
+    ]:
         if config_key not in ablation_results:
             continue
 
@@ -424,18 +489,24 @@ def format_ablation_table(full_model_metrics: dict, ablation_results: dict) -> s
 
         # Round values to display precision first, then compute delta
         # This ensures delta matches what's actually shown in the table
-        fm_auc_rounded = round(fm_auc['auc'], 3)
-        fm_sharpe_rounded = round(fm_sharpe['sharpe'], 2)
-        auc_metrics_auc_rounded = round(auc_metrics['auc'], 3)
-        sharpe_metrics_sharpe_rounded = round(sharpe_metrics['sharpe'], 2)
+        fm_auc_rounded = round(fm_auc["auc"], 3)
+        fm_sharpe_rounded = round(fm_sharpe["sharpe"], 2)
+        auc_metrics_auc_rounded = round(auc_metrics["auc"], 3)
+        sharpe_metrics_sharpe_rounded = round(sharpe_metrics["sharpe"], 2)
 
         # Compute delta using rounded values
         delta_auc = ((auc_metrics_auc_rounded - fm_auc_rounded) / fm_auc_rounded) * 100
-        delta_sharpe = ((sharpe_metrics_sharpe_rounded - fm_sharpe_rounded) / fm_sharpe_rounded) * 100
+        delta_sharpe = (
+            (sharpe_metrics_sharpe_rounded - fm_sharpe_rounded) / fm_sharpe_rounded
+        ) * 100
 
         lines.append("\\midrule")
-        lines.append(f"{config_names[config_key]} & AUC & {auc_metrics['acc']:.3f} & {auc_metrics['auc']:.3f} & {auc_metrics['trades']:.1f} & {auc_metrics['winrate']:.1f} & {auc_metrics['sharpe']:.2f} & {delta_auc:.1f} \\\\")
-        lines.append(f"\\quad & Sharpe & {sharpe_metrics['acc']:.3f} & {sharpe_metrics['auc']:.3f} & {sharpe_metrics['trades']:.1f} & {sharpe_metrics['winrate']:.1f} & {sharpe_metrics['sharpe']:.2f} & {delta_sharpe:.1f} \\\\")
+        lines.append(
+            f"{config_names[config_key]} & AUC & {auc_metrics['acc']:.3f} & {auc_metrics['auc']:.3f} & {auc_metrics['trades']:.1f} & {auc_metrics['winrate']:.1f} & {auc_metrics['sharpe']:.2f} & {delta_auc:.1f} \\\\"
+        )
+        lines.append(
+            f"\\quad & Sharpe & {sharpe_metrics['acc']:.3f} & {sharpe_metrics['auc']:.3f} & {sharpe_metrics['trades']:.1f} & {sharpe_metrics['winrate']:.1f} & {sharpe_metrics['sharpe']:.2f} & {delta_sharpe:.1f} \\\\"
+        )
 
     return "\n".join(lines)
 
@@ -447,7 +518,7 @@ def update_sota_table(tex_file: str, baseline_content: str, ours_row: str) -> bo
         print(f"Error: LaTeX file not found: {tex_file}")
         return False
 
-    with open(tex_file, 'r') as f:
+    with open(tex_file, "r") as f:
         content = f.read()
 
     # Pattern to match baseline sections and Ours row in the SOTA table
@@ -469,15 +540,17 @@ def update_sota_table(tex_file: str, baseline_content: str, ours_row: str) -> bo
 
     # Replace all sections: baselines + midrule + Ours row
     new_content_full = (
-        content[:match.start(1)] +
-        baseline_content + "\n" +
-        match.group(3) +  # Keep the midrule
-        ours_row + "\n" +
-        match.group(5) +  # Keep the bottomrule
-        content[match.end(5):]
+        content[: match.start(1)]
+        + baseline_content
+        + "\n"
+        + match.group(3)  # Keep the midrule
+        + ours_row
+        + "\n"
+        + match.group(5)  # Keep the bottomrule
+        + content[match.end(5) :]
     )
 
-    with open(tex_file, 'w') as f:
+    with open(tex_file, "w") as f:
         f.write(new_content_full)
 
     print(f"Successfully updated SOTA table in {tex_file}")
@@ -491,7 +564,7 @@ def update_ablation_table(tex_file: str, ablation_content: str) -> bool:
         print(f"Error: LaTeX file not found: {tex_file}")
         return False
 
-    with open(tex_file, 'r') as f:
+    with open(tex_file, "r") as f:
         content = f.read()
 
     # Pattern to match the ablation table content
@@ -512,13 +585,14 @@ def update_ablation_table(tex_file: str, ablation_content: str) -> bool:
 
     # Replace the table content
     new_content = (
-        content[:match.start(2)] +
-        ablation_content + "\n" +
-        match.group(3) +  # Keep the \bottomrule
-        content[match.end(3):]
+        content[: match.start(2)]
+        + ablation_content
+        + "\n"
+        + match.group(3)  # Keep the \bottomrule
+        + content[match.end(3) :]
     )
 
-    with open(tex_file, 'w') as f:
+    with open(tex_file, "w") as f:
         f.write(new_content)
 
     print(f"Successfully updated Ablation Study table in {tex_file}")
@@ -526,7 +600,9 @@ def update_ablation_table(tex_file: str, ablation_content: str) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Update SOTA Comparison Table in main.tex")
+    parser = argparse.ArgumentParser(
+        description="Update SOTA Comparison Table in main.tex"
+    )
     parser.add_argument(
         "--results-dir",
         type=str,
@@ -595,9 +671,11 @@ def main():
     # Compute "Ours" metrics from tuned results
     print("Computing 'Ours' metrics from tuned results...")
     ours_metrics = compute_sharpe_optimized_metrics(args.ours_results)
-    print(f"Ours metrics: Acc={ours_metrics['acc']:.3f}, AUC={ours_metrics['auc']:.3f}, "
-          f"N={ours_metrics['trades']:.1f}, Win%={ours_metrics['winrate']:.1f}, "
-          f"Sharpe={ours_metrics['sharpe']:.2f}")
+    print(
+        f"Ours metrics: Acc={ours_metrics['acc']:.3f}, AUC={ours_metrics['auc']:.3f}, "
+        f"N={ours_metrics['trades']:.1f}, Win%={ours_metrics['winrate']:.1f}, "
+        f"Sharpe={ours_metrics['sharpe']:.2f}"
+    )
     print()
 
     # Generate baseline rows
@@ -614,16 +692,24 @@ def main():
         for name, metrics in fincast_baselines.items():
             if metrics:
                 print(f"\n{name}:")
-                print(f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}")
-                print(f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}")
+                print(
+                    f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}"
+                )
+                print(
+                    f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}"
+                )
 
     if chronos_baselines:
         print("\nChronos-2 Baselines:")
         for name, metrics in chronos_baselines.items():
             if metrics:
                 print(f"\n{name}:")
-                print(f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}")
-                print(f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}")
+                print(
+                    f"  AUC-selected: Acc={metrics['auc']['acc']:.3f}, AUC={metrics['auc']['auc']:.3f}, Sharpe={metrics['auc']['sharpe']:.2f}"
+                )
+                print(
+                    f"  Sharpe-selected: Acc={metrics['sharpe']['acc']:.3f}, AUC={metrics['sharpe']['auc']:.3f}, Sharpe={metrics['sharpe']['sharpe']:.2f}"
+                )
     print()
 
     # Format as LaTeX
@@ -694,15 +780,16 @@ def main():
             # Sharpe-selected full model
             sharpe_metrics = compute_ablation_metrics(df, "sharpe")
 
-            full_model_metrics = {
-                'auc': auc_metrics,
-                'sharpe': sharpe_metrics
-            }
+            full_model_metrics = {"auc": auc_metrics, "sharpe": sharpe_metrics}
 
-            print(f"Full Model (AUC-selected): Acc={auc_metrics['acc']:.3f}, AUC={auc_metrics['auc']:.3f}, "
-                  f"Sharpe={auc_metrics['sharpe']:.2f}")
-            print(f"Full Model (Sharpe-selected): Acc={sharpe_metrics['acc']:.3f}, AUC={sharpe_metrics['auc']:.3f}, "
-                  f"Sharpe={sharpe_metrics['sharpe']:.2f}")
+            print(
+                f"Full Model (AUC-selected): Acc={auc_metrics['acc']:.3f}, AUC={auc_metrics['auc']:.3f}, "
+                f"Sharpe={auc_metrics['sharpe']:.2f}"
+            )
+            print(
+                f"Full Model (Sharpe-selected): Acc={sharpe_metrics['acc']:.3f}, AUC={sharpe_metrics['auc']:.3f}, "
+                f"Sharpe={sharpe_metrics['sharpe']:.2f}"
+            )
         except Exception as e:
             print(f"Error computing full model metrics: {e}")
             return

@@ -4,6 +4,7 @@ FinCast Fine-tuned Model Inference
 
 This script runs inference using fine-tuned FinCast models (with LoRA/PEFT).
 """
+
 import os
 import sys
 import argparse
@@ -16,8 +17,15 @@ import torch
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'FinCast-fts', 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'FinCast-fts', 'peft_Fincast'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "src")
+)
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "peft_Fincast"
+    ),
+)
 
 from fincast_finetune import load_fincast_model_for_training, wrap_model_with_peft
 
@@ -146,11 +154,19 @@ def predict_with_fincast_torch(model, context, horizon, device, freq=0):
         # outputs shape: [B, N, H, 1+Q] where N=num_patches, H=horizon, Q=num_quantiles
         # We want the mean prediction (index 0) at the specific horizon
         # Use the last patch (-1) and the specific horizon index (horizon-1)
-        prediction = outputs[0, -1, horizon-1, 0].cpu().item()
+        prediction = outputs[0, -1, horizon - 1, 0].cpu().item()
 
     return prediction
 
-def load_finetuned_model(model_path, base_model_path, context_length=128, lora_r=8, lora_alpha=16, use_dora=False):
+
+def load_finetuned_model(
+    model_path,
+    base_model_path,
+    context_length=128,
+    lora_r=8,
+    lora_alpha=16,
+    use_dora=False,
+):
     """
     Load a fine-tuned FinCast model.
 
@@ -271,13 +287,11 @@ def run_inference_for_stock(
             if i + context_length + horizon > len(test_prices):
                 break
 
-            context = test_prices[i:i+context_length]
-            actual = test_prices[i+context_length+horizon-1]
+            context = test_prices[i : i + context_length]
+            actual = test_prices[i + context_length + horizon - 1]
 
             # Predict
-            pred = predict_with_fincast_torch(
-                model, context, horizon, device, freq=0
-            )
+            pred = predict_with_fincast_torch(model, context, horizon, device, freq=0)
 
             predictions.append(pred)
             actuals.append(actual)
@@ -309,26 +323,28 @@ def run_inference_for_stock(
             auc = 0.5
 
         # Non-overlapping backtest for trading metrics
-        backtest_results = non_overlap_backtest(
-            test_df, pred_directions, horizon
+        backtest_results = non_overlap_backtest(test_df, pred_directions, horizon)
+
+        results.append(
+            {
+                "Stock": stock,
+                "Horizon": horizon,
+                "Threshold": threshold,
+                "Test_Accuracy": accuracy,
+                "Test_ROC_AUC": auc,
+                "Trades": backtest_results["Trades"],
+                "LongTrades": backtest_results["LongTrades"],
+                "ShortTrades": backtest_results["ShortTrades"],
+                "WinRate": backtest_results["WinRate"],
+                "Sharpe": backtest_results["Sharpe"],
+                "TotalReturn": backtest_results["TotalReturn"],
+            }
         )
 
-        results.append({
-            'Stock': stock,
-            'Horizon': horizon,
-            'Threshold': threshold,
-            'Test_Accuracy': accuracy,
-            'Test_ROC_AUC': auc,
-            'Trades': backtest_results['Trades'],
-            'LongTrades': backtest_results['LongTrades'],
-            'ShortTrades': backtest_results['ShortTrades'],
-            'WinRate': backtest_results['WinRate'],
-            'Sharpe': backtest_results['Sharpe'],
-            'TotalReturn': backtest_results['TotalReturn'],
-        })
-
-        print(f"  Accuracy: {accuracy:.3f}, AUC: {auc:.3f}, "
-              f"Trades: {backtest_results['Trades']}, Sharpe: {backtest_results['Sharpe']:.2f}")
+        print(
+            f"  Accuracy: {accuracy:.3f}, AUC: {auc:.3f}, "
+            f"Trades: {backtest_results['Trades']}, Sharpe: {backtest_results['Sharpe']:.2f}"
+        )
 
     # Save results
     results_df = pd.DataFrame(results)
@@ -341,7 +357,9 @@ def run_inference_for_stock(
 
 def main():
     parser = argparse.ArgumentParser(description="FinCast fine-tuned model inference")
-    parser.add_argument("--stock", type=str, help="Stock symbol (required if not using --all-stocks)")
+    parser.add_argument(
+        "--stock", type=str, help="Stock symbol (required if not using --all-stocks)"
+    )
     parser.add_argument(
         "--all-stocks", action="store_true", help="Run inference for all stocks"
     )
@@ -373,7 +391,9 @@ def main():
     )
     parser.add_argument("--lora-r", type=int, default=8, help="LoRA rank")
     parser.add_argument("--lora-alpha", type=int, default=16, help="LoRA alpha")
-    parser.add_argument("--use-dora", action="store_true", help="Use DoRA instead of LoRA")
+    parser.add_argument(
+        "--use-dora", action="store_true", help="Use DoRA instead of LoRA"
+    )
 
     args = parser.parse_args()
 
@@ -422,9 +442,9 @@ def main():
         combined_df.to_csv(combined_file, index=False)
         print(f"\n✓ Combined results saved to: {combined_file}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("All inference complete!")
-    print("="*80)
+    print("=" * 80)
 
 
 if __name__ == "__main__":

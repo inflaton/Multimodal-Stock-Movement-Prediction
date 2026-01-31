@@ -56,7 +56,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 # ============================================================================
 # SVM Hyperparameter Search Space
@@ -123,7 +125,9 @@ def find_best_threshold_for_horizon(
                 best_score = score
                 best_threshold = th
 
-    print(f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})")
+    print(
+        f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})"
+    )
     return best_threshold
 
 
@@ -146,7 +150,9 @@ def non_overlap_backtest(
     - long_only_confidence: Long only when p(up) > threshold
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -241,9 +247,7 @@ def non_overlap_backtest(
 # ============================================================================
 
 
-def tune_svm_for_horizon(
-    X_train, y_train, X_val, y_val, n_calls=30, verbose=True
-):
+def tune_svm_for_horizon(X_train, y_train, X_val, y_val, n_calls=30, verbose=True):
     """
     Tune SVM hyperparameters using Bayesian optimization.
 
@@ -284,7 +288,9 @@ def tune_svm_for_horizon(
             auc = roc_auc_score(y_val, y_pred_proba)
 
             if verbose:
-                print(f"  AUC: {auc:.4f} | C={C:.4f}, kernel={kernel}, gamma={gamma:.6f}")
+                print(
+                    f"  AUC: {auc:.4f} | C={C:.4f}, kernel={kernel}, gamma={gamma:.6f}"
+                )
 
             return -auc  # Minimize negative AUC
 
@@ -465,10 +471,14 @@ def run_tuning_for_stock(
             "Horizon": horizon,
             "BestThreshold": threshold,
             "Strategy": strategy,
-            "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+            "ConfidenceThreshold": (
+                confidence_threshold if "confidence" in strategy else None
+            ),
             "C": best_params["C"],
             "kernel": best_params["kernel"],
-            "gamma": best_params["gamma"] if best_params["kernel"] != "linear" else None,
+            "gamma": (
+                best_params["gamma"] if best_params["kernel"] != "linear" else None
+            ),
             "Train_Accuracy": train_acc,
             "Train_ROC_AUC": train_auc,
             "Test_Accuracy": test_acc,

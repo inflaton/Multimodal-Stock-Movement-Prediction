@@ -30,8 +30,21 @@ from glob import glob
 
 # Configuration
 STOCKS = ["AAPL", "META", "NVDA", "SPY", "TSLA"]
-MODELS = ["LSTM", "XGBoost", "LightGBM", "RandomForest", "GradientBoosting", "LogisticRegression", "SVM"]
-STRATEGIES = ["long_short", "long_only", "long_short_confidence", "long_only_confidence"]
+MODELS = [
+    "LSTM",
+    "XGBoost",
+    "LightGBM",
+    "RandomForest",
+    "GradientBoosting",
+    "LogisticRegression",
+    "SVM",
+]
+STRATEGIES = [
+    "long_short",
+    "long_only",
+    "long_short_confidence",
+    "long_only_confidence",
+]
 
 # Metrics to analyze
 METRICS = [
@@ -100,12 +113,20 @@ def analyze_by_model(df):
             print(f"\n--- {model} ---")
             subset = df[df["Model"] == model]
             print(f"  Samples: {len(subset)}")
-            print(f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})")
-            print(f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})")
+            print(
+                f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})"
+            )
+            print(
+                f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})"
+            )
             print(f"  Avg Trades:      {subset['Trades'].mean():.1f}")
-            print(f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)")
+            print(
+                f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)"
+            )
             print(f"  Avg Sharpe:      {subset['Sharpe'].mean():.4f}")
-            print(f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)")
+            print(
+                f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)"
+            )
 
 
 def analyze_by_strategy(df):
@@ -119,12 +140,20 @@ def analyze_by_strategy(df):
             print(f"\n--- {strategy.upper()} ---")
             subset = df[df["Strategy"] == strategy]
             print(f"  Samples: {len(subset)}")
-            print(f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})")
-            print(f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})")
+            print(
+                f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})"
+            )
+            print(
+                f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})"
+            )
             print(f"  Avg Trades:      {subset['Trades'].mean():.1f}")
-            print(f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)")
+            print(
+                f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)"
+            )
             print(f"  Avg Sharpe:      {subset['Sharpe'].mean():.4f}")
-            print(f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)")
+            print(
+                f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)"
+            )
 
 
 def analyze_by_stock(df):
@@ -190,24 +219,68 @@ def find_best_configurations(df):
 
     # Best by Sharpe Ratio
     print("\n--- Top 10 by Sharpe Ratio ---")
-    top_sharpe = df.nlargest(10, "Sharpe")[["Stock", "Horizon", "Model", "Strategy", "Sharpe", "TotalReturn", "WinRate", "Test_ROC_AUC"]]
+    top_sharpe = df.nlargest(10, "Sharpe")[
+        [
+            "Stock",
+            "Horizon",
+            "Model",
+            "Strategy",
+            "Sharpe",
+            "TotalReturn",
+            "WinRate",
+            "Test_ROC_AUC",
+        ]
+    ]
     print(top_sharpe.to_string(index=False))
 
     # Best by Total Return
     print("\n--- Top 10 by Total Return ---")
-    top_return = df.nlargest(10, "TotalReturn")[["Stock", "Horizon", "Model", "Strategy", "TotalReturn", "Sharpe", "WinRate", "Test_ROC_AUC"]]
+    top_return = df.nlargest(10, "TotalReturn")[
+        [
+            "Stock",
+            "Horizon",
+            "Model",
+            "Strategy",
+            "TotalReturn",
+            "Sharpe",
+            "WinRate",
+            "Test_ROC_AUC",
+        ]
+    ]
     print(top_return.to_string(index=False))
 
     # Best by Win Rate (with min trades filter)
     print("\n--- Top 10 by Win Rate (min 10 trades) ---")
     filtered = df[df["Trades"] >= 10]
     if len(filtered) > 0:
-        top_winrate = filtered.nlargest(10, "WinRate")[["Stock", "Horizon", "Model", "Strategy", "WinRate", "Trades", "Sharpe", "Test_ROC_AUC"]]
+        top_winrate = filtered.nlargest(10, "WinRate")[
+            [
+                "Stock",
+                "Horizon",
+                "Model",
+                "Strategy",
+                "WinRate",
+                "Trades",
+                "Sharpe",
+                "Test_ROC_AUC",
+            ]
+        ]
         print(top_winrate.to_string(index=False))
 
     # Best by AUC
     print("\n--- Top 10 by Test AUC ---")
-    top_auc = df.nlargest(10, "Test_ROC_AUC")[["Stock", "Horizon", "Model", "Strategy", "Test_ROC_AUC", "Test_Accuracy", "Sharpe", "TotalReturn"]]
+    top_auc = df.nlargest(10, "Test_ROC_AUC")[
+        [
+            "Stock",
+            "Horizon",
+            "Model",
+            "Strategy",
+            "Test_ROC_AUC",
+            "Test_Accuracy",
+            "Sharpe",
+            "TotalReturn",
+        ]
+    ]
     print(top_auc.to_string(index=False))
 
 
@@ -224,7 +297,9 @@ def create_comparison_table(df):
     print("COMPARISON TABLE (Direct Per-Stock Best Model Selection)")
     print("=" * 80)
     print()
-    print(f"{'Method':<45} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}")
+    print(
+        f"{'Method':<45} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}"
+    )
     print("-" * 95)
 
     # For each strategy - use direct per-stock selection
@@ -247,7 +322,9 @@ def create_comparison_table(df):
         if best_auc_rows:
             best_auc_df = pd.DataFrame(best_auc_rows)
             method_name = f"  Best by AUC"
-            print(f"{method_name:<45} {best_auc_df['Test_Accuracy'].mean():<7.3f} {best_auc_df['Test_ROC_AUC'].mean():<7.3f} {best_auc_df['Trades'].mean():<6.0f} {best_auc_df['WinRate'].mean()*100:<7.1f} {best_auc_df['Sharpe'].mean():<8.2f} {best_auc_df['TotalReturn'].mean()*100:<8.2f}")
+            print(
+                f"{method_name:<45} {best_auc_df['Test_Accuracy'].mean():<7.3f} {best_auc_df['Test_ROC_AUC'].mean():<7.3f} {best_auc_df['Trades'].mean():<6.0f} {best_auc_df['WinRate'].mean()*100:<7.1f} {best_auc_df['Sharpe'].mean():<8.2f} {best_auc_df['TotalReturn'].mean()*100:<8.2f}"
+            )
 
         # Best by Sharpe: For each stock, find the single best model by Sharpe (across all models/horizons)
         best_sharpe_rows = []
@@ -260,11 +337,15 @@ def create_comparison_table(df):
         if best_sharpe_rows:
             best_sharpe_df = pd.DataFrame(best_sharpe_rows)
             method_name = f"  Best by Sharpe"
-            print(f"{method_name:<45} {best_sharpe_df['Test_Accuracy'].mean():<7.3f} {best_sharpe_df['Test_ROC_AUC'].mean():<7.3f} {best_sharpe_df['Trades'].mean():<6.0f} {best_sharpe_df['WinRate'].mean()*100:<7.1f} {best_sharpe_df['Sharpe'].mean():<8.2f} {best_sharpe_df['TotalReturn'].mean()*100:<8.2f}")
+            print(
+                f"{method_name:<45} {best_sharpe_df['Test_Accuracy'].mean():<7.3f} {best_sharpe_df['Test_ROC_AUC'].mean():<7.3f} {best_sharpe_df['Trades'].mean():<6.0f} {best_sharpe_df['WinRate'].mean()*100:<7.1f} {best_sharpe_df['Sharpe'].mean():<8.2f} {best_sharpe_df['TotalReturn'].mean()*100:<8.2f}"
+            )
 
     print()
     print("-" * 95)
-    print("Note: For each stock, single best model selected across all ML types and horizons, then averaged.")
+    print(
+        "Note: For each stock, single best model selected across all ML types and horizons, then averaged."
+    )
 
 
 def create_model_comparison_table(df):
@@ -273,7 +354,9 @@ def create_model_comparison_table(df):
     print("MODEL COMPARISON TABLE (Best by metric per stock, then averaged)")
     print("=" * 80)
     print()
-    print(f"{'Model':<20} {'Strategy':<25} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}")
+    print(
+        f"{'Model':<20} {'Strategy':<25} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}"
+    )
     print("-" * 100)
 
     results = []
@@ -309,7 +392,9 @@ def create_model_comparison_table(df):
                     "Return%": best_df["TotalReturn"].mean() * 100,
                 }
                 results.append(row)
-                print(f"{model:<20} {strategy:<25} {row['Acc']:<7.3f} {row['AUC']:<7.3f} {row['N']:<6.0f} {row['Win%']:<7.1f} {row['Sharpe']:<8.2f} {row['Return%']:<8.2f}")
+                print(
+                    f"{model:<20} {strategy:<25} {row['Acc']:<7.3f} {row['AUC']:<7.3f} {row['N']:<6.0f} {row['Win%']:<7.1f} {row['Sharpe']:<8.2f} {row['Return%']:<8.2f}"
+                )
 
     print("-" * 100)
 
@@ -323,43 +408,82 @@ def create_summary_table(df, output_dir):
     print("=" * 80)
 
     # Summary by Model
-    model_summary = df.groupby("Model").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    model_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    model_summary = (
+        df.groupby("Model")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    model_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Model ---")
     print(model_summary.to_string())
 
     # Summary by Strategy
-    strategy_summary = df.groupby("Strategy").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    strategy_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    strategy_summary = (
+        df.groupby("Strategy")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    strategy_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Strategy ---")
     print(strategy_summary.to_string())
 
     # Summary by Stock
-    stock_summary = df.groupby("Stock").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    stock_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    stock_summary = (
+        df.groupby("Stock")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    stock_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Stock ---")
     print(stock_summary.to_string())
@@ -410,7 +534,7 @@ def generate_latex_table_by_auc(df, strategy="long_short"):
         "RandomForest": "RF",
         "GradientBoosting": "GB",
         "LogisticRegression": "LR",
-        "SVM": "SVM"
+        "SVM": "SVM",
     }
 
     # Find max values across all stocks for bolding
@@ -435,8 +559,12 @@ def generate_latex_table_by_auc(df, strategy="long_short"):
         # Format with bold for best values (across all stocks)
         acc_str = f"\\textbf{{{acc:.3f}}}" if acc == max_acc else f"{acc:.3f}"
         auc_str = f"\\textbf{{{auc:.3f}}}" if auc == max_auc else f"{auc:.3f}"
-        winrate_str = f"\\textbf{{{winrate:.1f}}}" if winrate == max_winrate else f"{winrate:.1f}"
-        sharpe_str = f"\\textbf{{{sharpe:.2f}}}" if sharpe == max_sharpe else f"{sharpe:.2f}"
+        winrate_str = (
+            f"\\textbf{{{winrate:.1f}}}" if winrate == max_winrate else f"{winrate:.1f}"
+        )
+        sharpe_str = (
+            f"\\textbf{{{sharpe:.2f}}}" if sharpe == max_sharpe else f"{sharpe:.2f}"
+        )
 
         line = f"{stock} & {model} & {horizon} & {acc_str} & {auc_str} & {trades} & {winrate_str} & {sharpe_str} \\\\"
         latex_lines.append(line)
@@ -450,7 +578,9 @@ def generate_latex_table_by_auc(df, strategy="long_short"):
     avg_sharpe = best_df["Sharpe"].mean()
 
     latex_lines.append("\\midrule")
-    latex_lines.append(f"\\multicolumn{{2}}{{l}}{{Average}} & {avg_horizon:.1f} & {avg_acc:.3f} & {avg_auc:.3f} & {avg_trades:.1f} & {avg_winrate:.1f} & {avg_sharpe:.2f} \\\\")
+    latex_lines.append(
+        f"\\multicolumn{{2}}{{l}}{{Average}} & {avg_horizon:.1f} & {avg_acc:.3f} & {avg_auc:.3f} & {avg_trades:.1f} & {avg_winrate:.1f} & {avg_sharpe:.2f} \\\\"
+    )
 
     return "\n".join(latex_lines)
 
@@ -480,7 +610,7 @@ def generate_latex_table_by_sharpe(df, strategy="long_short"):
         "RandomForest": "RF",
         "GradientBoosting": "GB",
         "LogisticRegression": "LR",
-        "SVM": "SVM"
+        "SVM": "SVM",
     }
 
     # Find max values across all stocks for bolding
@@ -505,8 +635,12 @@ def generate_latex_table_by_sharpe(df, strategy="long_short"):
         # Format with bold for best values (across all stocks)
         acc_str = f"\\textbf{{{acc:.3f}}}" if acc == max_acc else f"{acc:.3f}"
         auc_str = f"\\textbf{{{auc:.3f}}}" if auc == max_auc else f"{auc:.3f}"
-        winrate_str = f"\\textbf{{{winrate:.1f}}}" if winrate == max_winrate else f"{winrate:.1f}"
-        sharpe_str = f"\\textbf{{{sharpe:.2f}}}" if sharpe == max_sharpe else f"{sharpe:.2f}"
+        winrate_str = (
+            f"\\textbf{{{winrate:.1f}}}" if winrate == max_winrate else f"{winrate:.1f}"
+        )
+        sharpe_str = (
+            f"\\textbf{{{sharpe:.2f}}}" if sharpe == max_sharpe else f"{sharpe:.2f}"
+        )
 
         line = f"{stock} & {model} & {horizon} & {acc_str} & {auc_str} & {trades} & {winrate_str} & {sharpe_str} \\\\"
         latex_lines.append(line)
@@ -520,7 +654,9 @@ def generate_latex_table_by_sharpe(df, strategy="long_short"):
     avg_sharpe = best_df["Sharpe"].mean()
 
     latex_lines.append("\\midrule")
-    latex_lines.append(f"\\multicolumn{{2}}{{l}}{{Average}} & {avg_horizon:.1f} & {avg_acc:.3f} & {avg_auc:.3f} & {avg_trades:.1f} & {avg_winrate:.1f} & {avg_sharpe:.2f} \\\\")
+    latex_lines.append(
+        f"\\multicolumn{{2}}{{l}}{{Average}} & {avg_horizon:.1f} & {avg_acc:.3f} & {avg_auc:.3f} & {avg_trades:.1f} & {avg_winrate:.1f} & {avg_sharpe:.2f} \\\\"
+    )
 
     return "\n".join(latex_lines)
 
@@ -531,7 +667,7 @@ def update_latex_table_in_file(tex_file, caption_text, new_table_content):
         print(f"LaTeX file not found: {tex_file}")
         return False
 
-    with open(tex_file, 'r') as f:
+    with open(tex_file, "r") as f:
         content = f.read()
 
     # Find the table by caption
@@ -553,9 +689,11 @@ def update_latex_table_in_file(tex_file, caption_text, new_table_content):
         return False
 
     # Replace the table content (new content already includes \midrule and average row)
-    new_content = content[:match.start(2)] + new_table_content + "\n" + content[match.start(3):]
+    new_content = (
+        content[: match.start(2)] + new_table_content + "\n" + content[match.start(3) :]
+    )
 
-    with open(tex_file, 'w') as f:
+    with open(tex_file, "w") as f:
         f.write(new_content)
 
     print(f"Updated table: {caption_text}")
@@ -608,11 +746,25 @@ def generate_ablation_full_model_rows(df, strategy="long_short"):
     auc_row = f"Full Model & AUC & {auc_acc:.3f} & \\textbf{{{auc_auc:.3f}}} & {auc_trades:.1f} & {auc_winrate:.1f} & {auc_sharpe:.2f} & -- \\\\"
 
     # Add \textbf for best values in Sharpe row
-    sharpe_acc_str = f"\\textbf{{{sharpe_acc:.3f}}}" if sharpe_acc > auc_acc else f"{sharpe_acc:.3f}"
-    sharpe_auc_str = f"\\textbf{{{sharpe_auc:.3f}}}" if sharpe_auc > auc_auc else f"{sharpe_auc:.3f}"
-    sharpe_winrate_str = f"\\textbf{{{sharpe_winrate:.1f}}}" if sharpe_winrate > auc_winrate else f"{sharpe_winrate:.1f}"
-    sharpe_sharpe_str = f"\\textbf{{{sharpe_sharpe:.2f}}}" if sharpe_sharpe > auc_sharpe else f"{sharpe_sharpe:.2f}"
-    sharpe_ret_str = f"\\textbf{{{sharpe_ret:.1f}}}" if sharpe_ret > auc_ret else f"{sharpe_ret:.1f}"
+    sharpe_acc_str = (
+        f"\\textbf{{{sharpe_acc:.3f}}}" if sharpe_acc > auc_acc else f"{sharpe_acc:.3f}"
+    )
+    sharpe_auc_str = (
+        f"\\textbf{{{sharpe_auc:.3f}}}" if sharpe_auc > auc_auc else f"{sharpe_auc:.3f}"
+    )
+    sharpe_winrate_str = (
+        f"\\textbf{{{sharpe_winrate:.1f}}}"
+        if sharpe_winrate > auc_winrate
+        else f"{sharpe_winrate:.1f}"
+    )
+    sharpe_sharpe_str = (
+        f"\\textbf{{{sharpe_sharpe:.2f}}}"
+        if sharpe_sharpe > auc_sharpe
+        else f"{sharpe_sharpe:.2f}"
+    )
+    sharpe_ret_str = (
+        f"\\textbf{{{sharpe_ret:.1f}}}" if sharpe_ret > auc_ret else f"{sharpe_ret:.1f}"
+    )
 
     sharpe_row = f"\\quad & Sharpe & {sharpe_acc_str} & {sharpe_auc_str} & {sharpe_trades:.1f} & {sharpe_winrate_str} & {sharpe_sharpe_str} & -- \\\\"
 
@@ -634,7 +786,7 @@ def update_ablation_full_model(tex_file, df, strategy="long_short"):
         print(f"LaTeX file not found: {tex_file}")
         return False
 
-    with open(tex_file, 'r') as f:
+    with open(tex_file, "r") as f:
         content = f.read()
 
     # Pattern to match the Full Model rows in Ablation Study table
@@ -652,9 +804,11 @@ def update_ablation_full_model(tex_file, df, strategy="long_short"):
         return False
 
     # Replace the Full Model rows
-    new_content = content[:match.start(2)] + full_model_rows + "\n" + content[match.start(3):]
+    new_content = (
+        content[: match.start(2)] + full_model_rows + "\n" + content[match.start(3) :]
+    )
 
-    with open(tex_file, 'w') as f:
+    with open(tex_file, "w") as f:
         f.write(new_content)
 
     print("Updated Full Model rows in Ablation Study table")
@@ -697,11 +851,11 @@ def compute_sota_ours_metrics(df, strategy="long_short"):
     best_sharpe_df = pd.DataFrame(best_sharpe_rows)
 
     return {
-        'acc': best_sharpe_df["Test_Accuracy"].mean(),
-        'auc': best_sharpe_df["Test_ROC_AUC"].mean(),
-        'trades': best_sharpe_df["Trades"].mean(),
-        'winrate': best_sharpe_df["WinRate"].mean() * 100,
-        'sharpe': best_sharpe_df["Sharpe"].mean()
+        "acc": best_sharpe_df["Test_Accuracy"].mean(),
+        "auc": best_sharpe_df["Test_ROC_AUC"].mean(),
+        "trades": best_sharpe_df["Trades"].mean(),
+        "winrate": best_sharpe_df["WinRate"].mean() * 100,
+        "sharpe": best_sharpe_df["Sharpe"].mean(),
     }
 
 
@@ -754,22 +908,22 @@ def update_sota_ours_row(tex_file, df, strategy="long_short"):
 
     print("\nGenerated Ours row for SOTA table:")
     print(ours_row)
-    print(f"Metrics: Acc={ours_metrics['acc']:.3f}, AUC={ours_metrics['auc']:.3f}, "
-          f"N={ours_metrics['trades']:.1f}, Win%={ours_metrics['winrate']:.1f}, "
-          f"Sharpe={ours_metrics['sharpe']:.2f}")
+    print(
+        f"Metrics: Acc={ours_metrics['acc']:.3f}, AUC={ours_metrics['auc']:.3f}, "
+        f"N={ours_metrics['trades']:.1f}, Win%={ours_metrics['winrate']:.1f}, "
+        f"Sharpe={ours_metrics['sharpe']:.2f}"
+    )
 
     if not os.path.exists(tex_file):
         print(f"LaTeX file not found: {tex_file}")
         return False
 
-    with open(tex_file, 'r') as f:
+    with open(tex_file, "r") as f:
         content = f.read()
 
     # Pattern to match the Ours row in SOTA table
     # Look for the row starting with \textbf{Ours
-    pattern = (
-        r"(\\textbf\{Ours \(Multimodal\)\}.*?\\\\)"
-    )
+    pattern = r"(\\textbf\{Ours \(Multimodal\)\}.*?\\\\)"
 
     match = re.search(pattern, content, re.DOTALL)
 
@@ -779,16 +933,18 @@ def update_sota_ours_row(tex_file, df, strategy="long_short"):
         return False
 
     # Replace the Ours row
-    new_content = content[:match.start(1)] + ours_row + content[match.end(1):]
+    new_content = content[: match.start(1)] + ours_row + content[match.end(1) :]
 
-    with open(tex_file, 'w') as f:
+    with open(tex_file, "w") as f:
         f.write(new_content)
 
     print("Updated Ours row in SOTA comparison table")
     return True
 
 
-def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short", update_sota=False):
+def update_main_tex_tables(
+    df, tex_file="main.tex", strategy="long_short", update_sota=False
+):
     """Generate and update all tables in main.tex.
 
     Args:
@@ -819,15 +975,13 @@ def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short", updat
 
     # Update main.tex tables
     success1 = update_latex_table_in_file(
-        tex_file,
-        "Best Model Performance by Stock (Selected by AUC)",
-        auc_table
+        tex_file, "Best Model Performance by Stock (Selected by AUC)", auc_table
     )
 
     success2 = update_latex_table_in_file(
         tex_file,
         "Best Model Performance by Stock (Selected by Sharpe Ratio)",
-        sharpe_table
+        sharpe_table,
     )
 
     # Update Ablation Study Full Model rows
@@ -850,7 +1004,9 @@ def update_main_tex_tables(df, tex_file="main.tex", strategy="long_short", updat
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Analyze Hyperparameter Tuned ML Model Results")
+    parser = argparse.ArgumentParser(
+        description="Analyze Hyperparameter Tuned ML Model Results"
+    )
     parser.add_argument(
         "--results-dir",
         type=str,
@@ -899,7 +1055,7 @@ def main():
     print(f"Stocks: {df['Stock'].unique().tolist()}")
     print(f"Models: {df['Model'].unique().tolist()}")
     print(f"Strategies: {df['Strategy'].unique().tolist()}")
-    if 'Horizon' in df.columns:
+    if "Horizon" in df.columns:
         print(f"Horizons: {sorted(df['Horizon'].unique().tolist())}")
 
     # Run analyses
@@ -913,16 +1069,27 @@ def main():
     create_summary_table(df, args.output_dir)
 
     # Save model+strategy summary
-    model_strategy_summary.to_csv(f"{args.output_dir}/tuned_summary_by_model_strategy.csv", index=False)
-    model_comparison.to_csv(f"{args.output_dir}/tuned_model_comparison.csv", index=False)
+    model_strategy_summary.to_csv(
+        f"{args.output_dir}/tuned_summary_by_model_strategy.csv", index=False
+    )
+    model_comparison.to_csv(
+        f"{args.output_dir}/tuned_model_comparison.csv", index=False
+    )
 
     # Save full combined results
     df.to_csv(f"{args.output_dir}/tuned_all_results_combined.csv", index=False)
-    print(f"\nFull combined results saved to: {args.output_dir}/tuned_all_results_combined.csv")
+    print(
+        f"\nFull combined results saved to: {args.output_dir}/tuned_all_results_combined.csv"
+    )
 
     # Update LaTeX tables if requested
     if args.update_tex:
-        update_main_tex_tables(df, tex_file=args.tex_file, strategy="long_short", update_sota=args.update_sota)
+        update_main_tex_tables(
+            df,
+            tex_file=args.tex_file,
+            strategy="long_short",
+            update_sota=args.update_sota,
+        )
 
     print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")

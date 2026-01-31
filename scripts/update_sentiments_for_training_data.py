@@ -25,6 +25,7 @@ from pathlib import Path
 # Configuration
 STOCKS = ["AAPL", "META", "NVDA", "SPY", "TSLA"]
 
+
 def update_stock_sentiment(stock, training_dir, sentiment_dir):
     """
     Update sentiment scores for a single stock.
@@ -53,7 +54,7 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
 
     # Handle different date column names (Date, Date_x, date)
     date_col_training = None
-    for col in ['Date', 'Date_x', 'date']:
+    for col in ["Date", "Date_x", "date"]:
         if col in df.columns:
             date_col_training = col
             break
@@ -64,15 +65,17 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
         return False
 
     # If we have Date_x and Date_y from previous merge, clean up
-    if 'Date_x' in df.columns:
-        if date_col_training != 'Date':
-            df = df.rename(columns={date_col_training: 'Date'})
-            date_col_training = 'Date'
+    if "Date_x" in df.columns:
+        if date_col_training != "Date":
+            df = df.rename(columns={date_col_training: "Date"})
+            date_col_training = "Date"
         # Drop Date_y if it exists
-        if 'Date_y' in df.columns:
-            df = df.drop(columns=['Date_y'])
+        if "Date_y" in df.columns:
+            df = df.drop(columns=["Date_y"])
 
-    df["__DateDT__"] = pd.to_datetime(df[date_col_training], format="%d/%m/%Y", errors="coerce")
+    df["__DateDT__"] = pd.to_datetime(
+        df[date_col_training], format="%d/%m/%Y", errors="coerce"
+    )
 
     print(f"Original dataset shape: {df.shape}")
     print(f"Date range: {df['__DateDT__'].min()} to {df['__DateDT__'].max()}")
@@ -80,11 +83,15 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
     # Store original sentiment stats
     if "Weighted Sentiment Score" in df.columns:
         original_sentiment = df["Weighted Sentiment Score"].copy()
-        print(f"Original sentiment range: [{original_sentiment.min():.4f}, {original_sentiment.max():.4f}]")
+        print(
+            f"Original sentiment range: [{original_sentiment.min():.4f}, {original_sentiment.max():.4f}]"
+        )
         print(f"Original sentiment mean: {original_sentiment.mean():.4f}")
 
     # Load sentiment data
-    sentiment_file = f"{sentiment_dir}/news_sentiment_finbert_tone_weighted_{stock.lower()}.csv"
+    sentiment_file = (
+        f"{sentiment_dir}/news_sentiment_finbert_tone_weighted_{stock.lower()}.csv"
+    )
     print(f"Loading sentiment from: {sentiment_file}")
 
     if not os.path.exists(sentiment_file):
@@ -94,21 +101,27 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
     sentiment_df = pd.read_csv(sentiment_file)
 
     # Check if 'date' column exists, otherwise try 'Date'
-    date_col = 'date' if 'date' in sentiment_df.columns else 'Date'
-    sentiment_col = 'weighted_sentiment' if 'weighted_sentiment' in sentiment_df.columns else 'Weighted Sentiment'
+    date_col = "date" if "date" in sentiment_df.columns else "Date"
+    sentiment_col = (
+        "weighted_sentiment"
+        if "weighted_sentiment" in sentiment_df.columns
+        else "Weighted Sentiment"
+    )
 
     sentiment_df[date_col] = pd.to_datetime(sentiment_df[date_col])
     sentiment_df.rename(columns={sentiment_col: "Updated Sentiment"}, inplace=True)
 
     print(f"Sentiment data shape: {sentiment_df.shape}")
-    print(f"Sentiment date range: {sentiment_df[date_col].min()} to {sentiment_df[date_col].max()}")
+    print(
+        f"Sentiment date range: {sentiment_df[date_col].min()} to {sentiment_df[date_col].max()}"
+    )
 
     # Merge sentiment with training data
     df = df.merge(
         sentiment_df[[date_col, "Updated Sentiment"]],
         left_on="__DateDT__",
         right_on=date_col,
-        how="left"
+        how="left",
     )
 
     # Drop the duplicate date column from merge
@@ -121,8 +134,12 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
 
     if missing_count > 0:
         if "Weighted Sentiment Score" in df.columns:
-            df["Updated Sentiment"] = df["Updated Sentiment"].fillna(df["Weighted Sentiment Score"])
-            print(f"Filled {missing_count} missing values with original sentiment scores")
+            df["Updated Sentiment"] = df["Updated Sentiment"].fillna(
+                df["Weighted Sentiment Score"]
+            )
+            print(
+                f"Filled {missing_count} missing values with original sentiment scores"
+            )
         else:
             print("WARNING: No original sentiment to fall back on, filling with 0")
             df["Updated Sentiment"] = df["Updated Sentiment"].fillna(0)
@@ -150,14 +167,14 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
     columns_to_drop = ["Updated Sentiment", "__DateDT__"]
 
     # Also clean up any Date_x or Date_y columns from merges
-    if 'Date_x' in df.columns and 'Date_y' in df.columns:
+    if "Date_x" in df.columns and "Date_y" in df.columns:
         # Rename Date_x back to Date
-        df.rename(columns={'Date_x': 'Date'}, inplace=True)
-        columns_to_drop.append('Date_y')
-    elif 'Date_x' in df.columns:
-        df.rename(columns={'Date_x': 'Date'}, inplace=True)
-    elif 'Date_y' in df.columns:
-        columns_to_drop.append('Date_y')
+        df.rename(columns={"Date_x": "Date"}, inplace=True)
+        columns_to_drop.append("Date_y")
+    elif "Date_x" in df.columns:
+        df.rename(columns={"Date_x": "Date"}, inplace=True)
+    elif "Date_y" in df.columns:
+        columns_to_drop.append("Date_y")
 
     # Drop all temporary columns that exist
     columns_to_drop = [col for col in columns_to_drop if col in df.columns]
@@ -165,7 +182,9 @@ def update_stock_sentiment(stock, training_dir, sentiment_dir):
 
     # Print updated sentiment stats
     updated_sentiment = df["Weighted Sentiment Score"]
-    print(f"Updated sentiment range: [{updated_sentiment.min():.4f}, {updated_sentiment.max():.4f}]")
+    print(
+        f"Updated sentiment range: [{updated_sentiment.min():.4f}, {updated_sentiment.max():.4f}]"
+    )
     print(f"Updated sentiment mean: {updated_sentiment.mean():.4f}")
 
     # Save the updated file
@@ -187,26 +206,26 @@ def main():
         type=str,
         default=None,
         choices=STOCKS,
-        help="Update a specific stock (default: all stocks)"
+        help="Update a specific stock (default: all stocks)",
     )
     parser.add_argument(
         "--training-dir",
         type=str,
         default="dataset/training_data",
-        help="Directory containing training data (default: dataset/training_data)"
+        help="Directory containing training data (default: dataset/training_data)",
     )
     parser.add_argument(
         "--sentiment-dir",
         type=str,
         default="dataset/sentiment",
-        help="Directory containing sentiment data (default: dataset/sentiment)"
+        help="Directory containing sentiment data (default: dataset/sentiment)",
     )
 
     args = parser.parse_args()
 
-    print("="*70)
+    print("=" * 70)
     print("Update Sentiment Scores in Training Data")
-    print("="*70)
+    print("=" * 70)
     print(f"Training data directory: {args.training_dir}")
     print(f"Sentiment data directory: {args.sentiment_dir}")
 

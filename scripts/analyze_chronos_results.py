@@ -27,7 +27,12 @@ from glob import glob
 # Configuration
 STOCKS = ["AAPL", "META", "NVDA", "SPY", "TSLA"]
 MODEL_TYPES = ["zero-shot", "multivariate", "finetuned", "finetuned_cov"]
-STRATEGIES = ["long_short", "long_only", "long_short_confidence", "long_only_confidence"]
+STRATEGIES = [
+    "long_short",
+    "long_only",
+    "long_short_confidence",
+    "long_only_confidence",
+]
 
 # Metrics to analyze
 METRICS = [
@@ -117,7 +122,9 @@ def load_all_results(results_dir):
                     # Build the exact filename based on strategy
                     if strategy == "long_short":
                         # Default strategy has no suffix
-                        filename = f"{results_dir}/{model_type}_chronos-2_{stock}_results.csv"
+                        filename = (
+                            f"{results_dir}/{model_type}_chronos-2_{stock}_results.csv"
+                        )
                     else:
                         # Other strategies have explicit suffix
                         filename = f"{results_dir}/{model_type}_chronos-2_{stock}_{strategy}_results.csv"
@@ -155,12 +162,20 @@ def analyze_by_strategy(df):
             print(f"\n--- {strategy.upper()} ---")
             subset = df[df["Strategy"] == strategy]
             print(f"  Samples: {len(subset)}")
-            print(f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})")
-            print(f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})")
+            print(
+                f"  Avg Accuracy:    {subset['Test_Accuracy'].mean():.4f} (+/- {subset['Test_Accuracy'].std():.4f})"
+            )
+            print(
+                f"  Avg ROC-AUC:     {subset['Test_ROC_AUC'].mean():.4f} (+/- {subset['Test_ROC_AUC'].std():.4f})"
+            )
             print(f"  Avg Trades:      {subset['Trades'].mean():.1f}")
-            print(f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)")
+            print(
+                f"  Avg Win Rate:    {subset['WinRate'].mean():.4f} ({subset['WinRate'].mean()*100:.1f}%)"
+            )
             print(f"  Avg Sharpe:      {subset['Sharpe'].mean():.4f}")
-            print(f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)")
+            print(
+                f"  Avg Total Return: {subset['TotalReturn'].mean():.4f} ({subset['TotalReturn'].mean()*100:.2f}%)"
+            )
 
     return strategy_stats
 
@@ -246,24 +261,48 @@ def find_best_configurations(df):
 
     # Best by Sharpe Ratio
     print("\n--- Top 5 by Sharpe Ratio ---")
-    top_sharpe = df.nlargest(5, "Sharpe")[["Stock", "Horizon", "ModelType", "Strategy", "Sharpe", "TotalReturn", "WinRate"]]
+    top_sharpe = df.nlargest(5, "Sharpe")[
+        [
+            "Stock",
+            "Horizon",
+            "ModelType",
+            "Strategy",
+            "Sharpe",
+            "TotalReturn",
+            "WinRate",
+        ]
+    ]
     print(top_sharpe.to_string(index=False))
 
     # Best by Total Return
     print("\n--- Top 5 by Total Return ---")
-    top_return = df.nlargest(5, "TotalReturn")[["Stock", "Horizon", "ModelType", "Strategy", "TotalReturn", "Sharpe", "WinRate"]]
+    top_return = df.nlargest(5, "TotalReturn")[
+        [
+            "Stock",
+            "Horizon",
+            "ModelType",
+            "Strategy",
+            "TotalReturn",
+            "Sharpe",
+            "WinRate",
+        ]
+    ]
     print(top_return.to_string(index=False))
 
     # Best by Win Rate (with min trades filter)
     print("\n--- Top 5 by Win Rate (min 10 trades) ---")
     filtered = df[df["Trades"] >= 10]
     if len(filtered) > 0:
-        top_winrate = filtered.nlargest(5, "WinRate")[["Stock", "Horizon", "ModelType", "Strategy", "WinRate", "Trades", "Sharpe"]]
+        top_winrate = filtered.nlargest(5, "WinRate")[
+            ["Stock", "Horizon", "ModelType", "Strategy", "WinRate", "Trades", "Sharpe"]
+        ]
         print(top_winrate.to_string(index=False))
 
     # Best by Accuracy
     print("\n--- Top 5 by Test Accuracy ---")
-    top_acc = df.nlargest(5, "Test_Accuracy")[["Stock", "Horizon", "ModelType", "Strategy", "Test_Accuracy", "Test_ROC_AUC"]]
+    top_acc = df.nlargest(5, "Test_Accuracy")[
+        ["Stock", "Horizon", "ModelType", "Strategy", "Test_Accuracy", "Test_ROC_AUC"]
+    ]
     print(top_acc.to_string(index=False))
 
 
@@ -273,7 +312,9 @@ def create_comparison_table(df):
     print("COMPARISON TABLE (Grouped by Strategy)")
     print("=" * 80)
     print()
-    print(f"{'Method':<45} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}")
+    print(
+        f"{'Method':<45} {'Acc.':<7} {'AUC':<7} {'N':<6} {'Win%':<7} {'Sharpe':<8} {'Return%':<8}"
+    )
     print("-" * 95)
 
     # For each strategy
@@ -295,7 +336,7 @@ def create_comparison_table(df):
                 "zero-shot": "Zero-shot",
                 "multivariate": "Multivariate",
                 "finetuned": "Fine-tuned",
-                "finetuned_cov": "Fine-tuned + Cov"
+                "finetuned_cov": "Fine-tuned + Cov",
             }
             model_label = model_labels.get(model_type, model_type)
 
@@ -308,7 +349,9 @@ def create_comparison_table(df):
             avg_return = subset["TotalReturn"].mean() * 100
 
             method_name = f"  {model_label} (avg all stocks)"
-            print(f"{method_name:<45} {avg_acc:<7.3f} {avg_auc:<7.3f} {avg_trades:<6.0f} {avg_winrate:<7.1f} {avg_sharpe:<8.2f} {avg_return:<8.2f}")
+            print(
+                f"{method_name:<45} {avg_acc:<7.3f} {avg_auc:<7.3f} {avg_trades:<6.0f} {avg_winrate:<7.1f} {avg_sharpe:<8.2f} {avg_return:<8.2f}"
+            )
 
             # Best by AUC: find best per stock, then average
             best_auc_rows = []
@@ -320,7 +363,9 @@ def create_comparison_table(df):
             if best_auc_rows:
                 best_auc_df = pd.DataFrame(best_auc_rows)
                 method_name = f"  {model_label} Best by AUC"
-                print(f"{method_name:<45} {best_auc_df['Test_Accuracy'].mean():<7.3f} {best_auc_df['Test_ROC_AUC'].mean():<7.3f} {best_auc_df['Trades'].mean():<6.0f} {best_auc_df['WinRate'].mean()*100:<7.1f} {best_auc_df['Sharpe'].mean():<8.2f} {best_auc_df['TotalReturn'].mean()*100:<8.2f}")
+                print(
+                    f"{method_name:<45} {best_auc_df['Test_Accuracy'].mean():<7.3f} {best_auc_df['Test_ROC_AUC'].mean():<7.3f} {best_auc_df['Trades'].mean():<6.0f} {best_auc_df['WinRate'].mean()*100:<7.1f} {best_auc_df['Sharpe'].mean():<8.2f} {best_auc_df['TotalReturn'].mean()*100:<8.2f}"
+                )
 
             # Best by Sharpe: find best per stock, then average
             best_sharpe_rows = []
@@ -332,7 +377,9 @@ def create_comparison_table(df):
             if best_sharpe_rows:
                 best_sharpe_df = pd.DataFrame(best_sharpe_rows)
                 method_name = f"  {model_label} Best by Sharpe"
-                print(f"{method_name:<45} {best_sharpe_df['Test_Accuracy'].mean():<7.3f} {best_sharpe_df['Test_ROC_AUC'].mean():<7.3f} {best_sharpe_df['Trades'].mean():<6.0f} {best_sharpe_df['WinRate'].mean()*100:<7.1f} {best_sharpe_df['Sharpe'].mean():<8.2f} {best_sharpe_df['TotalReturn'].mean()*100:<8.2f}")
+                print(
+                    f"{method_name:<45} {best_sharpe_df['Test_Accuracy'].mean():<7.3f} {best_sharpe_df['Test_ROC_AUC'].mean():<7.3f} {best_sharpe_df['Trades'].mean():<6.0f} {best_sharpe_df['WinRate'].mean()*100:<7.1f} {best_sharpe_df['Sharpe'].mean():<8.2f} {best_sharpe_df['TotalReturn'].mean()*100:<8.2f}"
+                )
 
             # Best by Return: find best per stock, then average
             best_return_rows = []
@@ -344,11 +391,15 @@ def create_comparison_table(df):
             if best_return_rows:
                 best_return_df = pd.DataFrame(best_return_rows)
                 method_name = f"  {model_label} Best by Return"
-                print(f"{method_name:<45} {best_return_df['Test_Accuracy'].mean():<7.3f} {best_return_df['Test_ROC_AUC'].mean():<7.3f} {best_return_df['Trades'].mean():<6.0f} {best_return_df['WinRate'].mean()*100:<7.1f} {best_return_df['Sharpe'].mean():<8.2f} {best_return_df['TotalReturn'].mean()*100:<8.2f}")
+                print(
+                    f"{method_name:<45} {best_return_df['Test_Accuracy'].mean():<7.3f} {best_return_df['Test_ROC_AUC'].mean():<7.3f} {best_return_df['Trades'].mean():<6.0f} {best_return_df['WinRate'].mean()*100:<7.1f} {best_return_df['Sharpe'].mean():<8.2f} {best_return_df['TotalReturn'].mean()*100:<8.2f}"
+                )
 
     print()
     print("-" * 95)
-    print("Note: Results averaged across 5 stocks (AAPL, META, NVDA, SPY, TSLA). N = avg trades.")
+    print(
+        "Note: Results averaged across 5 stocks (AAPL, META, NVDA, SPY, TSLA). N = avg trades."
+    )
 
 
 def create_summary_table(df, output_dir):
@@ -358,43 +409,82 @@ def create_summary_table(df, output_dir):
     print("=" * 80)
 
     # Summary by Strategy
-    strategy_summary = df.groupby("Strategy").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    strategy_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    strategy_summary = (
+        df.groupby("Strategy")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    strategy_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Strategy ---")
     print(strategy_summary.to_string())
 
     # Summary by Stock
-    stock_summary = df.groupby("Stock").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    stock_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    stock_summary = (
+        df.groupby("Stock")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    stock_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Stock ---")
     print(stock_summary.to_string())
 
     # Summary by Model Type
-    model_summary = df.groupby("ModelType").agg({
-        "Test_Accuracy": "mean",
-        "Test_ROC_AUC": "mean",
-        "Trades": "mean",
-        "WinRate": "mean",
-        "Sharpe": "mean",
-        "TotalReturn": "mean",
-    }).round(4)
-    model_summary.columns = ["Avg_Accuracy", "Avg_ROC_AUC", "Avg_Trades", "Avg_WinRate", "Avg_Sharpe", "Avg_TotalReturn"]
+    model_summary = (
+        df.groupby("ModelType")
+        .agg(
+            {
+                "Test_Accuracy": "mean",
+                "Test_ROC_AUC": "mean",
+                "Trades": "mean",
+                "WinRate": "mean",
+                "Sharpe": "mean",
+                "TotalReturn": "mean",
+            }
+        )
+        .round(4)
+    )
+    model_summary.columns = [
+        "Avg_Accuracy",
+        "Avg_ROC_AUC",
+        "Avg_Trades",
+        "Avg_WinRate",
+        "Avg_Sharpe",
+        "Avg_TotalReturn",
+    ]
 
     print("\n--- Summary by Model Type ---")
     print(model_summary.to_string())
@@ -466,17 +556,25 @@ def main():
     create_summary_table(df, args.output_dir)
 
     # Save model+strategy summary
-    model_strategy_summary.to_csv(f"{args.output_dir}/chronos_summary_by_model_strategy.csv", index=False)
+    model_strategy_summary.to_csv(
+        f"{args.output_dir}/chronos_summary_by_model_strategy.csv", index=False
+    )
 
     # Save full combined results
     df.to_csv(f"{args.output_dir}/chronos_all_results_combined.csv", index=False)
-    print(f"\nFull combined results saved to: {args.output_dir}/chronos_all_results_combined.csv")
+    print(
+        f"\nFull combined results saved to: {args.output_dir}/chronos_all_results_combined.csv"
+    )
 
     # Save separate CSV for each model type (long_short strategy only for comparison)
     for model_type in df["ModelType"].unique():
-        model_df = df[(df["ModelType"] == model_type) & (df["Strategy"] == "long_short")]
+        model_df = df[
+            (df["ModelType"] == model_type) & (df["Strategy"] == "long_short")
+        ]
         if len(model_df) > 0:
-            output_file = f"{args.output_dir}/{model_type}_chronos-2_all_stocks_results.csv"
+            output_file = (
+                f"{args.output_dir}/{model_type}_chronos-2_all_stocks_results.csv"
+            )
             model_df.to_csv(output_file, index=False)
             print(f"Saved {len(model_df)} rows to: {output_file}")
 

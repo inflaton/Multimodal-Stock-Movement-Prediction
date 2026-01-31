@@ -71,7 +71,7 @@ DEFAULT_THRESHOLDS = {
     7: 0.0100,
     8: 0.0150,
     9: 0.0175,
-    10: 0.0170
+    10: 0.0170,
 }
 ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -99,7 +99,7 @@ ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 def load_data(stock: str, data_dir: str) -> pd.DataFrame:
     """Load and preprocess stock data."""
-    df = pd.read_csv(f"{data_dir}/{stock}_data_model_training.csv")        
+    df = pd.read_csv(f"{data_dir}/{stock}_data_model_training.csv")
     df["__DateDT__"] = pd.to_datetime(df["Date"], format="%d/%m/%Y", errors="coerce")
     df["Year"] = df["__DateDT__"].dt.year
     return df
@@ -128,7 +128,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 
 def non_overlap_backtest(
@@ -164,7 +166,9 @@ def non_overlap_backtest(
     dict with Trades, LongTrades, ShortTrades, WinRate, Sharpe, TotalReturn
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -429,7 +433,9 @@ def predict_with_chronos(
         # Chronos2Pipeline expects shape (n_series, n_variates, history_length)
         # For univariate: (1, 1, history_length)
         input_tensor = context_tensor.reshape(1, 1, -1)
-        forecast_list = pipeline.predict(input_tensor, prediction_length=prediction_length)
+        forecast_list = pipeline.predict(
+            input_tensor, prediction_length=prediction_length
+        )
         # Returns list of tensors, each with shape (n_variates, 21_quantiles, prediction_length)
         forecast_np = forecast_list[0].numpy()
         # For univariate, shape is (1, 21, prediction_length)
@@ -577,7 +583,11 @@ def generate_predictions_with_covariates(
     tuple of (predictions, predicted_probs)
     """
     # Combine train and test for rolling context
-    all_df = pd.concat([train_df, test_df], ignore_index=True).sort_values("__DateDT__").reset_index(drop=True)
+    all_df = (
+        pd.concat([train_df, test_df], ignore_index=True)
+        .sort_values("__DateDT__")
+        .reset_index(drop=True)
+    )
     train_len = len(train_df)
 
     predictions = []
@@ -671,7 +681,9 @@ def run_chronos_baseline_for_stock(
 
     # Validate covariate usage
     if use_covariates and model_type != "chronos2":
-        print(f"Warning: Covariates only supported for Chronos-2. Falling back to univariate mode.")
+        print(
+            f"Warning: Covariates only supported for Chronos-2. Falling back to univariate mode."
+        )
         use_covariates = False
 
     print(f"\n{'='*70}")
@@ -783,7 +795,9 @@ def run_chronos_baseline_for_stock(
             "ContextLength": context_length,
             "UseCovariates": use_covariates,
             "Strategy": strategy,
-            "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+            "ConfidenceThreshold": (
+                confidence_threshold if "confidence" in strategy else None
+            ),
             "Test_Accuracy": test_acc,
             "Test_ROC_AUC": test_auc,
             "Trades": backtest["Trades"],
@@ -799,7 +813,9 @@ def run_chronos_baseline_for_stock(
         print(f"\nTest Results ({strategy}):")
         print(f"  Accuracy: {test_acc:.3f}")
         print(f"  AUC: {test_auc:.3f}")
-        print(f"  Trades: {backtest['Trades']} (Long: {backtest['LongTrades']}, Short: {backtest['ShortTrades']}, Skipped: {backtest['Skipped']})")
+        print(
+            f"  Trades: {backtest['Trades']} (Long: {backtest['LongTrades']}, Short: {backtest['ShortTrades']}, Skipped: {backtest['Skipped']})"
+        )
         print(f"  Sharpe: {backtest['Sharpe']:.2f}")
         print(f"  Win Rate: {backtest['WinRate']*100:.1f}%")
         print(f"  Total Return: {backtest['TotalReturn']*100:.1f}%")
@@ -812,7 +828,9 @@ def run_chronos_baseline_for_stock(
     if use_covariates:
         output_file = f"{output_dir}/multivariate_{model_short}_{stock}{strategy_suffix}_results.csv"
     else:
-        output_file = f"{output_dir}/zero-shot_{model_short}_{stock}{strategy_suffix}_results.csv"
+        output_file = (
+            f"{output_dir}/zero-shot_{model_short}_{stock}{strategy_suffix}_results.csv"
+        )
     results_df.to_csv(output_file, index=False)
     print(f"\nResults saved to: {output_file}")
 
@@ -851,10 +869,10 @@ def main():
         help="Directory containing *_data_model_training.csv files",
     )
     parser.add_argument(
-        "--output-dir", 
-        type=str, 
-        default="./results/baselines", 
-        help="Directory to save output results"
+        "--output-dir",
+        type=str,
+        default="./results/baselines",
+        help="Directory to save output results",
     )
     parser.add_argument(
         "--context-length",
@@ -950,7 +968,9 @@ def main():
         combined = pd.concat(all_results, ignore_index=True)
         model_short = args.model.split("/")[-1]
         # Include strategy in filename (only if not default long_short)
-        strategy_suffix = f"_{args.strategy}" if args.strategy != STRATEGY_LONG_SHORT else ""
+        strategy_suffix = (
+            f"_{args.strategy}" if args.strategy != STRATEGY_LONG_SHORT else ""
+        )
         if args.use_covariates:
             combined_file = f"{args.output_dir}/multivariate_{model_short}_all_stocks{strategy_suffix}_results.csv"
         else:
@@ -965,44 +985,48 @@ def main():
         print(f"\nModel: {args.model}")
         if args.use_covariates:
             print(f"Mode: Multivariate with covariates: {covariate_cols}")
-        
+
         # Compute "Best by AUC" summary
         auc_selected = []
         for stock in STOCKS:
-            stock_data = combined[combined['Stock'] == stock]
+            stock_data = combined[combined["Stock"] == stock]
             if len(stock_data) > 0:
-                best_idx = stock_data['Test_ROC_AUC'].idxmax()
+                best_idx = stock_data["Test_ROC_AUC"].idxmax()
                 auc_selected.append(stock_data.loc[best_idx])
         auc_df = pd.DataFrame(auc_selected)
-        
+
         print(f"\nBest by AUC (per stock, then averaged):")
         print(f"  Accuracy:     {auc_df['Test_Accuracy'].mean():.3f}")
         print(f"  AUC:          {auc_df['Test_ROC_AUC'].mean():.3f}")
         print(f"  Sharpe:       {auc_df['Sharpe'].mean():.2f}")
         print(f"  Win%:         {auc_df['WinRate'].mean()*100:.1f}%")
-        
+
         # Compute "Best by Sharpe" summary
         sharpe_selected = []
         for stock in STOCKS:
-            stock_data = combined[combined['Stock'] == stock]
+            stock_data = combined[combined["Stock"] == stock]
             if len(stock_data) > 0:
-                best_idx = stock_data['Sharpe'].idxmax()
+                best_idx = stock_data["Sharpe"].idxmax()
                 sharpe_selected.append(stock_data.loc[best_idx])
         sharpe_df = pd.DataFrame(sharpe_selected)
-        
+
         print(f"\nBest by Sharpe (per stock, then averaged):")
         print(f"  Accuracy:     {sharpe_df['Test_Accuracy'].mean():.3f}")
         print(f"  AUC:          {sharpe_df['Test_ROC_AUC'].mean():.3f}")
         print(f"  Sharpe:       {sharpe_df['Sharpe'].mean():.2f}")
         print(f"  Win%:         {sharpe_df['WinRate'].mean()*100:.1f}%")
-        
+
         # Print LaTeX table rows for easy copy-paste
         print(f"\n{'='*70}")
         print("LaTeX Table Rows (for Table VI):")
         print(f"{'='*70}")
-        print(f"Chronos-2 (Best by AUC) & {auc_df['Test_Accuracy'].mean():.3f} & {auc_df['Test_ROC_AUC'].mean():.3f} & {auc_df['Sharpe'].mean():.2f} & {auc_df['WinRate'].mean()*100:.1f} \\\\")
-        print(f"Chronos-2 (Best by Sharpe) & {sharpe_df['Test_Accuracy'].mean():.3f} & {sharpe_df['Test_ROC_AUC'].mean():.3f} & {sharpe_df['Sharpe'].mean():.2f} & {sharpe_df['WinRate'].mean()*100:.1f} \\\\")
-        
+        print(
+            f"Chronos-2 (Best by AUC) & {auc_df['Test_Accuracy'].mean():.3f} & {auc_df['Test_ROC_AUC'].mean():.3f} & {auc_df['Sharpe'].mean():.2f} & {auc_df['WinRate'].mean()*100:.1f} \\\\"
+        )
+        print(
+            f"Chronos-2 (Best by Sharpe) & {sharpe_df['Test_Accuracy'].mean():.3f} & {sharpe_df['Test_ROC_AUC'].mean():.3f} & {sharpe_df['Sharpe'].mean():.2f} & {sharpe_df['WinRate'].mean()*100:.1f} \\\\"
+        )
+
         # Also print overall average for reference
         print(f"\n{'='*70}")
         print("Overall Average (all configurations):")
@@ -1011,7 +1035,7 @@ def main():
         print(f"  AUC:          {combined['Test_ROC_AUC'].mean():.3f}")
         print(f"  Sharpe:       {combined['Sharpe'].mean():.2f}")
         print(f"  Win%:         {combined['WinRate'].mean()*100:.1f}%")
-        
+
         print(f"\nCombined results saved to: {combined_file}")
     else:
         run_chronos_baseline_for_stock(

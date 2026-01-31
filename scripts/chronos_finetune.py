@@ -57,7 +57,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 # Fine-tuning hyperparameters
 DEFAULT_FINE_TUNE_LR = 1e-4
@@ -75,7 +77,7 @@ DEFAULT_THRESHOLDS = {
     7: 0.0100,
     8: 0.0150,
     9: 0.0175,
-    10: 0.0170
+    10: 0.0170,
 }
 ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -135,7 +137,9 @@ def non_overlap_backtest(
     dict with Trades, LongTrades, ShortTrades, Skipped, WinRate, Sharpe, TotalReturn
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -503,7 +507,9 @@ def generate_rolling_predictions(
         # Predict using AutoGluon predictor
         try:
             if known_covariates_ts is not None:
-                pred_df = predictor.predict(context_ts, known_covariates=known_covariates_ts)
+                pred_df = predictor.predict(
+                    context_ts, known_covariates=known_covariates_ts
+                )
             else:
                 pred_df = predictor.predict(context_ts)
             pred_df = pred_df.reset_index()
@@ -678,7 +684,9 @@ def run_finetuned_baseline_for_stock(
                 "BestThreshold": threshold,
                 "Mode": mode,
                 "Strategy": strategy,
-                "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+                "ConfidenceThreshold": (
+                    confidence_threshold if "confidence" in strategy else None
+                ),
                 "FineTuneLR": fine_tune_lr if fine_tune else None,
                 "FineTuneSteps": fine_tune_steps if fine_tune else None,
                 "UseCovariates": use_covariates,
@@ -706,6 +714,7 @@ def run_finetuned_baseline_for_stock(
         except Exception as e:
             print(f"Error for horizon {horizon}: {e}")
             import traceback
+
             traceback.print_exc()
             continue
 
@@ -747,10 +756,10 @@ def main():
         help="Directory containing *_data_model_training.csv files",
     )
     parser.add_argument(
-        "--output-dir", 
-        type=str, 
-        default="./results/baselines/finetuned_single", 
-        help="Directory to save output results"
+        "--output-dir",
+        type=str,
+        default="./results/baselines/finetuned_single",
+        help="Directory to save output results",
     )
     parser.add_argument(
         "--no-fine-tune",
@@ -824,7 +833,9 @@ def main():
     skip_if_exists = not args.overwrite_if_exists
 
     if skip_if_exists:
-        print(f"Will load existing models if available (use --overwrite-if-exists to force re-training)")
+        print(
+            f"Will load existing models if available (use --overwrite-if-exists to force re-training)"
+        )
         print(f"Models will be loaded from: {args.output_dir}")
     else:
         print(f"Will overwrite and re-train existing models")

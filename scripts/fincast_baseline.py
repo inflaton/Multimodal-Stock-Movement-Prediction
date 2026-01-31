@@ -41,7 +41,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 # Add FinCast-fts to path
-FINCAST_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "src")
+FINCAST_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "src"
+)
 if FINCAST_PATH not in sys.path:
     sys.path.insert(0, FINCAST_PATH)
 
@@ -58,6 +60,7 @@ TEST_YEAR = 2024
 FEE_BPS_ROUND_TRIP = 10  # 10 basis points = 0.10%
 RANDOM_SEED = 42
 
+
 # Default FinCast model path - check multiple locations
 def get_default_model_path():
     """Find FinCast model weights in standard locations."""
@@ -65,11 +68,14 @@ def get_default_model_path():
     possible_paths = [
         os.path.join(base_dir, "FinCast-fts", "model_weights", "v1.pth"),
         os.path.join(base_dir, "FinCast-fts", "checkpoints", "v1.pth"),
-        os.path.expanduser("~/.cache/huggingface/hub/models--Vincent05R--FinCast/snapshots/*/v1.pth"),
+        os.path.expanduser(
+            "~/.cache/huggingface/hub/models--Vincent05R--FinCast/snapshots/*/v1.pth"
+        ),
     ]
     for path in possible_paths:
         if "*" in path:
             import glob
+
             matches = glob.glob(path)
             if matches:
                 return matches[0]
@@ -77,6 +83,7 @@ def get_default_model_path():
             return path
     # Return first path as default (will need to be downloaded)
     return possible_paths[0]
+
 
 DEFAULT_MODEL_PATH = get_default_model_path()
 
@@ -90,7 +97,7 @@ DEFAULT_THRESHOLDS = {
     7: 0.0100,
     8: 0.0150,
     9: 0.0175,
-    10: 0.0170
+    10: 0.0170,
 }
 ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -205,6 +212,7 @@ def download_fincast_model(target_dir: str) -> str:
     """
     try:
         from huggingface_hub import hf_hub_download
+
         print("Downloading FinCast model from HuggingFace (~4GB)...")
         print("This may take several minutes...")
         model_path = hf_hub_download(
@@ -215,7 +223,9 @@ def download_fincast_model(target_dir: str) -> str:
         print(f"Model downloaded to: {model_path}")
         return model_path
     except ImportError:
-        print("huggingface_hub not installed. Install with: pip install huggingface_hub")
+        print(
+            "huggingface_hub not installed. Install with: pip install huggingface_hub"
+        )
         raise
     except Exception as e:
         print(f"Error downloading model: {e}")
@@ -281,7 +291,7 @@ def predict_with_fincast(
     # Extract quantiles (index 0=mean, 1-9=quantiles q1-q9)
     # q1 ~ 0.1 quantile, q5 ~ 0.5 (median), q9 ~ 0.9 quantile
     if full_outputs is not None and full_outputs.shape[2] > 1:
-        low = full_outputs[0, :prediction_length, 1]   # q1 ~ 0.1
+        low = full_outputs[0, :prediction_length, 1]  # q1 ~ 0.1
         high = full_outputs[0, :prediction_length, 9]  # q9 ~ 0.9
     else:
         low = mean
@@ -477,7 +487,9 @@ def run_fincast_baseline_for_stock(
         print(f"\nTest Results:")
         print(f"  Accuracy: {test_acc:.3f}")
         print(f"  AUC: {test_auc:.3f}")
-        print(f"  Trades: {backtest['Trades']} (Long: {backtest['LongTrades']}, Short: {backtest['ShortTrades']})")
+        print(
+            f"  Trades: {backtest['Trades']} (Long: {backtest['LongTrades']}, Short: {backtest['ShortTrades']})"
+        )
         print(f"  Sharpe: {backtest['Sharpe']:.2f}")
         print(f"  Win Rate: {backtest['WinRate']*100:.1f}%")
         print(f"  Total Return: {backtest['TotalReturn']*100:.1f}%")
@@ -523,10 +535,10 @@ def main():
         help="Directory containing *_data_model_training.csv files",
     )
     parser.add_argument(
-        "--output-dir", 
-        type=str, 
-        default="./results/baselines", 
-        help="Directory to save output results"
+        "--output-dir",
+        type=str,
+        default="./results/baselines",
+        help="Directory to save output results",
     )
     parser.add_argument(
         "--context-length",
@@ -546,15 +558,15 @@ def main():
         print(f"Model not found at: {model_path}")
         # Try to download from HuggingFace
         target_dir = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            "FinCast-fts",
-            "model_weights"
+            os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "model_weights"
         )
         try:
             model_path = download_fincast_model(target_dir)
         except Exception as e:
             print(f"Failed to download model: {e}")
-            print("\nPlease manually download from: https://huggingface.co/Vincent05R/FinCast")
+            print(
+                "\nPlease manually download from: https://huggingface.co/Vincent05R/FinCast"
+            )
             print(f"And place v1.pth in: {target_dir}")
             return
 
@@ -605,9 +617,9 @@ def main():
         # Compute "Best by AUC" summary
         auc_selected = []
         for stock in STOCKS:
-            stock_data = combined[combined['Stock'] == stock]
+            stock_data = combined[combined["Stock"] == stock]
             if len(stock_data) > 0:
-                best_idx = stock_data['Test_ROC_AUC'].idxmax()
+                best_idx = stock_data["Test_ROC_AUC"].idxmax()
                 auc_selected.append(stock_data.loc[best_idx])
         auc_df = pd.DataFrame(auc_selected)
 
@@ -620,9 +632,9 @@ def main():
         # Compute "Best by Sharpe" summary
         sharpe_selected = []
         for stock in STOCKS:
-            stock_data = combined[combined['Stock'] == stock]
+            stock_data = combined[combined["Stock"] == stock]
             if len(stock_data) > 0:
-                best_idx = stock_data['Sharpe'].idxmax()
+                best_idx = stock_data["Sharpe"].idxmax()
                 sharpe_selected.append(stock_data.loc[best_idx])
         sharpe_df = pd.DataFrame(sharpe_selected)
 
@@ -636,8 +648,12 @@ def main():
         print(f"\n{'='*70}")
         print("LaTeX Table Rows:")
         print(f"{'='*70}")
-        print(f"FinCast (Best by AUC) & {auc_df['Test_Accuracy'].mean():.3f} & {auc_df['Test_ROC_AUC'].mean():.3f} & {auc_df['Sharpe'].mean():.2f} & {auc_df['WinRate'].mean()*100:.1f} \\\\")
-        print(f"FinCast (Best by Sharpe) & {sharpe_df['Test_Accuracy'].mean():.3f} & {sharpe_df['Test_ROC_AUC'].mean():.3f} & {sharpe_df['Sharpe'].mean():.2f} & {sharpe_df['WinRate'].mean()*100:.1f} \\\\")
+        print(
+            f"FinCast (Best by AUC) & {auc_df['Test_Accuracy'].mean():.3f} & {auc_df['Test_ROC_AUC'].mean():.3f} & {auc_df['Sharpe'].mean():.2f} & {auc_df['WinRate'].mean()*100:.1f} \\\\"
+        )
+        print(
+            f"FinCast (Best by Sharpe) & {sharpe_df['Test_Accuracy'].mean():.3f} & {sharpe_df['Test_ROC_AUC'].mean():.3f} & {sharpe_df['Sharpe'].mean():.2f} & {sharpe_df['WinRate'].mean()*100:.1f} \\\\"
+        )
 
         print(f"\nCombined results saved to: {combined_file}")
     else:

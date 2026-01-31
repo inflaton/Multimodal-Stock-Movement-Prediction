@@ -67,7 +67,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 # ============================================================================
 # LSTM Hyperparameter Search Space
@@ -138,7 +140,9 @@ def find_best_threshold_for_horizon(
                 best_score = score
                 best_threshold = th
 
-    print(f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})")
+    print(
+        f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})"
+    )
     return best_threshold
 
 
@@ -220,7 +224,9 @@ def non_overlap_backtest(
     dict with Trades, LongTrades, ShortTrades, Skipped, WinRate, Sharpe, TotalReturn
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -581,7 +587,9 @@ def run_tuning_for_stock(
             "Horizon": horizon,
             "BestThreshold": threshold,
             "Strategy": strategy,
-            "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+            "ConfidenceThreshold": (
+                confidence_threshold if "confidence" in strategy else None
+            ),
             "learning_rate": best_params["learning_rate"],
             "dropout_rate": best_params["dropout_rate"],
             "lstm_units_1": best_params["lstm_units_1"],

@@ -60,7 +60,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 # ============================================================================
 # XGBoost Hyperparameter Search Space
@@ -132,7 +134,9 @@ def find_best_threshold_for_horizon(
                 best_score = score
                 best_threshold = th
 
-    print(f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})")
+    print(
+        f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})"
+    )
     return best_threshold
 
 
@@ -155,7 +159,9 @@ def non_overlap_backtest(
     - long_only_confidence: Long only when p(up) > threshold
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -250,9 +256,7 @@ def non_overlap_backtest(
 # ============================================================================
 
 
-def tune_xgboost_for_horizon(
-    X_train, y_train, X_val, y_val, n_calls=30, verbose=True
-):
+def tune_xgboost_for_horizon(X_train, y_train, X_val, y_val, n_calls=30, verbose=True):
     """
     Tune XGBoost hyperparameters using Bayesian optimization.
 
@@ -262,8 +266,16 @@ def tune_xgboost_for_horizon(
     """
 
     @use_named_args(xgb_space)
-    def objective(n_estimators, max_depth, learning_rate, subsample,
-                  colsample_bytree, gamma, reg_alpha, reg_lambda):
+    def objective(
+        n_estimators,
+        max_depth,
+        learning_rate,
+        subsample,
+        colsample_bytree,
+        gamma,
+        reg_alpha,
+        reg_lambda,
+    ):
         set_global_seed(RANDOM_SEED)
 
         try:
@@ -287,7 +299,9 @@ def tune_xgboost_for_horizon(
             auc = roc_auc_score(y_val, y_pred_proba)
 
             if verbose:
-                print(f"  AUC: {auc:.4f} | n_est={n_estimators}, depth={max_depth}, lr={learning_rate:.4f}")
+                print(
+                    f"  AUC: {auc:.4f} | n_est={n_estimators}, depth={max_depth}, lr={learning_rate:.4f}"
+                )
 
             return -auc  # Minimize negative AUC
 
@@ -458,7 +472,9 @@ def run_tuning_for_stock(
             "Horizon": horizon,
             "BestThreshold": threshold,
             "Strategy": strategy,
-            "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+            "ConfidenceThreshold": (
+                confidence_threshold if "confidence" in strategy else None
+            ),
             "n_estimators": best_params["n_estimators"],
             "max_depth": best_params["max_depth"],
             "learning_rate": best_params["learning_rate"],

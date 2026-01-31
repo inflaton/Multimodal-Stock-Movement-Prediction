@@ -56,6 +56,7 @@ CONFIGURATION NOTES:
 """
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import os
@@ -78,7 +79,9 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from sklearn.metrics import accuracy_score, roc_auc_score
 
 # Add FinCast-fts to path
-FINCAST_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "src")
+FINCAST_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "src"
+)
 if FINCAST_PATH not in sys.path:
     sys.path.insert(0, FINCAST_PATH)
 
@@ -94,14 +97,20 @@ RANDOM_SEED = 42
 
 # Default FinCast model path
 DEFAULT_MODEL_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
-    "FinCast-fts", "model_weights", "v1.pth"
+    os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "model_weights", "v1.pth"
 )
 
 # Default thresholds per horizon
 DEFAULT_THRESHOLDS = {
-    2: 0.0025, 3: 0.0025, 4: 0.0050, 5: 0.0050, 6: 0.0075,
-    7: 0.0100, 8: 0.0150, 9: 0.0175, 10: 0.0170
+    2: 0.0025,
+    3: 0.0025,
+    4: 0.0050,
+    5: 0.0050,
+    6: 0.0075,
+    7: 0.0100,
+    8: 0.0150,
+    9: 0.0175,
+    10: 0.0170,
 }
 
 ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -110,6 +119,7 @@ ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 # ============================================================================
 # Dataset for Fine-tuning
 # ============================================================================
+
 
 class StockForecastDataset(Dataset):
     """
@@ -145,11 +155,15 @@ class StockForecastDataset(Dataset):
         start_idx = self.valid_indices[idx]
 
         # Context: historical prices
-        context = self.prices[start_idx:start_idx + self.context_length]
+        context = self.prices[start_idx : start_idx + self.context_length]
 
         # Target: future prices (for computing loss)
-        target = self.prices[start_idx + self.context_length:
-                            start_idx + self.context_length + self.horizon]
+        target = self.prices[
+            start_idx
+            + self.context_length : start_idx
+            + self.context_length
+            + self.horizon
+        ]
 
         # Padding (no padding needed for context, but model expects it)
         padding = np.zeros(self.context_length + self.horizon, dtype=np.float32)
@@ -158,16 +172,17 @@ class StockForecastDataset(Dataset):
         freq = np.array([0], dtype=np.int64)
 
         return {
-            'context': torch.from_numpy(context),
-            'target': torch.from_numpy(target),
-            'padding': torch.from_numpy(padding),
-            'freq': torch.from_numpy(freq),
+            "context": torch.from_numpy(context),
+            "target": torch.from_numpy(target),
+            "padding": torch.from_numpy(padding),
+            "freq": torch.from_numpy(freq),
         }
 
 
 # ============================================================================
 # Loss Functions
 # ============================================================================
+
 
 class FinCastLoss(nn.Module):
     """
@@ -197,8 +212,8 @@ class FinCastLoss(nn.Module):
     def forward(
         self,
         predictions: torch.Tensor,  # [B, H, 1+Q] - mean + quantiles
-        targets: torch.Tensor,      # [B, H] - actual future prices
-        context_last: torch.Tensor, # [B] - last price in context
+        targets: torch.Tensor,  # [B, H] - actual future prices
+        context_last: torch.Tensor,  # [B] - last price in context
     ) -> torch.Tensor:
         """
         Compute combined loss.
@@ -228,29 +243,28 @@ class FinCastLoss(nn.Module):
             for i, q in enumerate(self.quantiles):
                 q_pred = predictions[:, :, 1 + i]  # [B, H]
                 errors = targets - q_pred
-                quantile_loss += torch.mean(
-                    torch.max(q * errors, (q - 1) * errors)
-                )
+                quantile_loss += torch.mean(torch.max(q * errors, (q - 1) * errors))
             quantile_loss /= len(self.quantiles)
 
         # Combined loss
         total_loss = (
-            self.mse_weight * mse_loss +
-            self.direction_weight * direction_loss +
-            self.quantile_weight * quantile_loss
+            self.mse_weight * mse_loss
+            + self.direction_weight * direction_loss
+            + self.quantile_weight * quantile_loss
         )
 
         return total_loss, {
-            'mse': mse_loss.item(),
-            'direction': direction_loss.item(),
-            'quantile': quantile_loss.item(),
-            'total': total_loss.item(),
+            "mse": mse_loss.item(),
+            "direction": direction_loss.item(),
+            "quantile": quantile_loss.item(),
+            "total": total_loss.item(),
         }
 
 
 # ============================================================================
 # Model Loading with PEFT
 # ============================================================================
+
 
 def load_fincast_model_for_training(model_path: str, config: SimpleNamespace):
     """
@@ -290,8 +304,7 @@ def wrap_model_with_peft(
     """
     # Import PEFT injector from FinCast
     peft_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "FinCast-fts", "peft_Fincast"
+        os.path.dirname(os.path.dirname(__file__)), "FinCast-fts", "peft_Fincast"
     )
     if peft_path not in sys.path:
         sys.path.insert(0, peft_path)
@@ -319,6 +332,7 @@ def wrap_model_with_peft(
 # Training Loop
 # ============================================================================
 
+
 def train_epoch(
     model: nn.Module,
     dataloader: DataLoader,
@@ -339,14 +353,14 @@ def train_epoch(
     optimizer.zero_grad()
 
     for batch_idx, batch in enumerate(dataloader):
-        context = batch['context'].to(device)
-        target = batch['target'].to(device)
-        padding = batch['padding'].to(device)
-        freq = batch['freq'].to(device)
+        context = batch["context"].to(device)
+        target = batch["target"].to(device)
+        padding = batch["padding"].to(device)
+        freq = batch["freq"].to(device)
 
         # Forward pass
         # Model expects: input_ts [B, C], input_padding [B, C+H], freq [B, 1]
-        outputs, aux_loss = model(context, padding[:, :context.shape[1]], freq)
+        outputs, aux_loss = model(context, padding[:, : context.shape[1]], freq)
 
         # outputs shape: [B, N, H, 1+Q] where N = num_patches
         # Take the last patch's prediction
@@ -371,15 +385,15 @@ def train_epoch(
             optimizer.step()
             optimizer.zero_grad()
 
-        total_loss += loss_dict['total']
-        total_mse += loss_dict['mse']
-        total_direction += loss_dict['direction']
+        total_loss += loss_dict["total"]
+        total_mse += loss_dict["mse"]
+        total_direction += loss_dict["direction"]
         num_batches += 1
 
     return {
-        'loss': total_loss / num_batches,
-        'mse': total_mse / num_batches,
-        'direction': total_direction / num_batches,
+        "loss": total_loss / num_batches,
+        "mse": total_mse / num_batches,
+        "direction": total_direction / num_batches,
     }
 
 
@@ -402,24 +416,24 @@ def evaluate(
 
     with torch.no_grad():
         for batch in dataloader:
-            context = batch['context'].to(device)
-            target = batch['target'].to(device)
-            padding = batch['padding'].to(device)
-            freq = batch['freq'].to(device)
+            context = batch["context"].to(device)
+            target = batch["target"].to(device)
+            padding = batch["padding"].to(device)
+            freq = batch["freq"].to(device)
 
-            outputs, _ = model(context, padding[:, :context.shape[1]], freq)
+            outputs, _ = model(context, padding[:, : context.shape[1]], freq)
             predictions = outputs[:, -1, :horizon, :]
 
             context_last = context[:, -1]
 
             loss, loss_dict = loss_fn(predictions, target[:, :horizon], context_last)
 
-            total_loss += loss_dict['total']
+            total_loss += loss_dict["total"]
             num_batches += 1
 
             # Store for metrics
             all_preds.append(predictions[:, -1, 0].cpu().numpy())  # Last horizon, mean
-            all_targets.append(target[:, horizon-1].cpu().numpy())
+            all_targets.append(target[:, horizon - 1].cpu().numpy())
             all_context_last.append(context_last.cpu().numpy())
 
     # Compute metrics
@@ -441,15 +455,16 @@ def evaluate(
         auc = 0.5
 
     return {
-        'loss': total_loss / num_batches,
-        'accuracy': accuracy,
-        'auc': auc,
+        "loss": total_loss / num_batches,
+        "accuracy": accuracy,
+        "auc": auc,
     }
 
 
 # ============================================================================
 # Main Fine-tuning Function
 # ============================================================================
+
 
 def finetune_fincast(
     stock: str,
@@ -538,8 +553,10 @@ def finetune_fincast(
     # Count trainable parameters
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total_params = sum(p.numel() for p in model.parameters())
-    print(f"Trainable parameters: {trainable_params:,} / {total_params:,} "
-          f"({100*trainable_params/total_params:.2f}%)")
+    print(
+        f"Trainable parameters: {trainable_params:,} / {total_params:,} "
+        f"({100*trainable_params/total_params:.2f}%)"
+    )
 
     # Loss function
     loss_fn = FinCastLoss(
@@ -570,66 +587,65 @@ def finetune_fincast(
         train_metrics = train_epoch(
             model, train_loader, optimizer, loss_fn, device, horizon, grad_accum_steps
         )
-        print(f"  Train - Loss: {train_metrics['loss']:.4f}, "
-              f"MSE: {train_metrics['mse']:.4f}, "
-              f"Direction: {train_metrics['direction']:.4f}")
+        print(
+            f"  Train - Loss: {train_metrics['loss']:.4f}, "
+            f"MSE: {train_metrics['mse']:.4f}, "
+            f"Direction: {train_metrics['direction']:.4f}"
+        )
 
         # Evaluate
-        test_metrics = evaluate(
-            model, test_loader, loss_fn, device, horizon, threshold
+        test_metrics = evaluate(model, test_loader, loss_fn, device, horizon, threshold)
+        print(
+            f"  Test  - Loss: {test_metrics['loss']:.4f}, "
+            f"Acc: {test_metrics['accuracy']:.3f}, "
+            f"AUC: {test_metrics['auc']:.3f}"
         )
-        print(f"  Test  - Loss: {test_metrics['loss']:.4f}, "
-              f"Acc: {test_metrics['accuracy']:.3f}, "
-              f"AUC: {test_metrics['auc']:.3f}")
 
         # Update scheduler
         scheduler.step()
 
         # Save best model
-        if test_metrics['auc'] > best_auc:
-            best_auc = test_metrics['auc']
+        if test_metrics["auc"] > best_auc:
+            best_auc = test_metrics["auc"]
             best_epoch = epoch + 1
             torch.save(
-                model.state_dict(),
-                os.path.join(stock_output_dir, "best_model.pth")
+                model.state_dict(), os.path.join(stock_output_dir, "best_model.pth")
             )
             print(f"  * New best model saved (AUC: {best_auc:.3f})")
 
-        history.append({
-            'epoch': epoch + 1,
-            'train_loss': train_metrics['loss'],
-            'test_loss': test_metrics['loss'],
-            'test_accuracy': test_metrics['accuracy'],
-            'test_auc': test_metrics['auc'],
-        })
+        history.append(
+            {
+                "epoch": epoch + 1,
+                "train_loss": train_metrics["loss"],
+                "test_loss": test_metrics["loss"],
+                "test_accuracy": test_metrics["accuracy"],
+                "test_auc": test_metrics["auc"],
+            }
+        )
 
     # Save final model and history
-    torch.save(
-        model.state_dict(),
-        os.path.join(stock_output_dir, "final_model.pth")
-    )
+    torch.save(model.state_dict(), os.path.join(stock_output_dir, "final_model.pth"))
 
     history_df = pd.DataFrame(history)
     history_df.to_csv(
-        os.path.join(stock_output_dir, "training_history.csv"),
-        index=False
+        os.path.join(stock_output_dir, "training_history.csv"), index=False
     )
 
     # Save config
     config_dict = {
-        'stock': stock,
-        'horizon': horizon,
-        'context_length': context_length,
-        'epochs': epochs,
-        'batch_size': batch_size,
-        'learning_rate': learning_rate,
-        'lora_r': lora_r,
-        'lora_alpha': lora_alpha,
-        'use_dora': use_dora,
-        'best_epoch': best_epoch,
-        'best_auc': best_auc,
+        "stock": stock,
+        "horizon": horizon,
+        "context_length": context_length,
+        "epochs": epochs,
+        "batch_size": batch_size,
+        "learning_rate": learning_rate,
+        "lora_r": lora_r,
+        "lora_alpha": lora_alpha,
+        "use_dora": use_dora,
+        "best_epoch": best_epoch,
+        "best_auc": best_auc,
     }
-    with open(os.path.join(stock_output_dir, "config.json"), 'w') as f:
+    with open(os.path.join(stock_output_dir, "config.json"), "w") as f:
         json.dump(config_dict, f, indent=2)
 
     print(f"\nFinished training {stock}")
@@ -637,11 +653,11 @@ def finetune_fincast(
     print(f"Results saved to: {stock_output_dir}")
 
     return {
-        'stock': stock,
-        'best_auc': best_auc,
-        'best_epoch': best_epoch,
-        'final_accuracy': history[-1]['test_accuracy'],
-        'final_auc': history[-1]['test_auc'],
+        "stock": stock,
+        "best_auc": best_auc,
+        "best_epoch": best_epoch,
+        "final_accuracy": history[-1]["test_accuracy"],
+        "final_auc": history[-1]["test_auc"],
     }
 
 
@@ -649,69 +665,68 @@ def finetune_fincast(
 # Main Entry Point
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Fine-tune FinCast for Stock Direction Prediction"
     )
     parser.add_argument(
-        "--stock", type=str, default="AAPL", choices=STOCKS,
-        help="Stock symbol to fine-tune on"
+        "--stock",
+        type=str,
+        default="AAPL",
+        choices=STOCKS,
+        help="Stock symbol to fine-tune on",
     )
     parser.add_argument(
-        "--all-stocks", action="store_true",
-        help="Fine-tune on all stocks"
+        "--all-stocks", action="store_true", help="Fine-tune on all stocks"
     )
     parser.add_argument(
-        "--model-path", type=str, default=DEFAULT_MODEL_PATH,
-        help="Path to FinCast model weights"
+        "--model-path",
+        type=str,
+        default=DEFAULT_MODEL_PATH,
+        help="Path to FinCast model weights",
     )
     parser.add_argument(
-        "--data-dir", type=str, default="./dataset/training_data",
-        help="Directory containing stock data CSV files"
+        "--data-dir",
+        type=str,
+        default="./dataset/training_data",
+        help="Directory containing stock data CSV files",
     )
     parser.add_argument(
-        "--output-dir", type=str, default="./results/baselines/finetuned_fincast",
-        help="Directory to save fine-tuned models"
+        "--output-dir",
+        type=str,
+        default="./results/baselines/finetuned_fincast",
+        help="Directory to save fine-tuned models",
     )
     parser.add_argument(
-        "--horizon", type=int, default=10,
-        help="Prediction horizon in days"
+        "--horizon", type=int, default=10, help="Prediction horizon in days"
     )
     parser.add_argument(
-        "--context-length", type=int, default=128,
-        help="Context length (historical days)"
+        "--context-length",
+        type=int,
+        default=128,
+        help="Context length (historical days)",
     )
     parser.add_argument(
-        "--epochs", type=int, default=10,
-        help="Number of training epochs"
+        "--epochs", type=int, default=10, help="Number of training epochs"
+    )
+    parser.add_argument("--batch-size", type=int, default=32, help="Batch size")
+    parser.add_argument("--lr", type=float, default=1e-5, help="Learning rate")
+    parser.add_argument("--lora-r", type=int, default=8, help="LoRA rank")
+    parser.add_argument(
+        "--lora-alpha", type=int, default=16, help="LoRA alpha (scaling factor)"
     )
     parser.add_argument(
-        "--batch-size", type=int, default=32,
-        help="Batch size"
+        "--use-dora", action="store_true", help="Use DoRA instead of LoRA"
     )
     parser.add_argument(
-        "--lr", type=float, default=1e-5,
-        help="Learning rate"
+        "--grad-accum", type=int, default=1, help="Gradient accumulation steps"
     )
     parser.add_argument(
-        "--lora-r", type=int, default=8,
-        help="LoRA rank"
-    )
-    parser.add_argument(
-        "--lora-alpha", type=int, default=16,
-        help="LoRA alpha (scaling factor)"
-    )
-    parser.add_argument(
-        "--use-dora", action="store_true",
-        help="Use DoRA instead of LoRA"
-    )
-    parser.add_argument(
-        "--grad-accum", type=int, default=1,
-        help="Gradient accumulation steps"
-    )
-    parser.add_argument(
-        "--direction-weight", type=float, default=0.5,
-        help="Weight for direction loss (vs MSE loss)"
+        "--direction-weight",
+        type=float,
+        default=0.5,
+        help="Weight for direction loss (vs MSE loss)",
     )
 
     args = parser.parse_args()
@@ -751,14 +766,13 @@ def main():
             all_results.append(results)
 
         # Summary
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("FINE-TUNING SUMMARY")
-        print("="*70)
+        print("=" * 70)
         results_df = pd.DataFrame(all_results)
         print(results_df.to_string(index=False))
         results_df.to_csv(
-            os.path.join(args.output_dir, "all_stocks_summary.csv"),
-            index=False
+            os.path.join(args.output_dir, "all_stocks_summary.csv"), index=False
         )
         print(f"\nAverage Best AUC: {results_df['best_auc'].mean():.3f}")
     else:

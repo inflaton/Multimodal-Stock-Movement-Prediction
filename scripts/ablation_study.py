@@ -31,9 +31,9 @@ import warnings
 
 # CRITICAL: Parse --force-cpu flag BEFORE importing TensorFlow
 # This ensures CUDA is disabled at the environment level before TF initializes
-FORCE_CPU_MODE = '--force-cpu' in sys.argv
+FORCE_CPU_MODE = "--force-cpu" in sys.argv
 if FORCE_CPU_MODE:
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     print("=" * 70)
     print("FORCE CPU MODE ENABLED")
     print("TensorFlow will use CPU only (CUDA_VISIBLE_DEVICES=-1)")
@@ -41,8 +41,10 @@ if FORCE_CPU_MODE:
 
     # Prevent TensorFlow cleanup at exit to avoid double free
     import atexit
+
     def skip_tf_cleanup():
         pass  # Do nothing - let OS clean up
+
     atexit.register(skip_tf_cleanup)
 
 warnings.filterwarnings("ignore")
@@ -63,10 +65,13 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 # Try to import XGBoost (optional dependency due to OpenMP requirements)
 try:
     from xgboost import XGBClassifier
+
     XGBOOST_AVAILABLE = True
 except Exception as e:
     print(f"Warning: XGBoost not available: {e}")
-    print("Continuing without XGBoost. To fix: brew install libomp && pip install --upgrade xgboost")
+    print(
+        "Continuing without XGBoost. To fix: brew install libomp && pip install --upgrade xgboost"
+    )
     XGBOOST_AVAILABLE = False
     XGBClassifier = None
 
@@ -83,9 +88,12 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 if FORCE_CPU_MODE:
     # Monkey-patch clear_session to do nothing in CPU mode during exit
     _original_clear_session = tf.keras.backend.clear_session
+
     def _noop_clear_session():
         import gc
+
         gc.collect()  # Just run garbage collection
+
     tf.keras.backend.clear_session = _noop_clear_session
 
 # Bayesian optimization
@@ -96,6 +104,7 @@ from skopt.utils import use_named_args
 # ============================================================================
 # Configuration
 # ============================================================================
+
 
 # Check if GPU with CuDNN is available
 def check_cudnn_available(force_cpu=False):
@@ -113,23 +122,25 @@ def check_cudnn_available(force_cpu=False):
 
     try:
         # Try to create a small test LSTM to verify CuDNN actually works
-        gpus = tf.config.list_physical_devices('GPU')
+        gpus = tf.config.list_physical_devices("GPU")
         if gpus and tf.test.is_built_with_cuda():
             # Test if CuDNN LSTM actually works
             try:
-                test_model = tf.keras.Sequential([
-                    tf.keras.layers.LSTM(8, input_shape=(5, 3))
-                ])
+                test_model = tf.keras.Sequential(
+                    [tf.keras.layers.LSTM(8, input_shape=(5, 3))]
+                )
                 test_input = tf.random.normal((1, 5, 3))
                 _ = test_model(test_input)
                 del test_model
                 # Safe cleanup - only clear session if CUDA is actually available
                 import gc
+
                 gc.collect()
                 return True
             except Exception as e:
                 print(f"GPU available but CuDNN test failed: {e}")
                 import gc
+
                 gc.collect()
                 return False
     except Exception as e:
@@ -143,10 +154,12 @@ def safe_clear_session():
         # In CPU mode, just do garbage collection without clear_session
         # to avoid double-free issues with CUDA
         import gc
+
         gc.collect()
     else:
         # In GPU mode, use normal clear_session
         tf.keras.backend.clear_session()
+
 
 # Global flag - will be set by main() based on command-line args
 USE_CUDNN = None
@@ -213,8 +226,14 @@ MODELS = {
             Integer(2, 20, name="min_samples_split"),
             Integer(1, 10, name="min_samples_leaf"),
         ],
-        "param_names": ["n_estimators", "max_depth", "learning_rate", "subsample",
-                        "min_samples_split", "min_samples_leaf"],
+        "param_names": [
+            "n_estimators",
+            "max_depth",
+            "learning_rate",
+            "subsample",
+            "min_samples_split",
+            "min_samples_leaf",
+        ],
     },
     "RandomForest": {
         "class": RandomForestClassifier,
@@ -225,8 +244,13 @@ MODELS = {
             Integer(1, 10, name="min_samples_leaf"),
             Categorical(["gini", "entropy"], name="criterion"),
         ],
-        "param_names": ["n_estimators", "max_depth", "min_samples_split",
-                        "min_samples_leaf", "criterion"],
+        "param_names": [
+            "n_estimators",
+            "max_depth",
+            "min_samples_split",
+            "min_samples_leaf",
+            "criterion",
+        ],
         "extra_params": {"class_weight": "balanced"},
     },
     "XGBoost": {
@@ -240,9 +264,20 @@ MODELS = {
             Real(0, 10, name="reg_alpha"),
             Real(0, 10, name="reg_lambda"),
         ],
-        "param_names": ["n_estimators", "max_depth", "learning_rate", "subsample",
-                        "colsample_bytree", "reg_alpha", "reg_lambda"],
-        "extra_params": {"use_label_encoder": False, "eval_metric": "logloss", "verbosity": 0},
+        "param_names": [
+            "n_estimators",
+            "max_depth",
+            "learning_rate",
+            "subsample",
+            "colsample_bytree",
+            "reg_alpha",
+            "reg_lambda",
+        ],
+        "extra_params": {
+            "use_label_encoder": False,
+            "eval_metric": "logloss",
+            "verbosity": 0,
+        },
     },
     "LightGBM": {
         "class": LGBMClassifier,
@@ -256,8 +291,16 @@ MODELS = {
             Real(0, 10, name="reg_alpha"),
             Real(0, 10, name="reg_lambda"),
         ],
-        "param_names": ["n_estimators", "num_leaves", "max_depth", "learning_rate",
-                        "subsample", "colsample_bytree", "reg_alpha", "reg_lambda"],
+        "param_names": [
+            "n_estimators",
+            "num_leaves",
+            "max_depth",
+            "learning_rate",
+            "subsample",
+            "colsample_bytree",
+            "reg_alpha",
+            "reg_lambda",
+        ],
         "extra_params": {"verbosity": -1},
     },
     "LogisticRegression": {
@@ -267,7 +310,11 @@ MODELS = {
             Categorical(["l1", "l2"], name="penalty"),
         ],
         "param_names": ["C", "penalty"],
-        "extra_params": {"solver": "saga", "max_iter": 1000, "class_weight": "balanced"},
+        "extra_params": {
+            "solver": "saga",
+            "max_iter": 1000,
+            "class_weight": "balanced",
+        },
         "needs_scaling": True,
     },
     "SVM": {
@@ -297,7 +344,13 @@ LSTM_SPACE = [
     Integer(16, 128, name="lstm_units_2"),
     Integer(16, 64, name="batch_size"),
 ]
-LSTM_PARAM_NAMES = ["learning_rate", "dropout_rate", "lstm_units_1", "lstm_units_2", "batch_size"]
+LSTM_PARAM_NAMES = [
+    "learning_rate",
+    "dropout_rate",
+    "lstm_units_1",
+    "lstm_units_2",
+    "batch_size",
+]
 
 # ============================================================================
 # Utility Functions
@@ -335,7 +388,9 @@ def load_raw_sentiment(stock: str, sentiment_dir: str) -> pd.DataFrame:
     if not files:
         print(f"  ERROR: No raw sentiment files found for {stock} in {sentiment_dir}")
         print(f"  Looking for pattern: {pattern}")
-        print(f"  These files are required for news_only, social_only, and equal_weights configs")
+        print(
+            f"  These files are required for news_only, social_only, and equal_weights configs"
+        )
         print(f"  Hint: Copy raw sentiment files to {sentiment_dir}")
         return None
 
@@ -357,9 +412,7 @@ def load_raw_sentiment(stock: str, sentiment_dir: str) -> pd.DataFrame:
 
 
 def compute_weighted_sentiment(
-    sentiment_df: pd.DataFrame,
-    news_weight: float = 0.7,
-    social_weight: float = 0.3
+    sentiment_df: pd.DataFrame, news_weight: float = 0.7, social_weight: float = 0.3
 ) -> pd.DataFrame:
     """
     Compute weighted sentiment score from raw sentiment data.
@@ -430,7 +483,9 @@ def find_best_threshold_for_horizon(
                 best_score = score
                 best_threshold = th
 
-    print(f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})")
+    print(
+        f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})"
+    )
     return best_threshold
 
 
@@ -539,13 +594,15 @@ def build_lstm_model(
     # When CuDNN is available, use default 'tanh' (enables CuDNN optimization)
     # If USE_CUDNN is None (not set yet), default to CPU mode for safety
     use_cudnn = USE_CUDNN if USE_CUDNN is not None else False
-    lstm_kwargs = {} if use_cudnn else {'recurrent_activation': 'sigmoid'}
+    lstm_kwargs = {} if use_cudnn else {"recurrent_activation": "sigmoid"}
 
     model = Sequential(
         [
             LSTM(
-                lstm_units_1, input_shape=(seq_len, num_features), return_sequences=True,
-                **lstm_kwargs
+                lstm_units_1,
+                input_shape=(seq_len, num_features),
+                return_sequences=True,
+                **lstm_kwargs,
             ),
             Dropout(dropout_rate),
             LSTM(lstm_units_2, return_sequences=False, **lstm_kwargs),
@@ -579,7 +636,12 @@ def tune_lstm(X_train_seq, y_train_seq, X_val_seq, y_val_seq, n_calls=20, verbos
 
         try:
             model = build_lstm_model(
-                seq_len, num_features, learning_rate, dropout_rate, lstm_units_1, lstm_units_2
+                seq_len,
+                num_features,
+                learning_rate,
+                dropout_rate,
+                lstm_units_1,
+                lstm_units_2,
             )
 
             early_stop = EarlyStopping(
@@ -590,7 +652,8 @@ def tune_lstm(X_train_seq, y_train_seq, X_val_seq, y_val_seq, n_calls=20, verbos
             )
 
             model.fit(
-                X_train_seq, y_train_seq,
+                X_train_seq,
+                y_train_seq,
                 validation_data=(X_val_seq, y_val_seq),
                 epochs=EPOCHS,
                 batch_size=int(batch_size),
@@ -637,8 +700,10 @@ def tune_lstm(X_train_seq, y_train_seq, X_val_seq, y_val_seq, n_calls=20, verbos
 
 def train_and_evaluate_lstm(
     best_params,
-    X_train_seq, y_train_seq,
-    X_test_seq, y_test_seq,
+    X_train_seq,
+    y_train_seq,
+    X_test_seq,
+    y_test_seq,
     test_df,
     horizon,
     seq_len,
@@ -648,7 +713,8 @@ def train_and_evaluate_lstm(
     set_global_seed(RANDOM_SEED)
 
     model = build_lstm_model(
-        seq_len, num_features,
+        seq_len,
+        num_features,
         best_params["learning_rate"],
         best_params["dropout_rate"],
         best_params["lstm_units_1"],
@@ -670,7 +736,8 @@ def train_and_evaluate_lstm(
     y_val_final = y_train_seq[-val_size:]
 
     model.fit(
-        X_train_final, y_train_final,
+        X_train_final,
+        y_train_final,
         validation_data=(X_val_final, y_val_final),
         epochs=EPOCHS,
         batch_size=int(best_params["batch_size"]),
@@ -694,7 +761,9 @@ def train_and_evaluate_lstm(
     # Backtest - need to align predictions with test_df
     # The test sequences start at index SEQ_LEN, so we need to offset
     test_df_for_backtest = test_df.iloc[SEQ_LEN:].reset_index(drop=True)
-    backtest = non_overlap_backtest(test_df_for_backtest, y_pred, horizon, predicted_probs=y_pred_proba)
+    backtest = non_overlap_backtest(
+        test_df_for_backtest, y_pred, horizon, predicted_probs=y_pred_proba
+    )
 
     # Clear memory - delete model first to avoid double free in CPU mode
     del model
@@ -823,7 +892,9 @@ def train_and_evaluate(
     train_auc = roc_auc_score(y_train, y_train_pred_proba)
 
     # Backtest
-    backtest = non_overlap_backtest(test_df, y_pred, horizon, predicted_probs=y_pred_proba)
+    backtest = non_overlap_backtest(
+        test_df, y_pred, horizon, predicted_probs=y_pred_proba
+    )
 
     return {
         "Train_Accuracy": train_acc,
@@ -873,7 +944,10 @@ def run_ablation_for_stock(
     # Load and compute sentiment based on configuration
     sentiment_score_col = None
     if ablation_config["use_sentiment"]:
-        if ablation_config["news_weight"] == 0.7 and ablation_config["social_weight"] == 0.3:
+        if (
+            ablation_config["news_weight"] == 0.7
+            and ablation_config["social_weight"] == 0.3
+        ):
             # Use existing Filtered Sentiment Score
             if "Filtered Sentiment Score" in df.columns:
                 df["Ablation_Sentiment"] = df["Filtered Sentiment Score"]
@@ -892,7 +966,9 @@ def run_ablation_for_stock(
                 )
                 if weighted_sentiment is not None:
                     df["__DateOnly__"] = df["__DateDT__"].dt.date
-                    weighted_sentiment["Date"] = pd.to_datetime(weighted_sentiment["Date"]).dt.date
+                    weighted_sentiment["Date"] = pd.to_datetime(
+                        weighted_sentiment["Date"]
+                    ).dt.date
                     df = df.merge(
                         weighted_sentiment,
                         left_on="__DateOnly__",
@@ -908,8 +984,12 @@ def run_ablation_for_stock(
     test_df = df[df["Year"] == TEST_YEAR].copy()
 
     print(f"\nTrain/Test Split:")
-    print(f"  Training: {len(train_df)} samples ({train_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {train_df['__DateDT__'].max().strftime('%Y-%m-%d')})")
-    print(f"  Testing:  {len(test_df)} samples ({test_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {test_df['__DateDT__'].max().strftime('%Y-%m-%d')})")
+    print(
+        f"  Training: {len(train_df)} samples ({train_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {train_df['__DateDT__'].max().strftime('%Y-%m-%d')})"
+    )
+    print(
+        f"  Testing:  {len(test_df)} samples ({test_df['__DateDT__'].min().strftime('%Y-%m-%d')} to {test_df['__DateDT__'].max().strftime('%Y-%m-%d')})"
+    )
 
     # Find best thresholds for each horizon
     if horizons is None:
@@ -933,7 +1013,11 @@ def run_ablation_for_stock(
         print("Error: No features available for this configuration!")
         return None
 
-    print(f"Features ({len(feature_cols)}): {feature_cols[:5]}..." if len(feature_cols) > 5 else f"Features: {feature_cols}")
+    print(
+        f"Features ({len(feature_cols)}): {feature_cols[:5]}..."
+        if len(feature_cols) > 5
+        else f"Features: {feature_cols}"
+    )
 
     # Determine which models to run
     if model_name:
@@ -1019,7 +1103,9 @@ def run_ablation_for_stock(
                 scaler,
             )
 
-            print(f"    Val AUC: {val_auc:.4f}, Test AUC: {result['Test_ROC_AUC']:.4f}, Sharpe: {result['Sharpe']:.2f}")
+            print(
+                f"    Val AUC: {val_auc:.4f}, Test AUC: {result['Test_ROC_AUC']:.4f}, Sharpe: {result['Sharpe']:.2f}"
+            )
 
             if result["Test_ROC_AUC"] > best_auc:
                 best_auc = result["Test_ROC_AUC"]
@@ -1070,15 +1156,19 @@ def run_ablation_for_stock(
                 # Train and evaluate
                 result = train_and_evaluate_lstm(
                     best_params,
-                    X_train_seq, y_train_seq,
-                    X_test_seq, y_test_seq,
+                    X_train_seq,
+                    y_train_seq,
+                    X_test_seq,
+                    y_test_seq,
                     test_copy,
                     horizon,
                     SEQ_LEN,
                     len(feature_cols),
                 )
 
-                print(f"    Val AUC: {val_auc:.4f}, Test AUC: {result['Test_ROC_AUC']:.4f}, Sharpe: {result['Sharpe']:.2f}")
+                print(
+                    f"    Val AUC: {val_auc:.4f}, Test AUC: {result['Test_ROC_AUC']:.4f}, Sharpe: {result['Sharpe']:.2f}"
+                )
 
                 if result["Test_ROC_AUC"] > best_auc:
                     best_auc = result["Test_ROC_AUC"]
@@ -1107,33 +1197,41 @@ def run_ablation_for_stock(
 
             # For each horizon, compare new vs existing and keep the best by AUC
             merged_results = []
-            all_horizons = set(existing_df['Horizon'].unique()) | set(results_df['Horizon'].unique())
+            all_horizons = set(existing_df["Horizon"].unique()) | set(
+                results_df["Horizon"].unique()
+            )
 
             for horizon in all_horizons:
-                existing_row = existing_df[existing_df['Horizon'] == horizon]
-                new_row = results_df[results_df['Horizon'] == horizon]
+                existing_row = existing_df[existing_df["Horizon"] == horizon]
+                new_row = results_df[results_df["Horizon"] == horizon]
 
                 if len(existing_row) == 0 and len(new_row) > 0:
                     # Only new result exists
                     merged_results.append(new_row.iloc[0])
-                    print(f"    Horizon {horizon}: Added new {new_row.iloc[0]['Model']} (AUC={new_row.iloc[0]['Test_ROC_AUC']:.4f})")
+                    print(
+                        f"    Horizon {horizon}: Added new {new_row.iloc[0]['Model']} (AUC={new_row.iloc[0]['Test_ROC_AUC']:.4f})"
+                    )
                 elif len(new_row) == 0 and len(existing_row) > 0:
                     # Only existing result exists
                     merged_results.append(existing_row.iloc[0])
                 elif len(existing_row) > 0 and len(new_row) > 0:
                     # Both exist - compare AUC and keep the better one
-                    existing_auc = existing_row.iloc[0]['Test_ROC_AUC']
-                    new_auc = new_row.iloc[0]['Test_ROC_AUC']
+                    existing_auc = existing_row.iloc[0]["Test_ROC_AUC"]
+                    new_auc = new_row.iloc[0]["Test_ROC_AUC"]
 
                     if new_auc > existing_auc:
                         merged_results.append(new_row.iloc[0])
-                        print(f"    Horizon {horizon}: Replaced {existing_row.iloc[0]['Model']} (AUC={existing_auc:.4f}) with {new_row.iloc[0]['Model']} (AUC={new_auc:.4f})")
+                        print(
+                            f"    Horizon {horizon}: Replaced {existing_row.iloc[0]['Model']} (AUC={existing_auc:.4f}) with {new_row.iloc[0]['Model']} (AUC={new_auc:.4f})"
+                        )
                     else:
                         merged_results.append(existing_row.iloc[0])
-                        print(f"    Horizon {horizon}: Kept {existing_row.iloc[0]['Model']} (AUC={existing_auc:.4f}), new {new_row.iloc[0]['Model']} (AUC={new_auc:.4f}) not better")
+                        print(
+                            f"    Horizon {horizon}: Kept {existing_row.iloc[0]['Model']} (AUC={existing_auc:.4f}), new {new_row.iloc[0]['Model']} (AUC={new_auc:.4f}) not better"
+                        )
 
             results_df = pd.DataFrame(merged_results)
-            results_df = results_df.sort_values(['Horizon']).reset_index(drop=True)
+            results_df = results_df.sort_values(["Horizon"]).reset_index(drop=True)
 
         results_df.to_csv(output_file, index=False)
         print(f"\nResults saved to: {output_file}")
@@ -1224,7 +1322,9 @@ def main():
     # Set global USE_CUDNN based on --force-cpu flag
     global USE_CUDNN
     USE_CUDNN = check_cudnn_available(force_cpu=args.force_cpu)
-    print(f"CuDNN GPU acceleration: {'ENABLED' if USE_CUDNN else 'DISABLED (CPU mode)'}")
+    print(
+        f"CuDNN GPU acceleration: {'ENABLED' if USE_CUDNN else 'DISABLED (CPU mode)'}"
+    )
 
     # Validate arguments
     if not args.config and not args.all_configs:
@@ -1240,7 +1340,9 @@ def main():
     set_global_seed(RANDOM_SEED)
 
     # Determine configurations and stocks to run
-    configs_to_run = list(ABLATION_CONFIGS.keys()) if args.all_configs else [args.config]
+    configs_to_run = (
+        list(ABLATION_CONFIGS.keys()) if args.all_configs else [args.config]
+    )
     stocks_to_run = STOCKS if args.all_stocks else [args.stock]
 
     all_combined_results = []
@@ -1271,7 +1373,9 @@ def main():
         # Combine results for this config (with merge support - keep best by AUC)
         if config_results:
             combined = pd.concat(config_results, ignore_index=True)
-            all_stocks_file = f"{args.output_dir}/ablation_{config_name}_all_stocks_results.csv"
+            all_stocks_file = (
+                f"{args.output_dir}/ablation_{config_name}_all_stocks_results.csv"
+            )
 
             # Check if file exists and merge if needed
             if os.path.exists(all_stocks_file):
@@ -1279,19 +1383,26 @@ def main():
 
                 # For each (stock, horizon) pair, compare and keep the best by AUC
                 merged_results = []
-                all_keys = set(zip(existing_df['Stock'], existing_df['Horizon'])) | set(zip(combined['Stock'], combined['Horizon']))
+                all_keys = set(zip(existing_df["Stock"], existing_df["Horizon"])) | set(
+                    zip(combined["Stock"], combined["Horizon"])
+                )
 
                 for stock, horizon in all_keys:
-                    existing_row = existing_df[(existing_df['Stock'] == stock) & (existing_df['Horizon'] == horizon)]
-                    new_row = combined[(combined['Stock'] == stock) & (combined['Horizon'] == horizon)]
+                    existing_row = existing_df[
+                        (existing_df["Stock"] == stock)
+                        & (existing_df["Horizon"] == horizon)
+                    ]
+                    new_row = combined[
+                        (combined["Stock"] == stock) & (combined["Horizon"] == horizon)
+                    ]
 
                     if len(existing_row) == 0 and len(new_row) > 0:
                         merged_results.append(new_row.iloc[0])
                     elif len(new_row) == 0 and len(existing_row) > 0:
                         merged_results.append(existing_row.iloc[0])
                     elif len(existing_row) > 0 and len(new_row) > 0:
-                        existing_auc = existing_row.iloc[0]['Test_ROC_AUC']
-                        new_auc = new_row.iloc[0]['Test_ROC_AUC']
+                        existing_auc = existing_row.iloc[0]["Test_ROC_AUC"]
+                        new_auc = new_row.iloc[0]["Test_ROC_AUC"]
 
                         if new_auc > existing_auc:
                             merged_results.append(new_row.iloc[0])
@@ -1299,9 +1410,13 @@ def main():
                             merged_results.append(existing_row.iloc[0])
 
                 combined = pd.DataFrame(merged_results)
-                combined = combined.sort_values(['Stock', 'Horizon']).reset_index(drop=True)
+                combined = combined.sort_values(["Stock", "Horizon"]).reset_index(
+                    drop=True
+                )
 
-                print(f"\nMerged all_stocks results (kept best by AUC for each stock/horizon)")
+                print(
+                    f"\nMerged all_stocks results (kept best by AUC for each stock/horizon)"
+                )
 
             combined.to_csv(all_stocks_file, index=False)
             all_combined_results.append(combined)
@@ -1329,12 +1444,18 @@ def main():
         print(f"\n{'='*70}")
         print("FINAL ABLATION SUMMARY")
         print(f"{'='*70}")
-        summary = final_combined.groupby("AblationConfig").agg({
-            "Test_Accuracy": "mean",
-            "Test_ROC_AUC": "mean",
-            "Sharpe": "mean",
-            "TotalReturn": "mean",
-        }).round(4)
+        summary = (
+            final_combined.groupby("AblationConfig")
+            .agg(
+                {
+                    "Test_Accuracy": "mean",
+                    "Test_ROC_AUC": "mean",
+                    "Sharpe": "mean",
+                    "TotalReturn": "mean",
+                }
+            )
+            .round(4)
+        )
         print(summary)
 
 

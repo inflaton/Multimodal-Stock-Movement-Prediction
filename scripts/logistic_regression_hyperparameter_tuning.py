@@ -58,7 +58,9 @@ VALID_STRATEGIES = [
     STRATEGY_LONG_ONLY_CONFIDENCE,
 ]
 
-DEFAULT_CONFIDENCE_THRESHOLD = 0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+DEFAULT_CONFIDENCE_THRESHOLD = (
+    0.6  # For confidence strategies: long when p(up) > 0.6, short when p(up) < 0.4
+)
 
 # ============================================================================
 # Logistic Regression Hyperparameter Search Space
@@ -125,7 +127,9 @@ def find_best_threshold_for_horizon(
                 best_score = score
                 best_threshold = th
 
-    print(f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})")
+    print(
+        f"  Horizon {horizon}d -> Best threshold = {best_threshold:.4f} (balance score: {best_score:.3f})"
+    )
     return best_threshold
 
 
@@ -148,7 +152,9 @@ def non_overlap_backtest(
     - long_only_confidence: Long only when p(up) > threshold
     """
     if strategy not in VALID_STRATEGIES:
-        raise ValueError(f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}")
+        raise ValueError(
+            f"Invalid strategy: {strategy}. Must be one of {VALID_STRATEGIES}"
+        )
 
     if strategy in [STRATEGY_LONG_SHORT_CONFIDENCE, STRATEGY_LONG_ONLY_CONFIDENCE]:
         if predicted_probs is None:
@@ -297,7 +303,9 @@ def tune_logistic_regression_for_horizon(
             auc = roc_auc_score(y_val, y_pred_proba)
 
             if verbose:
-                print(f"  AUC: {auc:.4f} | C={C:.4f}, penalty={penalty}, l1_ratio={l1_ratio:.2f}")
+                print(
+                    f"  AUC: {auc:.4f} | C={C:.4f}, penalty={penalty}, l1_ratio={l1_ratio:.2f}"
+                )
 
             return -auc  # Minimize negative AUC
 
@@ -489,10 +497,16 @@ def run_tuning_for_stock(
             "Horizon": horizon,
             "BestThreshold": threshold,
             "Strategy": strategy,
-            "ConfidenceThreshold": confidence_threshold if "confidence" in strategy else None,
+            "ConfidenceThreshold": (
+                confidence_threshold if "confidence" in strategy else None
+            ),
             "C": best_params["C"],
             "penalty": best_params["penalty"],
-            "l1_ratio": best_params["l1_ratio"] if best_params["penalty"] == "elasticnet" else None,
+            "l1_ratio": (
+                best_params["l1_ratio"]
+                if best_params["penalty"] == "elasticnet"
+                else None
+            ),
             "Train_Accuracy": train_acc,
             "Train_ROC_AUC": train_auc,
             "Test_Accuracy": test_acc,
@@ -516,7 +530,9 @@ def run_tuning_for_stock(
     # Save results
     results_df = pd.DataFrame(results)
     strategy_suffix = f"_{strategy}" if strategy != STRATEGY_LONG_SHORT else ""
-    output_file = f"{output_dir}/LogisticRegression_tuned_{stock}_results{strategy_suffix}.csv"
+    output_file = (
+        f"{output_dir}/LogisticRegression_tuned_{stock}_results{strategy_suffix}.csv"
+    )
     results_df.to_csv(output_file, index=False)
     print(f"\nResults saved to: {output_file}")
 
