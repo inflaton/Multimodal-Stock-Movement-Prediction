@@ -1,0 +1,187 @@
+Training single stock: NVDA
+Training single model: svm
+=========================================
+Starting Hyperparameter Tuning
+=========================================
+Stocks: NVDA
+Models: svm
+=========================================
+
+=========================================
+Training Stock: NVDA
+=========================================
+
+-----------------------------------------
+Training svm for NVDA
+-----------------------------------------
+
+######################################################################
+# STRATEGY: long_short
+######################################################################
+
+======================================================================
+SVM HYPERPARAMETER TUNING: NVDA
+======================================================================
+Training samples: 1006, Test samples: 251
+Finding best thresholds for horizons: [2, 3, 4, 5, 6, 7, 8, 9, 10]...
+  Horizon 2d -> Best threshold = 0.0050 (balance score: 0.998)
+  Horizon 3d -> Best threshold = 0.0075 (balance score: 0.993)
+  Horizon 4d -> Best threshold = 0.0125 (balance score: 0.999)
+  Horizon 5d -> Best threshold = 0.0125 (balance score: 0.994)
+  Horizon 6d -> Best threshold = 0.0150 (balance score: 0.997)
+  Horizon 7d -> Best threshold = 0.0175 (balance score: 0.995)
+  Horizon 8d -> Best threshold = 0.0175 (balance score: 0.998)
+  Horizon 9d -> Best threshold = 0.0200 (balance score: 0.997)
+  Horizon 10d -> Best threshold = 0.0225 (balance score: 0.997)
+Found thresholds for 9 horizons
+
+--------------------------------------------------
+Horizon: 2 days, Threshold: 0.0050
+--------------------------------------------------
+  AUC: 0.6443 | C=15.3522, kernel=linear, gamma=1.314510
+  AUC: 0.6409 | C=2.4401, kernel=rbf, gamma=0.002511
+  AUC: 0.6531 | C=0.6871, kernel=rbf, gamma=0.003728
+  AUC: 0.6443 | C=4.0138, kernel=linear, gamma=0.772672
+  AUC: 0.6415 | C=56.7820, kernel=linear, gamma=9.307783
+  AUC: 0.6549 | C=2.9507, kernel=rbf, gamma=0.001067
+  AUC: 0.3711 | C=0.0124, kernel=rbf, gamma=0.039760
+  AUC: 0.3570 | C=0.0154, kernel=poly, gamma=0.008533
+  AUC: 0.3718 | C=0.0230, kernel=rbf, gamma=0.033873
+  AUC: 0.5217 | C=85.6887, kernel=rbf, gamma=2.752717
+  AUC: 0.6426 | C=0.5738, kernel=linear, gamma=0.001000
+  AUC: 0.6563 | C=1.1883, kernel=rbf, gamma=0.001000
+  AUC: 0.6550 | C=1.1863, kernel=rbf, gamma=0.001000
+  AUC: 0.6442 | C=4.8538, kernel=linear, gamma=0.001000
+  AUC: 0.6415 | C=100.0000, kernel=linear, gamma=0.002791
+  AUC: 0.6549 | C=0.0100, kernel=linear, gamma=3.668978
+  AUC: 0.6415 | C=100.0000, kernel=linear, gamma=0.047530
+  AUC: 0.6451 | C=0.0552, kernel=linear, gamma=8.319530
+  AUC: 0.6497 | C=0.0201, kernel=linear, gamma=0.001000
+  AUC: 0.5075 | C=0.0100, kernel=poly, gamma=10.000000
+  AUC: 0.6549 | C=0.0100, kernel=linear, gamma=0.172316
+  AUC: 0.6549 | C=0.0100, kernel=linear, gamma=0.010628
+  AUC: 0.6426 | C=0.4983, kernel=linear, gamma=10.000000
+  AUC: 0.5194 | C=68.2096, kernel=poly, gamma=0.628798
+  AUC: 0.6415 | C=100.0000, kernel=linear, gamma=0.001000
+  AUC: 0.6415 | C=100.0000, kernel=linear, gamma=0.299554
+  AUC: 0.6436 | C=0.1156, kernel=linear, gamma=0.001000
+  AUC: 0.3570 | C=7.2919, kernel=poly, gamma=0.002303
+  AUC: 0.6549 | C=0.0100, kernel=linear, gamma=0.006277
+  AUC: 0.4918 | C=0.0100, kernel=rbf, gamma=10.000000
+
+Best hyperparameters: {'C': 1.1883297559635633, 'kernel': np.str_('rbf'), 'gamma': 0.001}
+Validation AUC: 0.6563
+
+Test Results:
+  Accuracy: 0.486
+  AUC: 0.651
+  Sharpe: -2.00
+  Win Rate: 41.6%
+
+--------------------------------------------------
+Horizon: 3 days, Threshold: 0.0075
+--------------------------------------------------
+  AUC: 0.5952 | C=15.3522, kernel=linear, gamma=1.314510
+  AUC: 0.6037 | C=2.4401, kernel=rbf, gamma=0.002511
+  AUC: 0.6186 | C=0.6871, kernel=rbf, gamma=0.003728
+  AUC: 0.5953 | C=4.0138, kernel=linear, gamma=0.772672
+  AUC: 0.5951 | C=56.7820, kernel=linear, gamma=9.307783
+  AUC: 0.6051 | C=2.9507, kernel=rbf, gamma=0.001067
+  AUC: 0.4173 | C=0.0124, kernel=rbf, gamma=0.039760
+  AUC: 0.3993 | C=0.0154, kernel=poly, gamma=0.008533
+  AUC: 0.4049 | C=0.0230, kernel=rbf, gamma=0.033873
+  AUC: 0.5163 | C=85.6887, kernel=rbf, gamma=2.752717
+  AUC: 0.5946 | C=0.5688, kernel=linear, gamma=0.002422
+  AUC: 0.5023 | C=0.9559, kernel=poly, gamma=10.000000
+  AUC: 0.5000 | C=0.8991, kernel=rbf, gamma=0.001000
+  AUC: 0.5951 | C=30.8857, kernel=linear, gamma=4.067989
+  AUC: 0.5952 | C=15.7151, kernel=linear, gamma=0.001000
+  AUC: 0.6015 | C=0.6289, kernel=rbf, gamma=0.021829
+  AUC: 0.5981 | C=42.4593, kernel=rbf, gamma=0.001163
+  AUC: 0.5850 | C=6.7610, kernel=rbf, gamma=0.010974
+  AUC: 0.5944 | C=0.6879, kernel=linear, gamma=0.014888
+  AUC: 0.5946 | C=0.3691, kernel=linear, gamma=0.021402
+  AUC: 0.5942 | C=0.2389, kernel=linear, gamma=0.001369
+  AUC: 0.6006 | C=0.0100, kernel=linear, gamma=1.131271
+  AUC: 0.6006 | C=0.0100, kernel=linear, gamma=0.001000
+  AUC: 0.5952 | C=100.0000, kernel=linear, gamma=0.010580
+  AUC: 0.4978 | C=0.6876, kernel=poly, gamma=8.512720
+  AUC: 0.5173 | C=2.7634, kernel=poly, gamma=3.730082
+  AUC: 0.5987 | C=0.0422, kernel=linear, gamma=7.729093
+  AUC: 0.6006 | C=0.0100, kernel=linear, gamma=0.002415
+  AUC: 0.5952 | C=100.0000, kernel=linear, gamma=0.001000
+  AUC: 0.5682 | C=100.0000, kernel=poly, gamma=0.037774
+
+Best hyperparameters: {'C': 0.6870614282613304, 'kernel': 'rbf', 'gamma': 0.003727925903376984}
+Validation AUC: 0.6186
+
+Test Results:
+  Accuracy: 0.474
+  AUC: 0.699
+  Sharpe: -1.56
+  Win Rate: 41.0%
+
+--------------------------------------------------
+Horizon: 4 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.6469 | C=15.3522, kernel=linear, gamma=1.314510
+  AUC: 0.6453 | C=2.4401, kernel=rbf, gamma=0.002511
+  AUC: 0.6490 | C=0.6871, kernel=rbf, gamma=0.003728
+  AUC: 0.6470 | C=4.0138, kernel=linear, gamma=0.772672
+  AUC: 0.6468 | C=56.7820, kernel=linear, gamma=9.307783
+  AUC: 0.6507 | C=2.9507, kernel=rbf, gamma=0.001067
+  AUC: 0.3794 | C=0.0124, kernel=rbf, gamma=0.039760
+  AUC: 0.3529 | C=0.0154, kernel=poly, gamma=0.008533
+  AUC: 0.3805 | C=0.0230, kernel=rbf, gamma=0.033873
+  AUC: 0.5392 | C=85.6887, kernel=rbf, gamma=2.752717
+  AUC: 0.6489 | C=0.6186, kernel=linear, gamma=0.001000
+  AUC: 0.6586 | C=1.1704, kernel=rbf, gamma=0.001000
+  AUC: 0.6477 | C=1.2267, kernel=linear, gamma=0.001000
+  AUC: 0.6548 | C=0.0385, kernel=linear, gamma=10.000000
+  AUC: 0.6521 | C=0.0100, kernel=linear, gamma=0.001000
+  AUC: 0.6521 | C=0.0100, kernel=linear, gamma=0.011514
+  AUC: 0.6648 | C=1.4658, kernel=rbf, gamma=0.001000
+  AUC: 0.3402 | C=1.4656, kernel=poly, gamma=0.008857
+  AUC: 0.6521 | C=0.0100, kernel=linear, gamma=0.075479
+  AUC: 0.3376 | C=100.0000, kernel=poly, gamma=0.002445
+  AUC: 0.6528 | C=0.1386, kernel=linear, gamma=0.001000
+  AUC: 0.6468 | C=100.0000, kernel=linear, gamma=0.001000
+  AUC: 0.6516 | C=0.1957, kernel=linear, gamma=8.567564
+  AUC: 0.6503 | C=0.2299, kernel=linear, gamma=8.424820
+  AUC: 0.5361 | C=11.7410, kernel=rbf, gamma=5.972284
+  AUC: 0.4524 | C=0.0100, kernel=poly, gamma=10.000000
+  AUC: 0.6521 | C=0.0100, kernel=linear, gamma=0.003163
+  AUC: 0.6468 | C=100.0000, kernel=linear, gamma=0.207503
+  AUC: 0.6468 | C=100.0000, kernel=linear, gamma=0.030691
+  AUC: 0.6521 | C=0.0100, kernel=linear, gamma=3.591276
+
+Best hyperparameters: {'C': 1.4658264287742608, 'kernel': np.str_('rbf'), 'gamma': 0.001}
+Validation AUC: 0.6648
+
+Test Results:
+  Accuracy: 0.482
+  AUC: 0.676
+  Sharpe: -2.10
+  Win Rate: 38.7%
+
+--------------------------------------------------
+Horizon: 5 days, Threshold: 0.0125
+--------------------------------------------------
+  AUC: 0.6851 | C=15.3522, kernel=linear, gamma=1.314510
+  AUC: 0.6744 | C=2.4401, kernel=rbf, gamma=0.002511
+  AUC: 0.6642 | C=0.6871, kernel=rbf, gamma=0.003728
+  AUC: 0.6851 | C=4.0138, kernel=linear, gamma=0.772672
+  AUC: 0.6852 | C=56.7820, kernel=linear, gamma=9.307783
+  AUC: 0.6698 | C=2.9507, kernel=rbf, gamma=0.001067
+  AUC: 0.3299 | C=0.0124, kernel=rbf, gamma=0.039760
+  AUC: 0.3548 | C=0.0154, kernel=poly, gamma=0.008533
+  AUC: 0.3337 | C=0.0230, kernel=rbf, gamma=0.033873
+  AUC: 0.4844 | C=85.6887, kernel=rbf, gamma=2.752717
+  AUC: 0.6825 | C=0.0319, kernel=linear, gamma=5.766100
+  AUC: 0.6876 | C=0.2814, kernel=linear, gamma=0.001000
+  AUC: 0.6798 | C=0.0100, kernel=linear, gamma=0.001000
+  AUC: 0.4642 | C=1.4372, kernel=poly, gamma=10.000000
+  AUC: 0.6850 | C=100.0000, kernel=linear, gamma=0.002920
+  AUC: 0.6868 | C=0.9615, kernel=linear, gamma=10.000000
+  AUC: 0.6858 | C=0.1051, kernel=linear, gamma=10.000000
+  AUC: 0.6897 | C=100.0000, kernel=poly, gamma=0.009484

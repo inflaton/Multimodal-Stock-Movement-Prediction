@@ -365,11 +365,11 @@ Stock & Model & $h$ & Acc. & AUC & $N$ & Win\% & Sharpe \\
 \midrule
 AAPL & LGBM & 9 & 0.530 & 0.508 & 27 & \textbf{74.1} & 1.40 \\
 META & LSTM & 4 & 0.502 & 0.493 & 62 & 58.1 & 1.75 \\
-NVDA & LSTM & 10 & 0.566 & 0.597 & 25 & 68.0 & 2.18 \\
+NVDA & LSTM & 4 & 0.475 & 0.603 & 62 & 61.3 & 2.33 \\
 SPY & LSTM & 9 & \textbf{0.579} & \textbf{0.669} & 27 & 70.4 & 1.72 \\
 TSLA & GB & 4 & 0.530 & 0.553 & 62 & 66.1 & \textbf{3.10} \\
 \midrule
-\multicolumn{2}{l}{Average} & 7.2 & 0.541 & 0.564 & 40.6 & 67.3 & 2.03 \\
+\multicolumn{2}{l}{Average} & 6.0 & 0.523 & 0.565 & 48.0 & 66.0 & 2.06 \\
 \bottomrule
 \multicolumn{8}{l}{\footnotesize $N$ = number of trades; LGBM = LightGBM; GB = Gradient Boosting.}
 \end{tabular}
@@ -465,7 +465,7 @@ We evaluate five configurations: (1) Technical Only---using only technical indic
 Configuration & Sel. & Acc. & AUC & $N$ & Win\% & Sharpe & $\Delta$(\%) \\
 \midrule
 Full Model & AUC & 0.514 & \textbf{0.700} & 32.8 & 36.3 & -1.03 & -- \\
-\quad & Sharpe & \textbf{0.541} & 0.564 & 40.6 & \textbf{67.3} & \textbf{2.03} & -- \\
+\quad & Sharpe & \textbf{0.523} & 0.565 & 48.0 & \textbf{66.0} & \textbf{2.06} & -- \\
 \midrule
 Technical Only & AUC & 0.484 & 0.692 & 22.2 & 37.7 & -1.13 & -1.2 \\
 \quad & Sharpe & 0.477 & 0.678 & 24.6 & 41.0 & -0.70 & -134.3 \\
