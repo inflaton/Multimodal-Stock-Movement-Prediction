@@ -271,32 +271,9 @@ def compute_sharpe_optimized_metrics(results_file: str, strategy: str = "long_sh
     """
     STOCKS = ["AAPL", "META", "NVDA", "SPY", "TSLA"]
 
-    try:
-        df = pd.read_csv(results_file)
-    except Exception as e:
-        print(f"Warning: Could not read {results_file}: {e}")
-        print("Using default hardcoded values")
-        return {
-            'acc': 0.541,
-            'auc': 0.564,
-            'trades': 40.6,
-            'winrate': 67.3,
-            'sharpe': 2.03
-        }
-
+    df = pd.read_csv(results_file)
     # Filter for the specified strategy
     strategy_df = df[df["Strategy"] == strategy]
-
-    if len(strategy_df) == 0:
-        print(f"Warning: No results found for strategy '{strategy}'")
-        print("Using default hardcoded values")
-        return {
-            'acc': 0.541,
-            'auc': 0.564,
-            'trades': 40.6,
-            'winrate': 67.3,
-            'sharpe': 2.03
-        }
 
     # For each stock, find the configuration with highest Sharpe
     best_sharpe_rows = []
@@ -305,17 +282,6 @@ def compute_sharpe_optimized_metrics(results_file: str, strategy: str = "long_sh
         if len(stock_data) > 0:
             best_idx = stock_data["Sharpe"].idxmax()
             best_sharpe_rows.append(stock_data.loc[best_idx])
-
-    if not best_sharpe_rows:
-        print("Warning: Could not find best Sharpe configurations")
-        print("Using default hardcoded values")
-        return {
-            'acc': 0.541,
-            'auc': 0.564,
-            'trades': 40.6,
-            'winrate': 67.3,
-            'sharpe': 2.03
-        }
 
     # Average across stocks
     best_sharpe_df = pd.DataFrame(best_sharpe_rows)
@@ -335,17 +301,7 @@ def format_ours_row(best_acc: float, ours_metrics: dict = None) -> str:
     Args:
         best_acc: Best accuracy among baselines (for bolding comparison)
         ours_metrics: Dictionary with 'acc', 'auc', 'trades', 'winrate', 'sharpe'.
-                     If None, will use default hardcoded values.
     """
-    if ours_metrics is None:
-        # Fallback to hardcoded values if not provided
-        ours_metrics = {
-            'acc': 0.541,
-            'auc': 0.564,
-            'trades': 40.6,
-            'winrate': 67.3,
-            'sharpe': 2.03
-        }
 
     # Check if "Ours" accuracy should be bolded
     acc_str = f"\\textbf{{{ours_metrics['acc']:.3f}}}" if abs(ours_metrics['acc'] - best_acc) < 0.0005 else f"{ours_metrics['acc']:.3f}"
@@ -466,9 +422,16 @@ def format_ablation_table(full_model_metrics: dict, ablation_results: dict) -> s
         if not auc_metrics or not sharpe_metrics:
             continue
 
-        # Compute delta (percentage change from full model)
-        delta_auc = ((auc_metrics['auc'] - fm_auc['auc']) / fm_auc['auc']) * 100
-        delta_sharpe = ((sharpe_metrics['sharpe'] - fm_sharpe['sharpe']) / fm_sharpe['sharpe']) * 100
+        # Round values to display precision first, then compute delta
+        # This ensures delta matches what's actually shown in the table
+        fm_auc_rounded = round(fm_auc['auc'], 3)
+        fm_sharpe_rounded = round(fm_sharpe['sharpe'], 2)
+        auc_metrics_auc_rounded = round(auc_metrics['auc'], 3)
+        sharpe_metrics_sharpe_rounded = round(sharpe_metrics['sharpe'], 2)
+
+        # Compute delta using rounded values
+        delta_auc = ((auc_metrics_auc_rounded - fm_auc_rounded) / fm_auc_rounded) * 100
+        delta_sharpe = ((sharpe_metrics_sharpe_rounded - fm_sharpe_rounded) / fm_sharpe_rounded) * 100
 
         lines.append("\\midrule")
         lines.append(f"{config_names[config_key]} & AUC & {auc_metrics['acc']:.3f} & {auc_metrics['auc']:.3f} & {auc_metrics['trades']:.1f} & {auc_metrics['winrate']:.1f} & {auc_metrics['sharpe']:.2f} & {delta_auc:.1f} \\\\")
