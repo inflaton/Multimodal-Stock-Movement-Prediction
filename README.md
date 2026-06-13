@@ -1,441 +1,147 @@
-# Multimodal Stock Movement Prediction: A Systematic Comparison of Task-Specific and Foundation Models
+# 2026_icdm — revision workspace
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange.svg)](https://pytorch.org/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.10+-FF6F00.svg)](https://www.tensorflow.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+Self-contained workspace for the ICDM 2026 Applied Track revision (Jun 6 deadline; SENTIRE'26 cascade fallback). Designed to run on a single RTX 4090 Laptop with 16 GB VRAM.
 
-**IJCNN 2026 Submission**
+The full plan lives at `../submissions/ICDM_Realistic_Revision_Plan.md`. This README is the operational shortcut.
 
-This repository contains the official implementation and datasets for our paper: **"Multimodal Stock Movement Prediction: A Systematic Comparison of Task-Specific and Foundation Models"**
+## Layout
 
-## 📄 Abstract
+```
+2026_icdm/
+├── configs/
+│   └── default.yaml         ← all knobs (split, seeds, embargo, HPO budgets, ablations)
+├── dataset/
+│   ├── training_features/   ← 5 stock CSVs, pre-built features (Close, sentiment, 10 Combi pairs)
+│   ├── daily_sentiment/     ← per-stock daily News / Social sentiment averages
+│   └── _dataset_stats.csv   ← per-stock corpus statistics for the dataset table
+├── src/
+│   ├── config.py            ← loads configs/default.yaml
+│   ├── data.py              ← load + chronological split + embargo + sentiment recomposition
+│   ├── metrics.py           ← Sharpe, MDD, Sortino, Calmar, DSR, PBO, block bootstrap CIs
+│   ├── backtest.py          ← long/short, non-overlapping h-day positions, txn costs
+│   ├── learned_alpha.py     ← learned-α fusion (per-stock + global) with L2 prior
+│   ├── hpo_traditional.py   ← LR/SVM/RF/GB/XGB/LGBM HPO with Val_* + Test_* columns
+│   ├── hpo_lstm.py          ← LSTM HPO (reduced grid; tune at h=5, broadcast to all horizons)
+│   ├── _load_features.py    ← shared loader for foundation scripts: training_features → Sentiment_S_t at α
+│   ├── chronos_baseline.py  ← zero-shot Chronos-2 (CLI: invoked by chronos_runner)
+│   ├── chronos_finetune.py  ← AutoGluon fine-tune (+ --use-covariates) (CLI)
+│   ├── fincast_baseline.py  ← zero-shot FinCast (CLI)
+│   ├── fincast_finetune.py  ← LoRA fine-tune (CLI)
+│   ├── chronos_runner.py    ← scaffold printing chronos_*.py launch commands
+│   ├── fincast_runner.py    ← scaffold printing fincast_*.py launch commands
+│   ├── select_best_config.py← reads Val_* across raw results, writes selected_config.json
+│   └── run_pipeline.py      ← end-to-end driver (steps 1-6)
+├── dataset/training_features/ ← per-stock features; single source of truth for all models
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_learned_alpha.ipynb
+│   ├── 03_pipeline_validation.ipynb
+│   ├── 04_results_aggregation.ipynb
+│   ├── 05_figures.ipynb
+│   └── 06_indicator_pairs_appendix.ipynb
+└── results/                 ← all run outputs land here (raw/, selected_config.json, figures, tables)
+```
 
-Predicting short-term stock price movements remains challenging due to market volatility and the influence of both quantitative and qualitative factors. We propose a multimodal framework that integrates technical indicators with FinBERT-based sentiment analysis from financial news and social media for 2-10 day stock direction prediction. Seven model families—LSTM, Random Forest, XGBoost, LightGBM, Gradient Boosting, Logistic Regression, and SVM—are systematically evaluated with Bayesian hyperparameter optimization across five stocks (AAPL, META, NVDA, SPY, TSLA) spanning 2020-2024.
+## Dependencies
 
-Our key findings:
-- **ROC-AUC vs Sharpe trade-off**: AUC-optimized models achieve strong discriminative performance (0.697 average, peak 0.793), while Sharpe-optimized models deliver superior risk-adjusted returns (2.05 average Sharpe, 66.8% win rate)
-- **Sentiment aggregation**: Reliability-weighted sentiment (70% news, 30% social media) substantially outperforms equal weighting (2.05 vs. -0.25 Sharpe)
-- **Foundation model comparison**: Our task-specific approach achieves 2.05 Sharpe, significantly outperforming fine-tuned Chronos-2 (0.90) and FinCast (0.16)
-- **Complementary features**: Technical features primarily drive discrimination while sentiment features primarily drive profitability
+Python 3.10+. Core packages:
+```
+pip install numpy pandas pyyaml scikit-learn scipy
+pip install scikit-optimize xgboost lightgbm
+pip install tensorflow keras   # for LSTM
+pip install matplotlib seaborn
+pip install autogluon.timeseries   # for Chronos-2 runner (large install, ~1 GB)
+```
 
-## 🌟 Key Contributions
+FinCast: scripts are bundled under `src/fincast_*.py`; install the FinCast runtime per its own README (LoRA via `peft`, base weights from the original repo).
 
-1. **Multimodal Framework**: Integration of FinBERT-Tone sentiment from financial news and social media with technical indicators (OHLCV data) for 2-10 day stock direction prediction
-
-2. **Systematic Evaluation**: Comprehensive comparison of seven model families with Bayesian hyperparameter optimization, revealing critical trade-offs between ROC-AUC and Sharpe ratio selection criteria
-
-3. **Sentiment Aggregation**: Demonstration that reliability-weighted sentiment aggregation (70% news, 30% social media) substantially improves trading performance, with ablation studies revealing complementary roles of technical and sentiment features
-
-4. **Foundation Model Benchmark**: First systematic comparison with state-of-the-art time-series foundation models (FinCast and Chronos-2) in both zero-shot and fine-tuned settings for financial prediction tasks
-
-## 📊 Dataset
-
-We provide preprocessed datasets for five stocks spanning 2020-2024:
-
-- **AAPL** (Apple Inc.)
-- **META** (Meta Platforms)
-- **NVDA** (NVIDIA Corporation)
-- **SPY** (S&P 500 ETF)
-- **TSLA** (Tesla Inc.)
-
-### Data Features
-
-Each stock dataset (`dataset/training_data/*_data_model_training.csv`) includes:
-
-- **Price Data**: Close prices, historical trends
-- **Sentiment Feature**: FinBERT-Tone reliability-filtered weighted sentiment (70% news, 30% social media) from:
-  - Financial news (MarketWatch, Google News, Kaggle datasets)
-  - Social media (Reddit, StockTwits, Twitter/X)
-- **Technical Indicators**: 10 combinations of trading signals:
-  - EMA/Price Crossovers (12, 20, 50-day)
-  - SMA Crossovers (8, 12, 20-day)
-  - MACD Crossover signals
-  - Prediction horizons (2-10 days)
-
-### Data Split
-- **Training**: 2020-2023 (1,006 samples average)
-- **Testing**: 2024 (251 samples average)
-
-## 🚀 Getting Started
-
-### Prerequisites
+## Quickstart on the GPU laptop
 
 ```bash
-Python 3.8+
-CUDA 11.8+ (for GPU acceleration, optional)
+cd 2026_icdm
+
+# 0) Sanity check — verifies split, seed reproducibility, single-cell eval
+jupyter notebook notebooks/03_pipeline_validation.ipynb
+
+# 1) Fit learned-α per stock and globally on 2023 val (fast, CPU)
+python -m src.run_pipeline --steps 1
+
+# 2) Traditional ML HPO (5 stocks × 8 ablations × 3 horizons × 5 seeds × 6 models)
+#    Long-running; checkpoint after every (stock, horizon, model).
+python -m src.run_pipeline --steps 2
+
+# 3) LSTM HPO with the reduced grid
+python -m src.run_pipeline --steps 3
+
+# 4) Foundation models. Two wrappers under scripts/ — each takes optional
+#    positional args (MODE STOCK SEED) so the same script does pretests AND
+#    the full sweep. Logs land in logs/<tag>_<timestamp>.log, and each printed
+#    command is wrapped in `conda run -n <env>` so you don't need to switch
+#    envs manually.
+#
+#    Chronos-2 (needs chronos-forecasting + autogluon.timeseries in stock-prediction env):
+bash scripts/run_chronos.sh chronos2_finetuned_cov AAPL 42   # pretest: one cell
+bash scripts/run_chronos.sh                                  # full sweep: 4 modes × 5 × 3 = 60 cells
+#
+#    FinCast (set FINCAST_PATH + FINCAST_WEIGHTS once; defaults point to the
+#    Multimodal-Stock-Movement-Prediction checkout):
+export FINCAST_PATH=/path/to/FinCast-fts/src
+export FINCAST_WEIGHTS=/path/to/FinCast-fts/model_weights/v1.pth
+bash scripts/run_fincast.sh fincast_finetuned AAPL 42        # pretest
+bash scripts/run_fincast.sh fincast_finetuned                # skip zero-shot if already done
+bash scripts/run_fincast.sh                                  # full sweep: 2 modes × 5 × 3 = 30 cells
+
+# Long overnight runs: detach with nohup and tail the log
+nohup bash scripts/run_chronos.sh > /dev/null 2>&1 &
+tail -f logs/chronos_*_$(date +%Y%m%d)*.log
+
+# 5) Lock model/horizon selection by val scores
+python -m src.run_pipeline --steps 5
+
+# 6) Aggregate everything into results/all_results.csv
+python -m src.run_pipeline --steps 6
+
+# 7) Build the manuscript tables + figures
+jupyter notebook notebooks/04_results_aggregation.ipynb
+jupyter notebook notebooks/05_figures.ipynb
+jupyter notebook notebooks/06_indicator_pairs_appendix.ipynb
 ```
 
-### Installation
+## Three things to verify on the GPU laptop before launching the big grid
 
-1. Clone the repository:
-```bash
-https://github.com/inflaton/Multimodal-Stock-Movement-Prediction.git
-cd Multimodal-Stock-Movement-Prediction
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-#### Optional: XGBoost Support (macOS)
-
-XGBoost requires the OpenMP library (`libomp`) on macOS. If you encounter an XGBoost import error:
-
-```bash
-# Install OpenMP library via Homebrew
-brew install libomp
-
-# Reinstall XGBoost
-pip install --upgrade xgboost
-```
-
-### FinCast Baseline Setup
-
-To run FinCast baseline experiments, you need to set up the FinCast environment separately:
-
-```bash
-# Clone the FinCast repository
-git clone https://github.com/inflaton/FinCast-fts.git
-cd FinCast-fts
-
-# Create conda environment and install dependencies
-bash ./env_setup.sh && bash ./dep_install.sh
-
-# Return to main project directory
-cd ..
-```
-
-This will create a conda environment named `fincast_v1` with Python 3.11 and all required dependencies including PyTorch 2.5.0 with CUDA 12.4 support.
-
-**Note**: FinCast requires:
-- Python 3.11+
-- PyTorch 2.5+
-- CUDA 11.8+ for GPU acceleration (PyTorch 2.5.0 supports compute capabilities sm_50, sm_80, sm_86, sm_89, sm_90, sm_90a)
-- Conda for environment management
-
-**GPU Compatibility**: Newer GPUs like NVIDIA GB10 (sm_121 Blackwell architecture) are not supported by PyTorch 2.5.0. For these GPUs:
-- Set `export CUDA_VISIBLE_DEVICES=""` to run on CPU, or
-- Install PyTorch 2.9+ nightly/from source with sm_121 support
-
-### Quick Start
-
-#### 1. Train Task-Specific Models
-
-Train models with hyperparameter optimization:
-
-```bash
-# Train XGBoost models
-python scripts/xgboost_hyperparameter_tuning.py --stock NVDA
-
-# Train all models for a specific stock
-for model in xgboost lightgbm random_forest logistic_regression svm gradient_boosting; do
-    python scripts/${model}_hyperparameter_tuning.py --stock NVDA
-done
-
-# Train LSTM models
-python scripts/lstm_hyperparameter_tuning.py --stock NVDA
-```
-
-#### 2. Run Baseline Models
-
-**Chronos-2 Baselines:**
-
-```bash
-# Zero-shot
-python scripts/chronos_baseline.py --all-stocks
-
-# Fine-tuned (price only)
-python scripts/chronos_finetune.py --all-stocks
-
-# Fine-tuned (with sentiment)
-python scripts/chronos_finetune.py --all-stocks --use-covariates
-```
-
-**FinCast Baselines:**
-
-```bash
-conda activate fincast_v1
-
-# Zero-shot
-python scripts/fincast_baseline.py --all-stocks
-
-# Fine-tuning (trains models)
-python scripts/fincast_finetune.py --all-stocks
-
-# Fine-tuned inference (evaluates fine-tuned models)
-python scripts/fincast_finetuned_inference.py --all-stocks
-```
-
-#### 3. Analyze Results
-
-Use Jupyter notebooks for comprehensive analysis:
-
-```bash
-jupyter notebook notebooks/02_our_results.ipynb      # Tuned models analysis
-jupyter notebook notebooks/03_ablation_study.ipynb   # Ablation studies
-jupyter notebook notebooks/04_baseline_results.ipynb # Baseline comparison
-```
-
-## 📈 Main Results
-
-### Task-Specific Models vs Foundation Models
-
-| Method | Selection | Accuracy | AUC | Trades | Win% | Sharpe |
-|--------|-----------|----------|-----|--------|------|--------|
-| **Ours (Multimodal)** | AUC | 0.496 | **0.697** | 33.6 | 38.2 | -1.29 |
-| **Ours (Multimodal)** | Sharpe | 0.530 | 0.551 | 39.8 | **66.8** | **2.05** |
-| Chronos-2 Fine-tuned + Sentiment | AUC | 0.534 | 0.542 | 56.0 | 52.7 | 0.24 |
-| Chronos-2 Fine-tuned + Sentiment | Sharpe | 0.464 | 0.475 | 56.0 | 57.2 | **0.89** |
-| FinCast Fine-tuned | AUC | **0.596** | **0.693** | 13.6 | 39.2 | -0.40 |
-| FinCast Fine-tuned | Sharpe | 0.546 | 0.529 | 21.8 | 44.6 | **0.16** |
-
-### Ablation Study: Sentiment Aggregation
-
-| Configuration | AUC | Win% | Sharpe | Total Return |
-|---------------|-----|------|--------|--------------|
-| **Weighted (70% news, 30% social)** | 0.551 | **66.8** | **2.05** | **140.5%** |
-| Equal Weight (50% news, 50% social) | 0.536 | 51.4 | -0.25 | -16.0% |
-| News Only (100% news) | 0.547 | 61.0 | 1.50 | 96.8% |
-| Social Only (100% social) | 0.516 | 45.3 | -1.04 | -57.9% |
-
-### Feature Ablation
-
-| Feature Set | AUC | Win% | Sharpe |
-|-------------|-----|------|--------|
-| **Technical + Sentiment (Full)** | **0.551** | **66.8** | **2.05** |
-| Technical Only | 0.531 | 64.9 | 1.88 |
-| Sentiment Only | 0.516 | 58.2 | 0.43 |
-
-## 🏗️ Repository Structure
-
-```
-.
-├── dataset/                        # All datasets
-│   ├── training_data/            # Final preprocessed training data
-│   │   ├── AAPL_data_model_training.csv
-│   │   ├── META_data_model_training.csv
-│   │   ├── NVDA_data_model_training.csv
-│   │   ├── SPY_data_model_training.csv
-│   │   └── TSLA_data_model_training.csv
-│   ├── sentiment/                # Sentiment analysis results
-│   │   └── news_sentiment_finbert_tone_weighted_*.csv
-│   └── README.md                 # Dataset documentation
-│
-├── scripts/                        # Training and evaluation scripts
-│   ├── xgboost_hyperparameter_tuning.py
-│   ├── lightgbm_hyperparameter_tuning.py
-│   ├── random_forest_hyperparameter_tuning.py
-│   ├── logistic_regression_hyperparameter_tuning.py
-│   ├── svm_hyperparameter_tuning.py
-│   ├── gradient_boosting_hyperparameter_tuning.py
-│   ├── lstm_hyperparameter_tuning.py
-│   ├── chronos_baseline.py
-│   ├── chronos_finetune.py
-│   ├── chronos_inference.py
-│   ├── fincast_baseline.py
-│   ├── fincast_finetune.py
-│   ├── fincast_finetuned_inference.py
-│   ├── ablation_study.py
-│   ├── analyze_chronos_results.py
-│   ├── analyze_tuned_results.py
-│   └── analyze_ablation_results.py
-│
-├── notebooks/                      # Jupyter notebooks for analysis
-│   ├── 01_update_sentiments_for_training_data.ipynb
-│   ├── 02_our_results.ipynb
-│   ├── 03_ablation_study.ipynb
-│   └── 04_baseline_results.ipynb
-│
-├── results/                        # Model results and metrics
-│   ├── chronos_all_results_combined.csv
-│   └── Filtered_*_hyperparameter_tuned_results.csv
-│
-├── FinCast-fts/                    # FinCast foundation model (git submodule)
-│   ├── env_setup.sh              # Create conda environment
-│   ├── dep_install.sh            # Install dependencies
-│   ├── scripts/                  # FinCast training scripts
-│   └── README.md                 # FinCast documentation
-│
-├── models/                         # Trained model checkpoints (to be added)
-├── docs/                           # Documentation
-├── requirements.txt                # Python dependencies
-├── LICENSE                         # MIT License
-└── README.md                       # This file
-```
-
-## 🔬 Methodology
-
-### Model Training Pipeline
-
-1. **Data Preprocessing**: Load and validate stock data with technical indicators and sentiment scores
-2. **Hyperparameter Optimization**: Bayesian optimization (scikit-optimize) with 30 iterations per configuration
-3. **Model Training**: Train on 2020-2023 data with early stopping
-4. **Evaluation**: Test on 2024 out-of-sample data
-5. **Trading Simulation**: Non-overlapping backtest with 10 bps transaction fees
-
-### Evaluation Metrics
-
-- **Classification**: Accuracy, ROC-AUC, Confusion Matrix
-- **Trading Performance**:
-  - Win Rate: Percentage of profitable trades
-  - Sharpe Ratio: Risk-adjusted return (annualized)
-  - Total Return: Cumulative return with fees
-  - Number of Trades: Trading frequency
-
-### Hyperparameter Search Spaces
-
-**XGBoost:**
-- `n_estimators`: [50, 500]
-- `max_depth`: [3, 12]
-- `learning_rate`: [0.01, 0.3]
-- `subsample`: [0.5, 1.0]
-- `colsample_bytree`: [0.5, 1.0]
-
-**LSTM:**
-- `units`: [32, 256]
-- `dropout`: [0.1, 0.5]
-- `learning_rate`: [0.0001, 0.01]
-- `sequence_length`: [10, 60]
-
-See individual training scripts for complete hyperparameter ranges.
-
-## 📊 Reproducing Results
-
-### Step-by-Step Guide
-
-1. **Set Up FinCast Environment** (for baseline comparisons):
-
-   ```bash
-   # Clone and set up FinCast
-   git clone https://github.com/inflaton/FinCast-fts.git
-   cd FinCast-fts
-   bash ./env_setup.sh && bash ./dep_install.sh
-   cd ..
+1. **Chronos-2 16 GB pretest.** Run a single fine-tune-with-covariates on AAPL:
    ```
-
-2. **Update Sentiment Data** (if needed):
-
-   ```bash
-   jupyter notebook notebooks/01_update_sentiments_for_training_data.ipynb
+   bash scripts/run_chronos.sh chronos2_finetuned_cov AAPL 42
    ```
+   Watch `nvidia-smi`. If OOM, drop `chronos_fine_tune_batch_size` from 8 → 4 in `configs/default.yaml`.
 
-3. **Train All Task-Specific Models**:
+2. **LSTM determinism.** Run notebooks/03 cell 4 twice and confirm Val_ROC_AUC matches bit-for-bit.
 
-   ```bash
-   # Train all models for all stocks
-   ./run_all_hyperparameter_tuning.sh
-   ```
+3. **Daily-sentiment correlation.** Notebook 01 reports `corr(train Weighted Sentiment, our S_70_30)`. If correlations are < 0.7, the new pipeline diverges from the original aggregation in a non-trivial way — the original `combine_sentiment_scores_per_date.ipynb` uses article-weighted aggregation `Σ s·w / Σ w`; this codebase uses the cleaner `0.7·mean(news) + 0.3·mean(social)`. Decide which to keep and document the choice in §III.C.2 of the manuscript.
 
-4. **Run Ablation Study**:
+## Hard-stop trigger (revision plan §1.2)
 
-   ```bash
-   # Run ablation experiments for all configurations
-   ./run_ablation_study.sh
-   ```
+Switch to a down-scoped Jun 6 submission if any of these is true on morning of D9:
+- Controlled-table mean Sharpe across 5 stocks < 0.5
+- Fewer than 3 of 5 stocks have completed the 5-seed grid
+- Chronos-2 cov fine-tune has not produced clean 3-seed results for ≥ 3 stocks
+- `selected_config.json` plumbing is not end-to-end locked
 
-5. **Train Foundation Model Baselines**:
+Down-scope = single seed for LSTM, zero-shot Chronos-2 only. Still submit — the SENTIRE cascade catches whatever ICDM rejects.
 
-   ```bash
-   # Run Chronos-2 baselines (zero-shot and fine-tuned, with/without sentiment)
-   ./run_baselines_chronos-2.sh
+## What lives elsewhere
 
-   # Run FinCast baselines (zero-shot, fine-tuning, and inference)
-   conda activate fincast_v1
-   ./run_baselines_fincast.sh
-   ```
+- **Raw sentiment files (~1 GB)** — `../news_social_media_data/final_combined/`. Not copied here to save disk. Daily aggregates in `dataset/daily_sentiment/` are the derived signal you need; the raw files are only useful if you want to re-run FinBERT scoring.
+- **Existing single-seed results** — `../paper/*.csv`. Useful as a sanity-check reference (the new pipeline's single-seed AUC should be in the same ballpark as the old per-stock numbers).
+- **Original HPO scripts** — `../paper/*_hyperparameter_tuning.py` and `../paper/v2/*`. Superseded by `src/hpo_*.py` here; kept in the old location for diff reference.
 
-6. **Analyze Results**:
+## Submission checklist for D20 (Jun 5)
 
-   ```bash
-   jupyter notebook notebooks/02_our_results.ipynb      # Our task-specific models results
-   jupyter notebook notebooks/03_ablation_study.ipynb   # Ablation study analysis
-   jupyter notebook notebooks/04_baseline_results.ipynb # Baseline models comparison
-   ```
-
-## 🎯 Key Findings
-
-### 1. Selection Criterion Trade-offs
-
-- **AUC-Selected Models**: Better discrimination (0.697 AUC), but lower profitability
-- **Sharpe-Selected Models**: Better risk-adjusted returns (2.05 Sharpe, 66.8% win rate)
-
-### 2. Sentiment Aggregation
-
-- **Weighted aggregation** (70% news, 30% social) significantly outperforms equal weighting
-- News sentiment is more reliable than social media sentiment
-- Combined sentiment features provide incremental value over technical features alone
-
-### 3. Feature Complementarity
-
-- **Technical features**: Primarily drive discrimination (AUC)
-- **Sentiment features**: Primarily drive profitability (Sharpe, Win Rate)
-- **Combined features**: Achieve best overall performance
-
-### 4. Foundation Model Limitations
-
-- **Zero-shot performance**: Near random chance (AUC 0.477-0.560)
-- **Fine-tuning helps**: But still underperforms task-specific models
-- **Covariate paradox**: Adding sentiment to Chronos-2 degrades trading performance
-- **Task-specific advantage**: Domain-specific optimization crucial for financial prediction
-
-## 💻 Hardware Requirements
-
-- **Minimum**: 16GB RAM, CPU-only training
-- **Recommended**: 32GB RAM, NVIDIA GPU (8GB+ VRAM) for LSTM and foundation model training
-- **Foundation Models**: NVIDIA GPU with CUDA 11.8+ (CUDA 12.4+ recommended for FinCast)
-- **Training Time**:
-  - Task-specific models: 1-4 hours per stock (CPU)
-  - LSTM models: 2-6 hours per stock (GPU)
-  - Chronos-2 baselines: 4-8 hours per stock (GPU)
-  - FinCast baselines: 6-12 hours per stock (GPU)
-
-## 📝 Citation
-
-If you use this code or datasets in your research, please cite our paper:
-
-```bibtex
-@inproceedings{multimodal-stock-prediction-2026,
-  title={Multimodal Stock Movement Prediction: A Systematic Comparison of Task-Specific and Foundation Models},
-  author={Anonymous Authors},
-  booktitle={International Joint Conference on Neural Networks (IJCNN)},
-  year={2026}
-}
-```
-
-## 🤝 Contributing
-
-This is a research project submitted to IJCNN 2026. Upon acceptance, we will welcome contributions including:
-- Bug fixes and improvements
-- Additional baseline implementations
-- Extended ablation studies
-- New stock additions
-
-## 📧 Contact
-
-For questions or issues, please open a GitHub issue or contact the authors (details will be provided upon acceptance).
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **FinBERT** and **FinBERT-Tone** for sentiment analysis
-- **Chronos-2** ([Amazon Science](https://github.com/amazon-science/chronos-forecasting)) for time-series foundation model baselines
-- **FinCast** ([Zhu et al., CIKM 2025](https://arxiv.org/abs/2508.19609)) for financial time-series foundation model baselines
-- **scikit-optimize** for Bayesian hyperparameter optimization
-- **scikit-learn**, **XGBoost**, **LightGBM**, **TensorFlow** for machine learning implementations
-- Financial data providers: Yahoo Finance, MarketWatch, Google News
-- Social media data sources: Reddit, StockTwits, Twitter/X
-
-## 📊 Paper Status
-
-**Status**: Under Review at IJCNN 2026
-**Submission Date**: [To be added]
-**Paper ID**: [To be added]
-
----
-
-**Note**: This is an anonymous submission for double-blind peer review. Author information and affiliations will be disclosed upon acceptance.
+- [ ] 10-page check (including references)
+- [ ] `\title{}` updated to one of the SENTIRE-friendly candidates
+- [ ] Contributions list leads with the learned reliability-weighted sentiment fusion, not "beats foundation models"
+- [ ] §IV.E foundation-model comparison is self-contained with no upstream cross-references
+- [ ] Limitations section addresses 5-stock scope, 1-year test, single regime
+- [ ] **Opt in to the SENTIRE cascade on the ICDM submission form** ← critical
+- [ ] Anonymization check (ICDM Applied Track is single-blind; double-check the venue's rules for the year)
+- [ ] Reproducibility artifact: this folder + a Dockerfile + frozen requirements.txt

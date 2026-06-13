@@ -1,0 +1,132 @@
+# 2026 ICDM revision — central experiment configuration.
+# Every script reads this file (or a copy/override) via src.config.load_config().
+
+# ---------------------------------------------------------------------------
+# Universe
+# ---------------------------------------------------------------------------
+stocks: [AAPL, META, NVDA, SPY, TSLA]
+
+# ---------------------------------------------------------------------------
+# Calendar split (Section 2.1 of the revision plan).
+# Train 2020-2022, validate on all of 2023, test on 2024, with a small embargo.
+# ---------------------------------------------------------------------------
+train_years: [2020, 2021, 2022]
+val_year: 2023
+test_year: 2024
+embargo_trading_days: 5    # gap between val_end and test_start
+
+# ---------------------------------------------------------------------------
+# Prediction horizons + label balancing threshold search range.
+# Short/mid/long sweep — `controlled.horizon = 5` is the headline; 2 and 10
+# anchor the "robustness across horizons" trend (Fig 4 in notebook 05).
+# ---------------------------------------------------------------------------
+horizons: [2, 5, 10]
+label_threshold_grid: [0.0, 0.0025, 0.005, 0.0075, 0.01]   # picked to balance classes
+
+# ---------------------------------------------------------------------------
+# Seeds (Section 2.2 of the revision plan).
+# Traditional ML + LSTM run all 5; foundation models run the first 3 (compute-bound).
+# ---------------------------------------------------------------------------
+ml_seeds:       [42, 7, 1337, 2024, 31415]
+foundation_seeds: [42, 7, 1337]
+
+# ---------------------------------------------------------------------------
+# Backtest config (matches the original paper to keep numbers comparable).
+# ---------------------------------------------------------------------------
+backtest:
+  strategy: long_short        # one of: long_short, long_only, long_only_confidence
+  fee_bps_round_trip: 10      # 10 basis points
+  trading_days_per_year: 252
+
+# ---------------------------------------------------------------------------
+# HPO budget per the revision plan (Section 1.1 cuts to fit a 4090 laptop).
+# ---------------------------------------------------------------------------
+hpo:
+  # Traditional ML: full HPO per (stock, ablation, horizon).
+  traditional_n_calls: 30
+  # LSTM: HPO once per (stock, ablation) at the representative horizon,
+  # then broadcast the resulting hyperparameters across all horizons and seeds.
+  lstm_representative_horizon: 5
+  lstm_n_calls: 30
+  # Chronos-2: AutoGluon defaults, but smaller batch for 16 GB VRAM.
+  chronos_fine_tune_steps: 1000
+  chronos_fine_tune_batch_size: 8        # was 32 in the old pipeline; reduce for 16 GB
+  chronos_context_length: 60
+  chronos_model: bolt_base               # AutoGluon Chronos2 preset — NOT full Chronos-2
+  # FinCast: existing LoRA defaults.
+  fincast_lora_lr: 1.0e-5
+  fincast_lora_epochs: 10
+
+# ---------------------------------------------------------------------------
+# Ablation configurations the plan requires (Section 2.2 + 3.1).
+# Each is a recipe for how to construct the sentiment feature S_t.
+#
+# Fusion is per-source-mean: S_t = alpha_news · News_Sentiment + (1 - alpha_news) · Social_Sentiment.
+# Both inputs are per-trading-day mean FinBERT-Tone scores stored in
+# dataset/training_features/<STOCK>.csv as `News Sentiment Score` and `Social Sentiment Score`.
+# ---------------------------------------------------------------------------
+ablations:
+  - name: full_70_30          # 70:30 news/social weighting
+    sentiment: weighted
+    alpha_news: 0.7
+  - name: equal_50_50
+    sentiment: weighted
+    alpha_news: 0.5
+  - name: news_only
+    sentiment: news_only
+  - name: social_only
+    sentiment: social_only
+  - name: sentiment_only      # 70:30 sentiment but drops technical indicators
+    sentiment: weighted
+    alpha_news: 0.7
+    drop_technical: true
+  - name: technical_only      # uses technical only, no sentiment
+    sentiment: none
+  - name: learned_alpha_per_stock     # learned-α fit on val, per-stock
+    sentiment: learned
+    learned_scope: per_stock
+    prior_alpha_news: 0.7
+    prior_l2: 0.1
+  - name: learned_alpha_global        # learned-α fit jointly on all 5 stocks' val
+    sentiment: learned
+    learned_scope: global
+    prior_alpha_news: 0.7
+    prior_l2: 0.1
+
+# ---------------------------------------------------------------------------
+# Model families for the controlled comparison.
+# ---------------------------------------------------------------------------
+models:
+  - logistic_regression
+  - svm
+  - random_forest
+  - gradient_boosting
+  - xgboost
+  - lightgbm
+  - lstm
+
+# Single controlled (model, horizon) pair used as the primary headline table.
+controlled:
+  model: lightgbm
+  horizon: 5
+
+# ---------------------------------------------------------------------------
+# Foundation models.
+# ---------------------------------------------------------------------------
+foundation_models:
+  - chronos2_zero_shot
+  - chronos2_zero_shot_cov
+  - chronos2_finetuned
+  - chronos2_finetuned_cov
+  - fincast_zero_shot
+  - fincast_finetuned
+
+# ---------------------------------------------------------------------------
+# Statistical reporting (Section 2.4).
+# ---------------------------------------------------------------------------
+stats:
+  bootstrap_n: 2000
+  bootstrap_block_method: stationary   # Politis-Romano
+  dsr: true                            # Deflated Sharpe Ratio
+  pbo: true                            # Probability of Backtest Overfitting
+  significance_level: 0.05

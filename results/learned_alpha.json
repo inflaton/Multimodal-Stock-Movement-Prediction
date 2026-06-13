@@ -1,0 +1,209 @@
+{
+  "per_stock": [
+    {
+      "stock": "AAPL",
+      "alpha_news": 0.72,
+      "val_auc_learned": 0.5633,
+      "val_auc_baseline": 0.5623,
+      "delta_val_auc": 0.001
+    },
+    {
+      "stock": "META",
+      "alpha_news": 0.84,
+      "val_auc_learned": 0.6177,
+      "val_auc_baseline": 0.5704,
+      "delta_val_auc": 0.0473
+    },
+    {
+      "stock": "NVDA",
+      "alpha_news": 0.82,
+      "val_auc_learned": 0.6556,
+      "val_auc_baseline": 0.6503,
+      "delta_val_auc": 0.0053
+    },
+    {
+      "stock": "SPY",
+      "alpha_news": 0.8,
+      "val_auc_learned": 0.5767,
+      "val_auc_baseline": 0.5731,
+      "delta_val_auc": 0.0036
+    },
+    {
+      "stock": "TSLA",
+      "alpha_news": 0.54,
+      "val_auc_learned": 0.5845,
+      "val_auc_baseline": 0.5806,
+      "delta_val_auc": 0.0039
+    }
+  ],
+  "global": {
+    "alpha_news": 0.8,
+    "val_auc_learned": 0.5980777672641642,
+    "val_auc_baseline": 0.5873455074454679,
+    "delta_val_auc": 0.0107322598186963
+  },
+  "config": {
+    "horizon": 5,
+    "threshold": 0.005,
+    "prior_alpha_news": 0.7,
+    "prior_l2": 0.1,
+    "train_years": [
+      2020,
+      2021,
+      2022
+    ],
+    "val_year": 2023
+  },
+  "sensitivity": [
+    {
+      "Stock": "AAPL",
+      "lambda": 0.0,
+      "alpha_news": 0.96,
+      "val_auc": 0.5673
+    },
+    {
+      "Stock": "META",
+      "lambda": 0.0,
+      "alpha_news": 0.84,
+      "val_auc": 0.6177
+    },
+    {
+      "Stock": "NVDA",
+      "lambda": 0.0,
+      "alpha_news": 0.9,
+      "val_auc": 0.6571
+    },
+    {
+      "Stock": "SPY",
+      "lambda": 0.0,
+      "alpha_news": 0.29,
+      "val_auc": 0.5786
+    },
+    {
+      "Stock": "TSLA",
+      "lambda": 0.0,
+      "alpha_news": 0.03,
+      "val_auc": 0.596
+    },
+    {
+      "Stock": "AAPL",
+      "lambda": 0.05,
+      "alpha_news": 0.96,
+      "val_auc": 0.5673
+    },
+    {
+      "Stock": "META",
+      "lambda": 0.05,
+      "alpha_news": 0.84,
+      "val_auc": 0.6177
+    },
+    {
+      "Stock": "NVDA",
+      "lambda": 0.05,
+      "alpha_news": 0.88,
+      "val_auc": 0.6569
+    },
+    {
+      "Stock": "SPY",
+      "lambda": 0.05,
+      "alpha_news": 0.8,
+      "val_auc": 0.5767
+    },
+    {
+      "Stock": "TSLA",
+      "lambda": 0.05,
+      "alpha_news": 0.54,
+      "val_auc": 0.5845
+    },
+    {
+      "Stock": "AAPL",
+      "lambda": 0.1,
+      "alpha_news": 0.72,
+      "val_auc": 0.5633
+    },
+    {
+      "Stock": "META",
+      "lambda": 0.1,
+      "alpha_news": 0.84,
+      "val_auc": 0.6177
+    },
+    {
+      "Stock": "NVDA",
+      "lambda": 0.1,
+      "alpha_news": 0.82,
+      "val_auc": 0.6556
+    },
+    {
+      "Stock": "SPY",
+      "lambda": 0.1,
+      "alpha_news": 0.8,
+      "val_auc": 0.5767
+    },
+    {
+      "Stock": "TSLA",
+      "lambda": 0.1,
+      "alpha_news": 0.54,
+      "val_auc": 0.5845
+    },
+    {
+      "Stock": "AAPL",
+      "lambda": 0.5,
+      "alpha_news": 0.72,
+      "val_auc": 0.5633
+    },
+    {
+      "Stock": "META",
+      "lambda": 0.5,
+      "alpha_news": 0.75,
+      "val_auc": 0.6125
+    },
+    {
+      "Stock": "NVDA",
+      "lambda": 0.5,
+      "alpha_news": 0.73,
+      "val_auc": 0.6528
+    },
+    {
+      "Stock": "SPY",
+      "lambda": 0.5,
+      "alpha_news": 0.72,
+      "val_auc": 0.5741
+    },
+    {
+      "Stock": "TSLA",
+      "lambda": 0.5,
+      "alpha_news": 0.68,
+      "val_auc": 0.5819
+    },
+    {
+      "Stock": "AAPL",
+      "lambda": 1.0,
+      "alpha_news": 0.72,
+      "val_auc": 0.5633
+    },
+    {
+      "Stock": "META",
+      "lambda": 1.0,
+      "alpha_news": 0.75,
+      "val_auc": 0.6125
+    },
+    {
+      "Stock": "NVDA",
+      "lambda": 1.0,
+      "alpha_news": 0.73,
+      "val_auc": 0.6528
+    },
+    {
+      "Stock": "SPY",
+      "lambda": 1.0,
+      "alpha_news": 0.72,
+      "val_auc": 0.5741
+    },
+    {
+      "Stock": "TSLA",
+      "lambda": 1.0,
+      "alpha_news": 0.68,
+      "val_auc": 0.5819
+    }
+  ]
+}

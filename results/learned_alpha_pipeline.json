@@ -1,0 +1,38 @@
+[
+  {
+    "stock": "AAPL",
+    "alpha_news": 0.72,
+    "val_auc": 0.563265306122449,
+    "scope": "per_stock"
+  },
+  {
+    "stock": "META",
+    "alpha_news": 0.84,
+    "val_auc": 0.617718101733447,
+    "scope": "per_stock"
+  },
+  {
+    "stock": "NVDA",
+    "alpha_news": 0.8200000000000001,
+    "val_auc": 0.6555789473684211,
+    "scope": "per_stock"
+  },
+  {
+    "stock": "SPY",
+    "alpha_news": 0.8,
+    "val_auc": 0.5767333333333333,
+    "scope": "per_stock"
+  },
+  {
+    "stock": "TSLA",
+    "alpha_news": 0.54,
+    "val_auc": 0.5844984389846614,
+    "scope": "per_stock"
+  },
+  {
+    "stock": null,
+    "alpha_news": 0.8,
+    "val_auc": 0.5980777672641642,
+    "scope": "global"
+  }
+]

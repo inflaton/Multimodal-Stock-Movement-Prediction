@@ -1,0 +1,652 @@
+{
+  "AAPL": {
+    "equal_50_50": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6051593521421108,
+        "std_val": 2.920673951802145e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.146597188089258,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "full_70_30": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6324973876698015,
+        "std_val": 0.0003677034550746799,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.3509501942379143,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_global": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6379049111807732,
+        "std_val": 0.00018239602982987152,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.3509501942379143,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_per_stock": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 5,
+        "mean_val": 0.6361088435374149,
+        "std_val": 0.004026598937694765,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.3509501942379143,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "news_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6457810867293626,
+        "std_val": 0.00010731241330430103,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "gradient_boosting",
+        "Horizon": 2,
+        "mean_val": 1.9397839101030356,
+        "std_val": 0.3887973299233557,
+        "n_seeds": 5
+      }
+    },
+    "sentiment_only": {
+      "val_auc": {
+        "Model": "gradient_boosting",
+        "Horizon": 5,
+        "mean_val": 0.6039319727891156,
+        "std_val": 0.0035858632816984644,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lstm",
+        "Horizon": 10,
+        "mean_val": 0.684340717833266,
+        "std_val": 1.135041295791592,
+        "n_seeds": 5
+      }
+    },
+    "social_only": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 10,
+        "mean_val": 0.6048323769254002,
+        "std_val": 0.006755055815751482,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "xgboost",
+        "Horizon": 2,
+        "mean_val": 1.486093972480034,
+        "std_val": 0.14141373879098487,
+        "n_seeds": 5
+      }
+    },
+    "technical_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6394657784743992,
+        "std_val": 0.0,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "xgboost",
+        "Horizon": 2,
+        "mean_val": 3.0006417244986165,
+        "std_val": 0.22813273040637239,
+        "n_seeds": 5
+      }
+    }
+  },
+  "META": {
+    "equal_50_50": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.5787262872628726,
+        "std_val": 0.0004497852829355732,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "svm",
+        "Horizon": 2,
+        "mean_val": 2.740444534723939,
+        "std_val": 0.2310367850833115,
+        "n_seeds": 5
+      }
+    },
+    "full_70_30": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.5906718188597383,
+        "std_val": 0.0,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 3.094992801918566,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_global": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 10,
+        "mean_val": 0.6173362637362637,
+        "std_val": 0.007724053801259029,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 3.0460743909024397,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_per_stock": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 10,
+        "mean_val": 0.6172571428571428,
+        "std_val": 0.010207015542471984,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 3.0460743909024397,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "news_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6076604975933835,
+        "std_val": 3.713121534169924e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.6884213588093675,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "sentiment_only": {
+      "val_auc": {
+        "Model": "svm",
+        "Horizon": 5,
+        "mean_val": 0.5716877446552243,
+        "std_val": 0.010145286754059608,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 1.364962106552907,
+        "std_val": 0.057855780795388605,
+        "n_seeds": 5
+      }
+    },
+    "social_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6075805480277026,
+        "std_val": 0.0006012865265798642,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lstm",
+        "Horizon": 10,
+        "mean_val": 1.9891111547217388,
+        "std_val": 0.6376221194774384,
+        "n_seeds": 5
+      }
+    },
+    "technical_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6266937669376694,
+        "std_val": 5.3229959438920796e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 2.6884213588093675,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    }
+  },
+  "NVDA": {
+    "equal_50_50": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6462332021175513,
+        "std_val": 7.738397075467847e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 2.846136713356563,
+        "std_val": 0.05338112432256916,
+        "n_seeds": 5
+      }
+    },
+    "full_70_30": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6615040043436948,
+        "std_val": 3.717405711310306e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "gradient_boosting",
+        "Horizon": 2,
+        "mean_val": 2.9143845772247357,
+        "std_val": 0.08351330459816045,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_global": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6648567938102349,
+        "std_val": 0.0,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "random_forest",
+        "Horizon": 2,
+        "mean_val": 2.75776483775486,
+        "std_val": 0.22994153917369808,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_per_stock": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6658069770598616,
+        "std_val": 0.0,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "random_forest",
+        "Horizon": 2,
+        "mean_val": 2.927368914687936,
+        "std_val": 0.11201858567902441,
+        "n_seeds": 5
+      }
+    },
+    "news_only": {
+      "val_auc": {
+        "Model": "svm",
+        "Horizon": 5,
+        "mean_val": 0.6691122573639202,
+        "std_val": 0.006329131136684859,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "random_forest",
+        "Horizon": 2,
+        "mean_val": 2.9049205121091917,
+        "std_val": 0.17699449907117107,
+        "n_seeds": 5
+      }
+    },
+    "sentiment_only": {
+      "val_auc": {
+        "Model": "gradient_boosting",
+        "Horizon": 5,
+        "mean_val": 0.5699470612189493,
+        "std_val": 0.02458942115700009,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lightgbm",
+        "Horizon": 10,
+        "mean_val": 2.2081466259660485,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "social_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6134794806550532,
+        "std_val": 0.0002626034031121131,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 2.739436652779206,
+        "std_val": 0.08012874830923564,
+        "n_seeds": 5
+      }
+    },
+    "technical_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6264897515949504,
+        "std_val": 0.002701371657356847,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "gradient_boosting",
+        "Horizon": 2,
+        "mean_val": 2.939136593918092,
+        "std_val": 0.13868576808472655,
+        "n_seeds": 5
+      }
+    }
+  },
+  "SPY": {
+    "equal_50_50": {
+      "val_auc": {
+        "Model": "lstm",
+        "Horizon": 5,
+        "mean_val": 0.6304084458290065,
+        "std_val": 0.02494059039101499,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 3.152611576290896,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "full_70_30": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6287535779339057,
+        "std_val": 0.00018051570290807952,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 2.410484014585271,
+        "std_val": 0.4973541234933157,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_global": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6295862607338016,
+        "std_val": 7.967374911475296e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 1.7151245434750408,
+        "std_val": 0.3739349365337773,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_per_stock": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6295862607338016,
+        "std_val": 7.967374911475296e-05,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 10,
+        "mean_val": 1.7151245434750408,
+        "std_val": 0.3739349365337773,
+        "n_seeds": 5
+      }
+    },
+    "news_only": {
+      "val_auc": {
+        "Model": "lstm",
+        "Horizon": 5,
+        "mean_val": 0.6201799930771893,
+        "std_val": 0.05019617332045963,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 1.29352260357989,
+        "std_val": 0.08536302822743856,
+        "n_seeds": 5
+      }
+    },
+    "sentiment_only": {
+      "val_auc": {
+        "Model": "svm",
+        "Horizon": 10,
+        "mean_val": 0.5657924107142857,
+        "std_val": 0.009503568984805644,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "random_forest",
+        "Horizon": 5,
+        "mean_val": 1.0241382995821418,
+        "std_val": 0.44408611682127846,
+        "n_seeds": 5
+      }
+    },
+    "social_only": {
+      "val_auc": {
+        "Model": "lstm",
+        "Horizon": 5,
+        "mean_val": 0.6249394254067151,
+        "std_val": 0.028684236480397775,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 2.093898695053899,
+        "std_val": 1.625047112940037,
+        "n_seeds": 5
+      }
+    },
+    "technical_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6223718449128285,
+        "std_val": 0.00020364917827870788,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 3.152611576290896,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    }
+  },
+  "TSLA": {
+    "equal_50_50": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 5,
+        "mean_val": 0.6542714247093808,
+        "std_val": 0.010571794216614385,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "xgboost",
+        "Horizon": 5,
+        "mean_val": 3.123982815550667,
+        "std_val": 0.7072195472100145,
+        "n_seeds": 5
+      }
+    },
+    "full_70_30": {
+      "val_auc": {
+        "Model": "gradient_boosting",
+        "Horizon": 2,
+        "mean_val": 0.6300546448087432,
+        "std_val": 0.008236271004797718,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lightgbm",
+        "Horizon": 2,
+        "mean_val": 2.859423954515265,
+        "std_val": 0.3061237169615759,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_global": {
+      "val_auc": {
+        "Model": "svm",
+        "Horizon": 2,
+        "mean_val": 0.6193533697632058,
+        "std_val": 0.001677821458405198,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 2.5886850678648794,
+        "std_val": 0.0,
+        "n_seeds": 5
+      }
+    },
+    "learned_alpha_per_stock": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 10,
+        "mean_val": 0.639551543806863,
+        "std_val": 0.0051865511622289995,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 2.273008972323438,
+        "std_val": 0.7058732085023804,
+        "n_seeds": 5
+      }
+    },
+    "news_only": {
+      "val_auc": {
+        "Model": "random_forest",
+        "Horizon": 2,
+        "mean_val": 0.6218253968253968,
+        "std_val": 0.0010016419472038554,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lightgbm",
+        "Horizon": 10,
+        "mean_val": 3.251008132516766,
+        "std_val": 0.04932998080629193,
+        "n_seeds": 5
+      }
+    },
+    "sentiment_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 0.6039552432995056,
+        "std_val": 0.0,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "lightgbm",
+        "Horizon": 2,
+        "mean_val": 2.8821773596953397,
+        "std_val": 0.11514413942991776,
+        "n_seeds": 5
+      }
+    },
+    "social_only": {
+      "val_auc": {
+        "Model": "xgboost",
+        "Horizon": 10,
+        "mean_val": 0.6383551830360341,
+        "std_val": 0.001835816212507846,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 2.2381478713462193,
+        "std_val": 0.4057354676404238,
+        "n_seeds": 5
+      }
+    },
+    "technical_only": {
+      "val_auc": {
+        "Model": "logistic_regression",
+        "Horizon": 5,
+        "mean_val": 0.6058934847256014,
+        "std_val": 0.0032428525504501183,
+        "n_seeds": 5
+      },
+      "val_sharpe": {
+        "Model": "logistic_regression",
+        "Horizon": 2,
+        "mean_val": 2.5023706418250056,
+        "std_val": 0.1405229871228381,
+        "n_seeds": 5
+      }
+    }
+  }
+}
