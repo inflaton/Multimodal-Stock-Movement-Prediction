@@ -109,7 +109,7 @@ ALL_HORIZONS = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 
 def load_data(stock: str, data_dir: str, alpha_news: float = 0.7) -> pd.DataFrame:
-    """Load and preprocess stock data from the 2026_icdm training_features layout.
+    """Load and preprocess stock data from the training_features layout.
 
     Adds a `Sentiment_S_t` covariate (per-source-mean fusion of news + social at
     `alpha_news`), so the foundation comparison uses the same sentiment as the

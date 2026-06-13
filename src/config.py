@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 import yaml
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]   # 2026_icdm/
+REPO_ROOT = Path(__file__).resolve().parents[1]   # repo root
 DEFAULT_CONFIG_PATH = REPO_ROOT / "configs" / "default.yaml"
 
 

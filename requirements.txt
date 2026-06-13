@@ -1,0 +1,41 @@
+# Python dependencies for the Multimodal-Stock-Movement-Prediction repo.
+#
+# Packages installed in the maintainer's `stock-prediction` conda env are
+# pinned to the exact versions used (see tools/env_versions.txt; refresh with
+# `bash tools/freeze_env.sh`). The pipeline also touches packages that live in
+# other envs (e.g. the FinCast LoRA env); those are left as compatible ranges
+# so each step can be installed independently.
+
+# ---- Core scientific stack ----
+numpy==2.4.6
+pandas==3.0.3
+PyYAML==6.0.3
+scipy==1.17.1
+
+# ---- Machine learning (steps 2-3) ----
+scikit-learn==1.9.0
+scikit-optimize==0.10.2          # Bayesian HPO (skopt)
+xgboost==3.2.0
+lightgbm==4.6.0
+
+# ---- Deep learning ----
+# LSTM uses TensorFlow / Keras (step 3); foundation models use PyTorch (step 4).
+tensorflow==2.21.0
+keras==3.14.1
+torch==2.12.0
+
+# ---- Time-series foundation models (step 4) ----
+# AutoGluon ships Chronos-2 / Chronos-Bolt; FinCast is installed separately
+# (see README: place its source at FinCast-fts/ or set FINCAST_PATH).
+# autogluon.timeseries>=1.1
+
+# ---- Visualization ----
+matplotlib==3.10.9
+seaborn==0.13.2
+
+# ---- Notebook runtime ----
+jupyter==1.1.1
+notebook==7.5.7
+ipykernel==7.2.0
+tqdm==4.68.2
+Jinja2==3.1.6

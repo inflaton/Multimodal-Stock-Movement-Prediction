@@ -1,6 +1,6 @@
 """Shared data loader for the bundled foundation-model scripts.
 
-Reads `<data_dir>/<STOCK>.csv` from `2026_icdm/dataset/training_features/`
+Reads `<data_dir>/<STOCK>.csv` from `dataset/training_features/`
 (the canonical per-stock feature CSV used by `src.data`) and produces a
 DataFrame with the columns the foundation scripts (chronos_baseline.py,
 chronos_finetune.py, fincast_baseline.py, fincast_finetune.py) consume:
@@ -31,7 +31,7 @@ NEWS_COL = "News Sentiment Score"
 SOCIAL_COL = "Social Sentiment Score"
 SENTIMENT_OUT = "Sentiment_S_t"
 
-# Default split — keep in sync with 2026_icdm/configs/default.yaml.
+# Default split — keep in sync with configs/default.yaml.
 # Hard-coded here so the bundled scripts can run without depending on the
 # `src.config` module's package layout.
 DEFAULT_TRAIN_YEARS: List[int] = [2020, 2021, 2022]

@@ -28,9 +28,10 @@ cd "$(dirname "$0")/.."
 
 mkdir -p logs
 
-# Sensible defaults for THIS machine; override via env on a different box.
-: "${FINCAST_PATH:=/home/inflaton/code/Multimodal-Stock-Movement-Prediction/FinCast-fts/src}"
-: "${FINCAST_WEIGHTS:=/home/inflaton/code/Multimodal-Stock-Movement-Prediction/FinCast-fts/model_weights/v1.pth}"
+# Repo-relative defaults; override via env to point at a FinCast checkout elsewhere.
+# After the `cd` above, $(pwd) is the repo root.
+: "${FINCAST_PATH:=$(pwd)/FinCast-fts/src}"
+: "${FINCAST_WEIGHTS:=$(pwd)/FinCast-fts/model_weights/v1.pth}"
 export FINCAST_PATH FINCAST_WEIGHTS
 
 if [[ ! -d "${FINCAST_PATH}" ]]; then

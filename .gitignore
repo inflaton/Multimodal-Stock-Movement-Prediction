@@ -217,3 +217,9 @@ results/baselines/finetuned_fincast/SPY
 results/baselines/finetuned_fincast/TSLA
 
 /FinCast-fts
+# OS metadata
+.DS_Store
+
+# Run logs (created by scripts/run_*.sh)
+logs/
+/tools

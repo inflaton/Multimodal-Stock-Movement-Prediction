@@ -122,7 +122,7 @@ def main():
               "falling back to fixed 0.7 weighting.\n")
 
     print("This scaffold dispatches to src/chronos_*.py.")
-    print("Run commands (execute from 2026_icdm/ on GPU laptop):\n")
+    print("Run commands (execute from the repo root on GPU laptop):\n")
     for s in stocks:
         alpha = _resolve_alpha(s, args.alpha_scope, 0.7, table)
         for seed in seeds:
