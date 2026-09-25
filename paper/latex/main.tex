@@ -1,37 +1,38 @@
+% Reviewer-response tags used throughout this source:
+% [R1-LIT]        Adds the requested recent evidence-acquisition literature.
+% [R1-SCOPE]      Bounds the five-equity, single-test-year empirical claim.
+% [R1-SENTIMENT]  Qualifies the FinBERT-Tone daily mean-pooled representation.
+% [R1-FOUNDATION] Qualifies the asymmetric, single-seed foundation-model study.
+% [R1-FUSION]     Limits the learned-fusion claim to one convex weight.
+% [R1-PRIOR]      Clarifies that the prior-result comparison is a reconstruction.
+% [R1-CAMERA]     Records post-acceptance camera-ready production changes.
+
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts % needed for \thanks in IEEE conference mode
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{hyperref}
+% [R1-CAMERA] Omit hyperlink annotations and unused drawing/color packages for the final IEEE PDF.
 \usepackage{url}
 \usepackage{booktabs}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage{xcolor}
+% [R1-CAMERA] The unused xcolor package is intentionally omitted from the camera-ready source.
 \usepackage{multirow}
 \usepackage{cite}
 \usepackage{balance}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,calc}
-
-\hypersetup{
-  colorlinks=true,
-  linkcolor=blue,
-  citecolor=blue,
-  urlcolor=blue,
-}
+% [R1-CAMERA] Unused TikZ support and the removed hyperlink setup are intentionally absent here.
 
 \begin{document}
 
 \title{Does Sentiment Fusion Help?\\A Selection-Bias-Free Re-Evaluation of Multimodal Stock Movement Prediction}
 
-% TODO (authors): verify full given names before camera-ready. 
+% [R1-CAMERA] Include the accepted author identities and affiliations in the non-anonymous version.
 \author{
 \IEEEauthorblockN{
-Donghao HUANG\textsuperscript{1,2},
+Donghao HUANG\textsuperscript{1},
 Zheng Kai HENG\textsuperscript{2},
 Zhaoxia WANG\textsuperscript{2,*}
 \thanks{*Corresponding author: zxwang@smu.edu.sg}
@@ -60,13 +61,15 @@ multi-seed reporting with paired significance tests---and apply it to a
 comprehensive grid of 4{,}200 task-specific runs (seven model families, eight
 feature configurations, five U.S.\ equities, three horizons, five seeds) plus
 two time-series foundation models (Chronos-2, FinCast). Three findings emerge.
+% [R1-PRIOR] Replace causal-sounding attribution to prior papers with a bounded reconstruction claim.
 \emph{First}, selecting the best model and horizon per stock on the test set
-inflates the average Sharpe ratio from 1.40 to 2.29---accounting for most of
-the headline numbers reported in prior work. \emph{Second}, under bias-free
+inflates the average Sharpe ratio from 1.40 to 2.29, a 39\% increase that puts
+an otherwise identical pipeline in the range of some prior reports.
+\emph{Second}, under bias-free
 evaluation a technical-indicator-only baseline is \emph{not} beaten by any
 sentiment configuration: fixed 70:30 news--social fusion, equal weighting,
 news-only, social-only, and a learned reliability-weighted fusion all
-underperform technical-only, by $+0.58$ Sharpe on average for fixed 70:30
+underperform technical-only; the gap is $0.58$ Sharpe on average for fixed 70:30
 ($p<10^{-20}$, paired Wilcoxon). \emph{Third}, time-series foundation models do
 not beat task-specific models and mostly post negative Sharpe ratios. We
 conclude that, in this setting, the reported value of multimodal sentiment
@@ -173,6 +176,18 @@ correlates more strongly with returns, motivating a fixed 70:30
 news-to-social weighting that several pipelines adopt. Most of these studies
 report sizeable gains for fusion over price- or indicator-only baselines.
 
+% [R1-LIT] Add the specifically requested recent work on evidence acquisition for multimodal financial reasoning.
+\noindent\textbf{Evidence acquisition for multimodal financial reasoning.}
+Recent work shifts from monolithic fusion toward actively acquiring the
+evidence needed for each reasoning step. Deng et al.\ propose SEA, a
+planner-guided multi-agent framework that decomposes financial questions and
+retrieves task-conditioned evidence from images, text, and external knowledge
+before answering \cite{deng2026sea}. Their setting is complementary to ours:
+SEA studies evidence-grounded multimodal question answering, whereas we test
+whether pre-aggregated daily sentiment improves out-of-sample movement
+prediction. It nevertheless motivates event- or query-conditioned text
+representations as a richer alternative to daily mean pooling.
+
 \noindent\textbf{Time-series foundation models.}
 General-purpose forecasters pre-trained on large, heterogeneous corpora---e.g.,
 Chronos-2 \cite{ansari2025chronos} and the finance-specific FinCast
@@ -230,11 +245,12 @@ five-trading-day \emph{embargo} is removed from the start of the test window
 which leaves no clean data on which to make modeling choices.
 
 \subsection{Validation-Locked Model and Horizon Selection}
+% [R1-PRIOR] State the trial count for our actual reconstruction rather than implying a direct prior-code reproduction.
 This is the single most consequential element. Prior multimodal pipelines
 typically report, for each stock, the \emph{best} model family and prediction
-horizon---but the ``best'' is identified on the test year. With seven model
-families and nine candidate horizons, that is up to $63$ trials per stock; the
-maximum over $63$ noisy trials is a badly upward-biased estimate of true
+horizon---but the ``best'' is identified on the test year. Even our grid of
+seven model families and three candidate horizons creates $21$ trials per
+stock; the maximum over noisy trials is an upward-biased estimate of true
 performance \cite{bailey2014dsr,harvey2016}.
 
 We instead compute, for every (stock, ablation, model, horizon) cell, the
@@ -363,9 +379,12 @@ fixed-70:30 pipeline, we select the best (model, horizon) per stock two ways:
 behind many reported numbers), and \emph{validation-locked}, maximizing the
 2023 validation Sharpe ratio and then reading the test number back.
 Table~\ref{tab:selbias} shows the result. Test-peek selection yields a
-$2.29$ average Sharpe ratio---squarely in the range prior work reports---while
+% [R1-PRIOR] Mark the estimate as a controlled mechanism reconstruction, not a reproduction of a named prior paper.
+$2.29$ average Sharpe ratio---squarely in the range of some prior reports---while
 the identical pipeline, selected honestly, yields $1.40$. Roughly $0.9$ units
-of Sharpe ratio, about $40\%$ of the headline, is pure selection bias.
+of Sharpe ratio, about $39\%$ of the test-peek value, is attributable to the
+selection rule alone. This is a controlled reconstruction of the mechanism,
+not a direct reproduction of any specific prior paper.
 Discrimination is barely affected (AUC $0.560$ vs.\ $0.565$): the bias lives
 almost entirely in the trading metric, exactly where overfitting concentrates
 \cite{bailey2014dsr}.
@@ -679,18 +698,29 @@ ratios with the Deflated Sharpe Ratio for the number of trials conducted
 \label{sec:limits}
 
 Our study is deliberately a focused re-evaluation, and its scope bounds its
-claims. (i)~\textbf{Universe:} five large-cap U.S.\ equities and a single
-test year (2024); the negative result may not transfer to other regimes,
-small caps, or other markets, though the selection-bias mechanism is
-universal. (ii)~\textbf{Sentiment
-representation:} a single daily FinBERT-Tone scalar per source; a richer
-representation (document embeddings, event tags, intraday text) could carry
-signal that scalar aggregation discards---testing this is the most promising
-direction for future work. (iii)~\textbf{Data quality:} SPY news coverage in the
-test year is only $41\%$, so SPY's sentiment ablations are partly imputed; the
-conclusion is unchanged when SPY is excluded. (iv)~\textbf{Foundation models}
-were run single-seed under compute limits; we therefore state their result as a
-directional finding, not a precise estimate.
+% [R1-SCOPE] Make the five-equity and one-year test boundary explicit.
+claims. (i)~\textbf{Universe:} five large-cap U.S.\ equities and a single test
+year (2024); the negative result may not transfer to other regimes, small caps,
+or other markets, though the selection-bias mechanism is general.
+% [R1-SENTIMENT] State that the null may be specific to daily mean-pooled FinBERT-Tone features.
+(ii)~\textbf{Sentiment representation:} one daily FinBERT-Tone scalar per
+source; document embeddings, event tags, intraday text, or step-wise evidence
+acquisition \cite{deng2026sea} could preserve signal that mean pooling discards.
+(iii)~\textbf{Data quality:} SPY news coverage in the test year is only $41\%$,
+so SPY's sentiment ablations are partly imputed; the conclusion is unchanged
+when SPY is excluded.
+% [R1-FOUNDATION] Identify both the single-seed evidence and FinCast input asymmetry.
+(iv)~\textbf{Foundation-model comparison:} these models
+were run single-seed under compute limits, and the released FinCast artifact
+accepts only prices, so this comparison is directional rather than conclusive.
+% [R1-FUSION] Restrict the negative learned-fusion result to the tested one-parameter family.
+(v)~\textbf{Fusion class:} our learned method is a one-parameter convex weight;
+its failure does not rule out richer cross-modal architectures.
+% [R1-PRIOR] Explicitly separate selection-bias reconstruction from direct prior-code reproduction.
+(vi)~\textbf{Prior-work comparison:} the $2.29$ test-peek result reconstructs a
+selection mechanism in our pipeline rather than rerunning another paper's code;
+it demonstrates the size of the bias but does not attribute any specific prior
+result to that mechanism.
 
 %===============================================================================
 \section{Conclusion}
@@ -715,7 +745,8 @@ resistance for future work.
 All code, configuration files, processed per-stock features, and the
 full results table are released at GitHub, together with the immutable
 validation-locked selection file that all reported test numbers are read
-through. A reproducibility checklist accompanies the submission.
+% [R1-CAMERA] Do not claim that an internal checklist is part of the published manuscript package.
+through.
 
 \appendices
 \section{Per-Split Dataset Statistics}
