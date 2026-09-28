@@ -6,6 +6,11 @@
 % [R1-FUSION]     Limits the learned-fusion claim to one convex weight.
 % [R1-PRIOR]      Clarifies that the prior-result comparison is a reconstruction.
 % [R1-CAMERA]     Records post-acceptance camera-ready production changes.
+% [CA-PRECISION] Defines selection scope and qualifies empirical/model claims.
+% [CA-SPY]       Reports saved-run robustness excluding SPY from evaluation.
+% [CA-VAL]       Acknowledges overfitting from reuse of the validation window.
+% [CA-TONE]      Replaces "honest/honestly" with the actual selection procedure.
+% [CA-PERCENT]   Corrects the denominator of the abstract's 39-percent statement.
 
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts % needed for \thanks in IEEE conference mode
@@ -54,17 +59,19 @@ sentiment with technical indicators---is widely reported to deliver large
 risk-adjusted gains, with recent studies citing average Sharpe ratios above
 two. We show that such gains are, to a substantial degree, artifacts of
 optimistic evaluation rather than evidence that sentiment fusion works. We
-build a selection-bias-free evaluation protocol for multimodal financial
-prediction---an explicit chronological train/validation/test split with an
-embargo, model and horizon selection locked to the validation window, and
-multi-seed reporting with paired significance tests---and apply it to a
+% [CA-PRECISION] Define the term narrowly at its first occurrence.
+build a selection-bias-free evaluation protocol: model-family, horizon, and
+fusion-weight selection use no test-set information. The protocol combines a
+chronological train/validation/test split with an embargo and multi-seed
+reporting with paired significance tests. We apply it to a
 comprehensive grid of 4{,}200 task-specific runs (seven model families, eight
 feature configurations, five U.S.\ equities, three horizons, five seeds) plus
 two time-series foundation models (Chronos-2, FinCast). Three findings emerge.
 % [R1-PRIOR] Replace causal-sounding attribution to prior papers with a bounded reconstruction claim.
 \emph{First}, selecting the best model and horizon per stock on the test set
-inflates the average Sharpe ratio from 1.40 to 2.29, a 39\% increase that puts
-an otherwise identical pipeline in the range of some prior reports.
+% [CA-PERCENT] (2.29 - 1.40) / 2.29 is 39%; this is not a 39% increase over 1.40.
+inflates the average Sharpe ratio from 1.40 to 2.29, a gap equal to 39\% of
+the test-selected value, putting the same pipeline in the range of some prior reports.
 \emph{Second}, under bias-free
 evaluation a technical-indicator-only baseline is \emph{not} beaten by any
 sentiment configuration: fixed 70:30 news--social fusion, equal weighting,
@@ -113,7 +120,13 @@ baseline?} We answer it with a comprehensive experimental analysis rather than
 a new model. We re-implement a conventional multimodal-fusion pipeline---FinBERT
 sentiment, technical indicators, classical and neural classifiers, a long/short
 backtest---and evaluate it under a protocol designed to control for selection.
-The apparent advantage of fusion does not survive that protocol.
+% [CA-PRECISION][CA-VAL] Test-set exclusion does not eliminate validation overfitting.
+Here, ``selection-bias-free'' refers specifically to the absence of test-set
+information in model-family, horizon, and fusion-weight selection; it does not
+rule out validation overfitting (Section~\ref{sec:limits}).
+% [CA-PRECISION] Restrict the introductory negative claim to daily FinBERT-Tone fusion.
+The apparent advantage of the evaluated daily FinBERT-Tone fusion does not
+survive that protocol.
 
 Concretely, we make three contributions.
 
@@ -128,7 +141,9 @@ backtest-overfitting diagnostics \cite{bailey2014dsr,bailey2016pbo}.
 \item \textbf{A learned reliability-weighted sentiment fusion} that generalizes
 the fixed 70:30 news--social heuristic of prior work \cite{nyakurukwa2024} into
 a data-driven, prior-regularized weight estimated on validation data
-(Section~\ref{sec:protocol}-D). We report it honestly: it does not help.
+% [CA-TONE][CA-PRECISION] Replace "report it honestly" and name the baseline and setting.
+(Section~\ref{sec:protocol}-D). With the weight selected using validation
+only, it does not outperform the technical-only baseline in this setting.
 
 \item \textbf{A comprehensive re-evaluation} (Section~\ref{sec:results})
 across $4{,}200$ task-specific runs and two time-series foundation models,
@@ -381,7 +396,8 @@ behind many reported numbers), and \emph{validation-locked}, maximizing the
 Table~\ref{tab:selbias} shows the result. Test-peek selection yields a
 % [R1-PRIOR] Mark the estimate as a controlled mechanism reconstruction, not a reproduction of a named prior paper.
 $2.29$ average Sharpe ratio---squarely in the range of some prior reports---while
-the identical pipeline, selected honestly, yields $1.40$. Roughly $0.9$ units
+% [CA-TONE] Replace "selected honestly" with "selected using validation only".
+the identical pipeline, selected using validation only, yields $1.40$. Roughly $0.9$ units
 of Sharpe ratio, about $39\%$ of the test-peek value, is attributable to the
 selection rule alone. This is a controlled reconstruction of the mechanism,
 not a direct reproduction of any specific prior paper.
@@ -413,7 +429,8 @@ TSLA & 2.57 & 0.514 & 0.30 & 0.502 \\
 \end{tabular}
 \end{table}
 
-\subsection{Does Sentiment Fusion Help? No.}
+% [CA-PRECISION] Qualify the subsection heading instead of an unrestricted "No."
+\subsection{Does Sentiment Fusion Help in This Setting?}
 The central experiment compares the eight feature configurations under bias-free
 evaluation. Table~\ref{tab:ablation} reports the mean over the entire grid---all
 seven model families, three horizons, five stocks, five seeds ($525$ runs per
@@ -421,18 +438,23 @@ configuration)---which removes any dependence on a hand-picked model or horizon.
 
 A note on aggregation, since two views of the data appear in this paper.
 Table~\ref{tab:selbias} reports the \emph{best configuration per stock}---one
-model and one horizon chosen for each stock---which is why its honest,
+% [CA-TONE] Remove "honest"; the existing "validation-locked" states the procedure.
+model and one horizon chosen for each stock---which is why its
 validation-locked figure for fixed 70:30 is $1.40$. Table~\ref{tab:ablation}
 instead reports the \emph{grid mean}: the average over every model and horizon
 with no selection at all, $0.23$ for the same configuration. These are not in
 conflict---one is a favourable per-stock pick, the other an unselected
-average---and the grid mean is the unbiased estimate of a configuration's worth.
+% [CA-PRECISION] Describe the grid mean without claiming an unbiased estimate of worth.
+average---and the grid mean summarizes performance across the evaluated grid
+without selecting a model or horizon.
 Table~\ref{tab:aggviews} reports both views for all eight configurations:
 \textbf{technical\_only} ranks first under \emph{both} the grid mean and the
 per-stock best-configuration view, while the ordering of the sentiment
 configurations is itself unstable between the two---per-stock selection inflates
 every configuration and reshuffles their ranks, whereas the grid mean exposes
-the decisive gaps. Sentiment loses regardless of how performance is aggregated.
+% [CA-PRECISION] Bound the aggregation claim to the two reported schemes and tested features.
+the gaps. The evaluated sentiment configurations underperform technical-only
+under both aggregation schemes.
 
 \begin{table*}[t]
 \caption{Feature-configuration comparison under bias-free evaluation. Each row
@@ -500,11 +522,12 @@ chance. The controlled single-model view (LightGBM at $h=5$) tells the same
 story---technical-only $0.95$ Sharpe vs.\ $0.23$ for full\_70\_30---so the
 finding is not an artifact of pooling.
 
-This directly contradicts two claims common in the multimodal-fusion
-literature: that fusion is ``essential'' and that sentiment ``drives
-profitability.'' Under bias-free evaluation,
-sentiment is, at best, an inert feature and, at worst, a source of noise that
-the downstream classifier cannot discount.
+% [CA-PRECISION] Bound the negative finding to the actual representation and evidence.
+These results do not support claims that fusion is ``essential'' or that
+sentiment ``drives profitability'' in this setting. Under the evaluated
+protocol, adding the daily mean-pooled FinBERT-Tone sentiment representation
+does not improve average performance and can degrade it; this finding does
+not establish that other textual representations are uninformative.
 
 \subsection{The Learned Fusion Does Not Rescue It}
 The learned reliability weight (Section~\ref{sec:protocol}-D) was our intended
@@ -516,8 +539,10 @@ only META shows a real gain ($+0.047$). On the test year,
 \textbf{learned\_alpha\_per\_stock} ($0.39$ Sharpe) and
 \textbf{learned\_alpha\_global} ($0.21$) still lose to technical-only by $0.42$
 and $0.61$ Sharpe units respectively (Table~\ref{tab:ablation},
-$p<10^{-9}$). A better-fit weight on a feature that carries no signal yields a
-better-fit version of nothing.
+% [CA-PRECISION] Replace "better-fit version of nothing" with the one-weight empirical result.
+$p<10^{-9}$). Thus, optimizing this single convex weight on validation data
+does not make the evaluated daily sentiment representation outperform
+technical indicators alone.
 
 \begin{table}[t]
 \caption{Learned news weight $\alpha^\star$ vs.\ the fixed $0.7$ heuristic, and
@@ -541,18 +566,20 @@ Global & 0.80 & 0.598 & $+0.011$ \\
 \end{tabular}
 \end{table}
 
-\subsection{Model Families: Simpler Is Stronger}
+% [CA-PRECISION] State the observed mean ranking in the heading, not a general capacity rule.
+\subsection{Model Families: Logistic Regression Leads on Average}
 Table~\ref{tab:models} breaks the task-specific grid down by model family
 (each row averaged over all eight feature configurations, three horizons, five
-stocks, and five seeds). The ordering is itself informative: Logistic
-Regression---the simplest, most heavily regularized family---is the strongest
-on every metric ($0.547$ AUC, $0.90$ Sharpe), while the highest-capacity
-families, the LSTM and the SVM, are the weakest and post negative Sharpe
-ratios. In a regime where the dominant feature is a sparse set of
-Buy/Sell/Hold indicator signals and the textual features carry almost no
-signal, additional model capacity mostly fits noise. This is the same lesson
-as the feature ablation, seen from the model side: when the data are this
-noisy, restraint---in features and in capacity---outperforms expressiveness.
+% [CA-PRECISION] Neither regularization strength nor capacity is ranked across families.
+stocks, and five seeds).
+Logistic Regression, a regularized linear classifier, has the highest mean
+AUC ($0.547$), Sharpe ratio ($0.90$), and win rate ($0.542$) in this comparison.
+More expressive models do not show a consistent advantage: the LSTM has
+near-chance AUC ($0.499$), while both the LSTM and SVM post slightly negative
+average Sharpe ratios ($-0.04$ and $-0.06$, respectively). These aggregate
+results favor Logistic Regression for the evaluated features and tuning
+budgets; they do not establish a general ranking by model capacity or
+regularization strength.
 
 \begin{table}[t]
 \caption{Task-specific model families, each averaged over the full feature
@@ -659,11 +686,13 @@ technical-only (Table~\ref{tab:ablation}).}
 \section{Discussion}
 
 \noindent\textbf{Why does fusion fail here?}
-The proximate cause is signal: daily FinBERT-Tone sentiment correlates with
-next-day returns at $|\rho|\le0.06$, with inconsistent sign across stocks. A
-near-zero-signal, noisy regressor concatenated onto an informative
-technical-indicator vector cannot improve a well-regularized classifier and
-can degrade it---which is exactly the ordering in Table~\ref{tab:ablation}.
+% [CA-PRECISION] Correlation motivates an interpretation, not a proof of no signal.
+One possible explanation is limited predictive information in the evaluated
+representation: daily FinBERT-Tone sentiment correlates with next-day returns
+at $|\rho|\le0.06$, with inconsistent sign across stocks. These small linear
+correlations do not rule out nonlinear or longer-horizon relationships, but
+the ablations show no average improvement from adding this representation
+(Table~\ref{tab:ablation}).
 Aggregating thousands of documents into one daily scalar discards most of the
 textual content; the scalar that remains is dominated by a persistently
 positive tone (Table~\ref{tab:data}) that varies little with the next move.
@@ -682,8 +711,9 @@ The contribution of this paper is therefore methodological and cautionary. The
 selection-bias-free protocol of Section~\ref{sec:protocol} is inexpensive,
 transferable, and, in our case, decisive: it converts an apparently strong
 multimodal result---an average Sharpe ratio above two under test-set
-selection (Table~\ref{tab:selbias})---into an honest finding that, here,
-multimodal sentiment fusion does not help. We do not claim sentiment is universally
+% [CA-TONE][CA-PRECISION] Replace "honest finding" and specify daily FinBERT-Tone fusion.
+selection (Table~\ref{tab:selbias})---into a validation-locked finding that,
+here, daily FinBERT-Tone sentiment fusion does not help. We do not claim sentiment is universally
 useless---higher-frequency text, event-level rather than daily aggregation, or
 richer representations than a scalar may yet carry signal---but we do claim
 that any such result must be demonstrated under an evaluation protocol that
@@ -707,8 +737,14 @@ or other markets, though the selection-bias mechanism is general.
 source; document embeddings, event tags, intraday text, or step-wise evidence
 acquisition \cite{deng2026sea} could preserve signal that mean pooling discards.
 (iii)~\textbf{Data quality:} SPY news coverage in the test year is only $41\%$,
-so SPY's sentiment ablations are partly imputed; the conclusion is unchanged
-when SPY is excluded.
+% [CA-SPY] Reproduce with scripts/summarize_spy_exclusion.py; no models or weights refitted.
+so SPY's sentiment ablations are partly imputed. Excluding SPY from the saved
+test results leaves $420$ runs per feature configuration. Mean Sharpe is
+$1.05$ for technical-only, $0.39$ for fixed 70:30 fusion (gap $0.65$), and
+$0.58$ for the strongest sentiment configuration (per-stock learned fusion).
+Technical-only also retains the highest mean AUC ($0.543$ vs.\ $0.540$ for
+the strongest sentiment configuration by AUC, news-only). This check excludes
+SPY from evaluation only; fitted models and fusion weights are unchanged.
 % [R1-FOUNDATION] Identify both the single-seed evidence and FinCast input asymmetry.
 (iv)~\textbf{Foundation-model comparison:} these models
 were run single-seed under compute limits, and the released FinCast artifact
@@ -721,6 +757,12 @@ its failure does not rule out richer cross-modal architectures.
 selection mechanism in our pipeline rather than rerunning another paper's code;
 it demonstrates the size of the bias but does not attribute any specific prior
 result to that mechanism.
+% [CA-VAL] Repeated validation use can overfit despite an untouched test set.
+(vii)~\textbf{Validation reuse:} the same 2023 window is used for hyperparameter
+tuning, model-family and horizon selection, and fusion-weight estimation.
+Repeated optimization can overfit this validation window even without test-set
+information. Nested temporal validation or additional rolling validation
+windows would better assess sensitivity to these choices.
 
 %===============================================================================
 \section{Conclusion}
@@ -731,7 +773,8 @@ explicit chronological split with embargo, validation-locked model and horizon
 selection, multi-seed training, and paired significance testing. Across $4{,}200$ task-specific runs
 and two time-series foundation models, the reported advantage of fusion did not
 survive. Test-set selection alone inflates the average Sharpe ratio from
-$1.40$ to $2.29$; under honest evaluation, no sentiment
+% [CA-TONE][CA-PRECISION] Replace "honest evaluation" and bound the conclusion to tested features.
+$1.40$ to $2.29$; under validation-locked evaluation in this setting, no evaluated daily FinBERT-Tone sentiment
 configuration---including a learned reliability-weighted fusion that
 generalizes the fixed 70:30 heuristic---beats a technical-indicator-only
 baseline, and foundation models do not beat task-specific models. The practical

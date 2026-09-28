@@ -1,0 +1,126 @@
+{
+  "scope": "Exclude SPY from evaluation only; no refitting or reselection. Global fusion weights retain their original five-stock validation fit.",
+  "aggregation": "Grid means weight every model/horizon/stock/seed cell equally. Validation-locked means average seeds for each saved per-stock choice, then stocks.",
+  "inputs_sha256": {
+    "results/all_results.csv": "8b8a731cbda880ee9395307451a6a0dfc591336998dfb06e3e95581ecf7d55bf",
+    "results/selected_config.json": "f420a8990be3e890f3051ea29c67c3ef0eecbdfad6557fcdfc1f560c69e48035"
+  },
+  "summaries": {
+    "all_stocks": {
+      "technical_only": {
+        "runs": 525,
+        "mean_test_sharpe": 0.8136968400567751,
+        "mean_test_auc": 0.5416094123872833,
+        "validation_locked_mean_test_sharpe": 2.2565968078011474,
+        "technical_only_minus_configuration_sharpe": 0.0
+      },
+      "full_70_30": {
+        "runs": 525,
+        "mean_test_sharpe": 0.23153354843377516,
+        "mean_test_auc": 0.5315385425189516,
+        "validation_locked_mean_test_sharpe": 1.3974192099194152,
+        "technical_only_minus_configuration_sharpe": 0.582163291623
+      },
+      "equal_50_50": {
+        "runs": 525,
+        "mean_test_sharpe": 0.46020154972198757,
+        "mean_test_auc": 0.5356063674562326,
+        "validation_locked_mean_test_sharpe": 1.1325859399359408,
+        "technical_only_minus_configuration_sharpe": 0.35349529033478755
+      },
+      "news_only": {
+        "runs": 525,
+        "mean_test_sharpe": 0.23891533075475774,
+        "mean_test_auc": 0.5409934002882171,
+        "validation_locked_mean_test_sharpe": 1.2037863573810597,
+        "technical_only_minus_configuration_sharpe": 0.5747815093020174
+      },
+      "social_only": {
+        "runs": 525,
+        "mean_test_sharpe": -0.0488607735118467,
+        "mean_test_auc": 0.5154358982646425,
+        "validation_locked_mean_test_sharpe": 1.2023217501245989,
+        "technical_only_minus_configuration_sharpe": 0.8625576135686218
+      },
+      "sentiment_only": {
+        "runs": 525,
+        "mean_test_sharpe": -0.29725025150714673,
+        "mean_test_auc": 0.49917657428305573,
+        "validation_locked_mean_test_sharpe": 0.15743402068997733,
+        "technical_only_minus_configuration_sharpe": 1.110947091563922
+      },
+      "learned_alpha_per_stock": {
+        "runs": 525,
+        "mean_test_sharpe": 0.3930055808406723,
+        "mean_test_auc": 0.532067931531398,
+        "validation_locked_mean_test_sharpe": 2.0551206719796644,
+        "technical_only_minus_configuration_sharpe": 0.42069125921610284
+      },
+      "learned_alpha_global": {
+        "runs": 525,
+        "mean_test_sharpe": 0.20846124155788914,
+        "mean_test_auc": 0.5295379436016712,
+        "validation_locked_mean_test_sharpe": 2.106109267456621,
+        "technical_only_minus_configuration_sharpe": 0.605235598498886
+      }
+    },
+    "excluding_spy": {
+      "technical_only": {
+        "runs": 420,
+        "mean_test_sharpe": 1.0483013340314937,
+        "mean_test_auc": 0.5428094964949468,
+        "validation_locked_mean_test_sharpe": 2.4292948866384085,
+        "technical_only_minus_configuration_sharpe": 0.0
+      },
+      "full_70_30": {
+        "runs": 420,
+        "mean_test_sharpe": 0.3933825005265151,
+        "mean_test_auc": 0.5306028890179755,
+        "validation_locked_mean_test_sharpe": 1.4703799188147402,
+        "technical_only_minus_configuration_sharpe": 0.6549188335049787
+      },
+      "equal_50_50": {
+        "runs": 420,
+        "mean_test_sharpe": 0.5464845516882528,
+        "mean_test_auc": 0.5319699616548861,
+        "validation_locked_mean_test_sharpe": 1.0242813018069001,
+        "technical_only_minus_configuration_sharpe": 0.5018167823432409
+      },
+      "news_only": {
+        "runs": 420,
+        "mean_test_sharpe": 0.4536540374041094,
+        "mean_test_auc": 0.5396365596405891,
+        "validation_locked_mean_test_sharpe": 1.262936948503729,
+        "technical_only_minus_configuration_sharpe": 0.5946472966273844
+      },
+      "social_only": {
+        "runs": 420,
+        "mean_test_sharpe": 0.011018521641261958,
+        "mean_test_auc": 0.5073978090498463,
+        "validation_locked_mean_test_sharpe": 1.1157756375283259,
+        "technical_only_minus_configuration_sharpe": 1.0372828123902318
+      },
+      "sentiment_only": {
+        "runs": 420,
+        "mean_test_sharpe": -0.21543371036959366,
+        "mean_test_auc": 0.5036583141964371,
+        "validation_locked_mean_test_sharpe": 0.03636201207326012,
+        "technical_only_minus_configuration_sharpe": 1.2637350444010873
+      },
+      "learned_alpha_per_stock": {
+        "runs": 420,
+        "mean_test_sharpe": 0.5814782960068446,
+        "mean_test_auc": 0.5334345840428042,
+        "validation_locked_mean_test_sharpe": 1.979652346708553,
+        "technical_only_minus_configuration_sharpe": 0.4668230380246491
+      },
+      "learned_alpha_global": {
+        "runs": 420,
+        "mean_test_sharpe": 0.3542994523599803,
+        "mean_test_auc": 0.5305158342586046,
+        "validation_locked_mean_test_sharpe": 2.043388091054749,
+        "technical_only_minus_configuration_sharpe": 0.6940018816715134
+      }
+    }
+  }
+}

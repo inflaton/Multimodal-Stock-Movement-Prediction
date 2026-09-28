@@ -136,6 +136,19 @@ jupyter notebook notebooks/05_figures.ipynb
 jupyter notebook notebooks/06_indicator_pairs_appendix.ipynb
 ```
 
+<!-- [CA-SPY] Document the added robustness-summary command and evaluation-only scope. -->
+The SPY-excluded robustness figures in the limitations section can be reproduced
+from the saved results without rerunning training:
+
+```bash
+python scripts/summarize_spy_exclusion.py
+```
+
+This checks the complete 4,200-run grid and writes
+`results/spy_excluded_robustness.json`, including input hashes, grid means, and
+the existing validation-locked per-stock selections, both with and without SPY.
+SPY is excluded from evaluation only; models and fusion weights are not refitted.
+
 ## Validation checks before launching the full grid
 
 1. **Chronos-2 fits in VRAM.** On 16 GB VRAM run a single fine-tune-with-covariates cell:

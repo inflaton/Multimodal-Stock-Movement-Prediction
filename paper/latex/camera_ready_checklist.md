@@ -3,6 +3,8 @@
 ## Completed in the manuscript
 
 - [x] Reviewer comments incorporated and documented in `response_to_reviewers.md`.
+<!-- [CA-PRECISION][CA-SPY][CA-VAL] Record completion of the coauthor's follow-up revisions. -->
+- [x] Follow-up wording clarified; SPY-excluded figures reproduced from saved runs with `scripts/summarize_spy_exclusion.py`; validation-reuse limitation added.
 - [x] Author names, affiliations, and email addresses included.
 - [x] IEEE conference class and US-letter page size used.
 - [x] Paper stays within the eight-page limit, including references and appendix.
