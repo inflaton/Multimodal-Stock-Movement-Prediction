@@ -149,6 +149,7 @@ This checks the complete 4,200-run grid and writes
 the existing validation-locked per-stock selections, both with and without SPY.
 SPY is excluded from evaluation only; models and fusion weights are not refitted.
 
+<!-- [CA-AUDIT] Document the manuscript numerical-audit command. -->
 The full manuscript numerical audit checks all eight tables and recomputes the
 supporting prose statistics without retraining:
 
@@ -172,6 +173,7 @@ See `paper/latex/numerical_audit.md` for corrections, source mappings, and audit
 
 ## Paper ↔ code mapping
 
+<!-- [CA-AUDIT] Figure 1 now uses the verified vector overview; Figure 4 maps to the learned-alpha notebook. -->
 | Paper section | Code / artifact |
 |---|---|
 | §III.A Problem formulation | `src/data.py` |

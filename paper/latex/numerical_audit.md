@@ -1,3 +1,4 @@
+<!-- [CA-AUDIT] Documents the numerical audit behind the camera-ready corrections. -->
 # Manuscript numerical audit
 
 Audited on 2026-09-28 against the saved experiment outputs and processed feature files. No models were retrained, weights refitted, or configurations reselected.

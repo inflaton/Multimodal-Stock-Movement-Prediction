@@ -19,6 +19,7 @@ We added Deng et al., “Multi-Agent SEA: Step-Wise Evidence Acquisition for Mul
 
 ## 2. Scope of the empirical claim
 
+<!-- [CA-AUDIT] Describe SPY as an equity ETF. -->
 Section VII now states more directly that the negative result is based on four large-cap U.S. stocks and SPY, an equity ETF, in one test year and may not transfer to other market regimes, small-cap equities, or other markets. The abstract and conclusion retain the qualifier “in this setting.”
 
 ## 3. Sentiment representation
@@ -51,12 +52,17 @@ Section VII now reports the actual SPY-excluded results. Across 420 saved runs p
 We replace “honestly” and “honest” with descriptions of validation-only selection or validation-locked evaluation. Section V-D now states the observed model-family averages: Logistic Regression leads on AUC, Sharpe, and win rate; the LSTM has near-chance AUC; and the LSTM and SVM have slightly negative average Sharpe ratios. We describe Logistic Regression as a regularized linear classifier without asserting a cross-family ranking of regularization strength or model capacity. We also correct the abstract's percentage wording: the gap from 1.40 to 2.29 is 39% of the test-selected value, not a 39% increase over 1.40.
 
 <!-- [CA-PRECISION] Renumber the existing preparation section after inserting the follow-up response. -->
+<!-- [CA-AUDIT][CA-CITE] Summarize the numerical audit and citation correction. -->
 ## 8. Numerical verification
 
 We checked all 224 numerical entries in the eight tables against the saved results and processed features. Six rounding discrepancies were corrected without changing the headline results. We also corrected the common p-value bound, qualified the learned-weight gain bound, distinguished AUC from Sharpe in the horizon and foundation-model comparisons, and reported the strong positive win-rate/Sharpe correlation. Figure 1's grid equation now includes all five factors, including the five instruments.
 
 We retained 70:30 as the fixed baseline evaluated in this study and removed its unsupported attribution to prior work. The related-work citation now identifies the verified Seetharam–Nyakurukwa paper and describes only its evidence about distinct news/social sentiment sources. The audit is reproducible with `scripts/audit_paper_numbers.py`; `numerical_audit.md` documents the calculations and their limits.
 
+<!-- [CA-PRECISION][CA-STATS] Summarize the final wording and seed-averaged statistical revisions. -->
+We further tightened wording that could read as a claim about prior work or as stronger than the evidence: the abstract and conclusion now refer to the apparent value of the evaluated fusion; contribution (ii) is limited to daily FinBERT-Tone sentiment; the fixed 70:30 rule is described consistently as our news-weighted baseline; and Section V-F no longer draws a feature-level conclusion from the win-rate/Sharpe relationship. Section V-E now identifies Logistic Regression as the best family on the test grid and also reports the all-family mean (0.25 Sharpe, 0.528 AUC), which still exceeds every foundation configuration. Because the 525 matched cells share stock, model, and horizon across seeds, Section VII adds a seed-averaged check over 105 cells: technical-only still beats every sentiment configuration at p < 0.01.
+
+<!-- [CA-AUDIT] Renumber after inserting the numerical-verification section. -->
 ## 9. Camera-ready preparation
 
 The camera-ready manuscript includes the author names and affiliations, uses the IEEE conference format, and remains within the eight-page limit including references and the appendix. We also checked the final PDF for embedded fonts, letter-size pages, security settings, attachments, active links, and visual layout.

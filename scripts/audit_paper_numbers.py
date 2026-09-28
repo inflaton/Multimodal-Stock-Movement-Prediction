@@ -1,3 +1,4 @@
+# [CA-AUDIT] Added to reproduce the manuscript's table and prose numerical audit.
 """Audit manuscript tables and supporting numbers without retraining models.
 
 Run: python scripts/audit_paper_numbers.py --out results/paper_number_audit.json
