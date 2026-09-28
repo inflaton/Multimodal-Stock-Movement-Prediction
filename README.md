@@ -149,6 +149,15 @@ This checks the complete 4,200-run grid and writes
 the existing validation-locked per-stock selections, both with and without SPY.
 SPY is excluded from evaluation only; models and fusion weights are not refitted.
 
+The full manuscript numerical audit checks all eight tables and recomputes the
+supporting prose statistics without retraining:
+
+```bash
+python scripts/audit_paper_numbers.py --out results/paper_number_audit.json
+```
+
+See `paper/latex/numerical_audit.md` for corrections, source mappings, and audit limits.
+
 ## Validation checks before launching the full grid
 
 1. **Chronos-2 fits in VRAM.** On 16 GB VRAM run a single fine-tune-with-covariates cell:
@@ -173,7 +182,9 @@ SPY is excluded from evaluation only; models and fusion weights are not refitted
 | §IV Experimental setup | `configs/default.yaml`, `dataset/training_features/` |
 | §V Task-specific grid results | `notebooks/04_results_aggregation.ipynb`, `results/raw/`, `results/all_results.csv` |
 | §V Foundation-model results | `src/chronos_*.py`, `src/fincast_*.py`, `results/chronos-2/`, `results/fincast/` |
-| Figures 1–4 | `notebooks/05_figures.ipynb`, `results/fig_*.pdf` |
+| Figure 1 | `paper/latex/figures/study_overview_verified.pptx`, vector PDF in the same directory |
+| Figures 2–3 | `notebooks/05_figures.ipynb`, `results/fig_*.pdf` |
+| Figure 4 | `notebooks/02_learned_alpha.ipynb`, `results/fig_learned_alpha.pdf` |
 
 ## Citation
 

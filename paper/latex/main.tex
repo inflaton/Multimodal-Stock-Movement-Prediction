@@ -11,6 +11,7 @@
 % [CA-VAL]       Acknowledges overfitting from reuse of the validation window.
 % [CA-TONE]      Replaces "honest/honestly" with the actual selection procedure.
 % [CA-PERCENT]   Corrects the denominator of the abstract's 39-percent statement.
+% [CA-AUDIT]     Reconciles tables and numerical interpretations with saved results.
 
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts % needed for \thanks in IEEE conference mode
@@ -56,16 +57,16 @@ zxwang@smu.edu.sg
 \begin{abstract}
 Multimodal stock-movement prediction---fusing financial-news and social-media
 sentiment with technical indicators---is widely reported to deliver large
-risk-adjusted gains, with recent studies citing average Sharpe ratios above
-two. We show that such gains are, to a substantial degree, artifacts of
-optimistic evaluation rather than evidence that sentiment fusion works. We
+risk-adjusted gains, with prior studies reporting Sharpe ratios above
+two. We show how test-set selection can inflate the apparent performance of
+a conventional sentiment-fusion pipeline. We
 % [CA-PRECISION] Define the term narrowly at its first occurrence.
 build a selection-bias-free evaluation protocol: model-family, horizon, and
 fusion-weight selection use no test-set information. The protocol combines a
 chronological train/validation/test split with an embargo and multi-seed
 reporting with paired significance tests. We apply it to a
 comprehensive grid of 4{,}200 task-specific runs (seven model families, eight
-feature configurations, five U.S.\ equities, three horizons, five seeds) plus
+feature configurations, five U.S.\ equity instruments, three horizons, five seeds) plus
 two time-series foundation models (Chronos-2, FinCast). Three findings emerge.
 % [R1-PRIOR] Replace causal-sounding attribution to prior papers with a bounded reconstruction claim.
 \emph{First}, selecting the best model and horizon per stock on the test set
@@ -139,7 +140,7 @@ training; and reporting with paired significance tests alongside
 backtest-overfitting diagnostics \cite{bailey2014dsr,bailey2016pbo}.
 
 \item \textbf{A learned reliability-weighted sentiment fusion} that generalizes
-the fixed 70:30 news--social heuristic of prior work \cite{nyakurukwa2024} into
+the fixed 70:30 news--social baseline evaluated here into
 a data-driven, prior-regularized weight estimated on validation data
 % [CA-TONE][CA-PRECISION] Replace "report it honestly" and name the baseline and setting.
 (Section~\ref{sec:protocol}-D). With the weight selected using validation
@@ -162,7 +163,7 @@ pipeline, executed inside a selection-bias-free evaluation protocol.
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figures/Figure1.png}
+\includegraphics[width=\textwidth]{figures/study_overview_verified.pdf}
 \caption{Overview of the study. (a)~A conventional multimodal stock-movement
 pipeline: news, social-media, and price data are turned into FinBERT-Tone
 sentiment and technical-indicator features, fused, fed to seven model families,
@@ -185,11 +186,11 @@ attentive cross-modal and inter-stock modeling; more recent work fuses news,
 social media, and engineered indicators
 \cite{karadas2025,wang2023learning,jaggi2021}. Domain-adapted language models
 such as FinBERT \cite{araci2019,huang2022} are the usual sentiment extractors.
-A recurring design choice is how to weight news against social media:
-Nyakurukwa and Seetharam \cite{nyakurukwa2024} report that news sentiment
-correlates more strongly with returns, motivating a fixed 70:30
-news-to-social weighting that several pipelines adopt. Most of these studies
-report sizeable gains for fusion over price- or indicator-only baselines.
+A recurring design choice is how to combine news and social media.
+Seetharam and Nyakurukwa \cite{seetharam2024} find that these sentiment
+sources are not equivalent, with information flows varying across stocks.
+We compare a fixed 70:30 news-to-social baseline with equal and learned
+weights; the 70:30 ratio is a design choice, not an estimate from that study.
 
 % [R1-LIT] Add the specifically requested recent work on evidence acquisition for multimodal financial reasoning.
 \noindent\textbf{Evidence acquisition for multimodal financial reasoning.}
@@ -277,12 +278,11 @@ a modeling choice. Section~\ref{sec:results}-A quantifies how much this single
 change removes.
 
 \subsection{Learned Reliability-Weighted Fusion}
-Prior work aggregates daily news sentiment $S^{\text{news}}_t$ and social sentiment $S^{\text{soc}}_t$ with fixed weights\cite{nyakurukwa2024}:
+Our fixed baseline aggregates daily news sentiment $S^{\text{news}}_t$ and social sentiment $S^{\text{soc}}_t$ with 70:30 weights:
 \begin{equation}
 S_t = 0.7\,S^{\text{news}}_t + 0.3\,S^{\text{soc}}_t, 
 \label{eqn:fix-weight}
 \end{equation}
-%citing the empirical news--return relationship \cite{nyakurukwa2024}. A fixed constant borrowed from another study is a hyperparameter, not a method. 
 
 %We generalize it to a learned weight 
 We generalize Equation~\ref{eqn:fix-weight} by introducing a learnable weight:
@@ -293,7 +293,7 @@ S_t(\alpha) = \alpha\,S^{\text{news}}_t + (1-\alpha)\,S^{\text{soc}}_t%,
 where $\alpha\in[0,1]$ is a learnable weight estimated by maximizing the validation ROC-AUC 
 %
 with a quadratic penalty pulling $\alpha$
-toward the literature value of $0.7$:
+toward the fixed baseline value of $0.7$:
 
 \begin{equation}
 \alpha^\star = \arg\max_{\alpha}\;
@@ -320,8 +320,8 @@ over the test year, and maximum drawdown (MDD).
 \label{sec:setup}
 
 \subsection{Data}
-We study five large, liquid U.S.\ equities spanning distinct sectors and
-volatility regimes: AAPL, META, NVDA, SPY, and TSLA. Daily OHLCV prices are
+We study four large-cap U.S.\ stocks (AAPL, META, NVDA, and TSLA) and the
+SPY equity ETF, spanning different market exposures. Daily OHLCV prices are
 from Yahoo!\ Finance \cite{yfinance2023}. Financial-news and social-media text
 (2020--2024) is scored with FinBERT-Tone \cite{huang2022} to produce a
 per-document sentiment in $[-1,1]$, then averaged per trading day into
@@ -344,7 +344,7 @@ type.}
 Stock & News cov. & Social cov. & Mean $S^{\text{news}}$ & Mean $S^{\text{soc}}$ \\
 \midrule
 AAPL & 0.993 & 0.996 & 0.456 & 0.690 \\
-META & 0.936 & 0.887 & 0.522 & 0.803 \\
+META & 0.936 & 0.887 & 0.521 & 0.803 \\
 NVDA & 0.937 & 0.994 & 0.455 & 0.665 \\
 SPY  & 0.835 & 0.947 & 0.371 & 0.767 \\
 TSLA & 1.000 & 0.991 & 0.473 & 0.752 \\
@@ -472,7 +472,7 @@ Configuration & Test AUC & Test Sharpe & Win rate & Cum.\ return & MDD & $\Delta
 \textbf{technical\_only}        & \textbf{0.542} & \textbf{0.81\,$\pm$\,1.61} & \textbf{0.542} & \textbf{0.73} & $\mathbf{-0.265}$ & --- & --- \\
 equal\_50\_50                   & 0.536 & 0.46\,$\pm$\,1.45 & 0.506 & 0.45 & $-0.275$ & $+0.35$ & $1.1\times10^{-7}$ \\
 learned\_alpha\_per\_stock      & 0.532 & 0.39\,$\pm$\,1.40 & 0.508 & 0.38 & $-0.272$ & $+0.42$ & $3.6\times10^{-10}$ \\
-news\_only                      & 0.541 & 0.24\,$\pm$\,1.39 & 0.504 & 0.33 & $-0.283$ & $+0.58$ & $6.4\times10^{-20}$ \\
+news\_only                      & 0.541 & 0.24\,$\pm$\,1.39 & 0.504 & 0.33 & $-0.283$ & $+0.57$ & $6.4\times10^{-20}$ \\
 full\_70\_30                    & 0.532 & 0.23\,$\pm$\,1.46 & 0.496 & 0.37 & $-0.295$ & $+0.58$ & $2.4\times10^{-21}$ \\
 learned\_alpha\_global          & 0.530 & 0.21\,$\pm$\,1.51 & 0.495 & 0.37 & $-0.295$ & $+0.61$ & $1.9\times10^{-15}$ \\
 social\_only                    & 0.515 & $-0.05$\,$\pm$\,1.33 & 0.482 & 0.09 & $-0.322$ & $+0.86$ & $4.5\times10^{-30}$ \\
@@ -514,7 +514,7 @@ The result is unambiguous. \textbf{technical\_only} attains the highest Sharpe
 ratio ($0.81$), the highest AUC ($0.542$), the highest win rate, and the
 shallowest drawdown. \emph{Every} configuration that adds sentiment does worse,
 and the gap is statistically decisive: the paired Wilcoxon test rejects
-equality at $p<10^{-7}$ for all seven comparisons, with technical-only winning
+equality at $p<2\times10^{-7}$ for all seven comparisons, with technical-only winning
 $57$--$70\%$ of the $525$ matched cells. Adding fixed 70:30 fusion costs $0.58$
 Sharpe units on average; replacing indicators entirely with sentiment
 (\textbf{sentiment\_only}) costs $1.11$ and drives both AUC and win rate below
@@ -532,9 +532,9 @@ not establish that other textual representations are uninformative.
 \subsection{The Learned Fusion Does Not Rescue It}
 The learned reliability weight (Section~\ref{sec:protocol}-D) was our intended
 methodological improvement. It behaves sensibly---Table~\ref{tab:alpha} shows
-$\alpha^\star$ landing near or above the literature value of $0.7$ for four of
+$\alpha^\star$ landing near or above the baseline value of $0.7$ for four of
 five stocks---but it does not change the conclusion. On validation AUC it beats
-the fixed 70:30 rule by a negligible margin for four stocks ($\Delta\le0.005$);
+the fixed 70:30 rule by a small margin for four stocks ($\Delta<0.006$);
 only META shows a real gain ($+0.047$). On the test year,
 \textbf{learned\_alpha\_per\_stock} ($0.39$ Sharpe) and
 \textbf{learned\_alpha\_global} ($0.21$) still lose to technical-only by $0.42$
@@ -559,7 +559,7 @@ AAPL & 0.72 & 0.563 & $+0.001$ \\
 META & 0.84 & 0.618 & $+0.047$ \\
 NVDA & 0.82 & 0.656 & $+0.005$ \\
 SPY  & 0.80 & 0.577 & $+0.004$ \\
-TSLA & 0.54 & 0.585 & $+0.004$ \\
+TSLA & 0.54 & 0.584 & $+0.004$ \\
 \midrule
 Global & 0.80 & 0.598 & $+0.011$ \\
 \bottomrule
@@ -595,7 +595,7 @@ Model family & Test AUC & Test Sharpe & Win rate \\
 Random Forest                & 0.539 & 0.26 & 0.494 \\
 XGBoost                      & 0.533 & 0.36 & 0.503 \\
 SVM                          & 0.531 & $-0.06$ & 0.478 \\
-Gradient Boosting            & 0.528 & 0.11 & 0.487 \\
+Gradient Boosting            & 0.528 & 0.10 & 0.487 \\
 LightGBM                     & 0.519 & 0.24 & 0.501 \\
 LSTM                         & 0.499 & $-0.04$ & 0.497 \\
 \bottomrule
@@ -606,10 +606,10 @@ LSTM                         & 0.499 & $-0.04$ & 0.497 \\
 Table~\ref{tab:foundation} compares the five foundation-model configurations
 against the strongest task-specific family. Every foundation configuration
 posts a near-chance AUC ($0.47$--$0.50$) and, in aggregate, a negative Sharpe
-ratio. Fine-tuning helps Chronos-2, and adding covariates helps further---the
-fine-tuned-with-covariates variant is the only one to approach break-even
-($-0.02$ Sharpe)---which is consistent with the view that the gap to
-task-specific models narrows under matched information and tuning. But none
+ratio. Fine-tuning improves mean AUC in both input settings, but its effect
+on Sharpe is mixed: without covariates, Sharpe falls from $-0.38$ to $-0.54$;
+with covariates, it rises from $-0.61$ to $-0.02$. The fine-tuned-with-covariates
+variant is the only one to approach break-even. But none
 beats the task-specific models: the best task-specific family (Logistic
 Regression) reaches $0.90$ average Sharpe and $0.547$ AUC. The often-quoted
 claim that ``lightweight task-specific models beat foundation models'' thus
@@ -645,12 +645,13 @@ class.
 \end{table}
 
 \subsection{Where Any Signal Lives: Horizon and Discrimination}
-Two secondary patterns help interpret the main result. First, what little
-predictability exists is concentrated at the shortest horizon: averaged over
+Two secondary patterns help interpret the main result. First, mean Sharpe
+is highest at the shortest horizon: averaged over
 the grid, $h=2$ gives $0.51$ Sharpe and $0.527$ AUC, decaying to $0.04$ Sharpe
-at $h=10$ (Fig.~\ref{fig:horizon}). Second, win rate and Sharpe ratio are only
-loosely coupled across configurations (Fig.~\ref{fig:wrsharpe}): many
-configurations clear a $50\%$ win rate yet still lose money after costs,
+at $h=10$ (Fig.~\ref{fig:horizon}); mean AUC instead peaks at $h=5$ ($0.536$).
+Second, win rate and Sharpe ratio are strongly positively correlated across
+the grid (Pearson $r=0.830$; Fig.~\ref{fig:wrsharpe}), but some
+configurations clear a $50\%$ win rate yet still have negative Sharpe,
 because a few large adverse moves dominate. Both patterns are consistent with a
 very low underlying signal-to-noise ratio in which evaluation choices, not
 features, determine the headline.
@@ -659,15 +660,15 @@ features, determine the headline.
 \centering
 \includegraphics[width=\linewidth]{figures/fig_horizon_tradeoffs.pdf}
 \caption{Mean number of trades, Sharpe ratio, and win rate by horizon over the
-full grid. Predictability concentrates at the shortest horizon and decays.}
+full grid. Mean Sharpe is highest at the shortest horizon and declines as $h$ increases.}
 \label{fig:horizon}
 \end{figure}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/fig_winrate_sharpe.pdf}
-\caption{Win rate vs.\ Sharpe ratio across all task-specific runs. The two are
-only weakly related: a win rate above $0.5$ does not guarantee a positive
+\caption{Win rate vs.\ Sharpe ratio across all task-specific runs. Despite a
+strong positive correlation ($r=0.830$), a win rate above $0.5$ does not guarantee a positive
 Sharpe ratio once transaction costs and return asymmetry are accounted for.}
 \label{fig:wrsharpe}
 \end{figure}
@@ -676,8 +677,9 @@ Sharpe ratio once transaction costs and return asymmetry are accounted for.}
 \centering
 \includegraphics[width=\linewidth]{figures/fig_learned_alpha.pdf}
 \caption{Learned news weight $\alpha^\star$ per stock (and global), and its
-sensitivity to the prior strength $\lambda$. The weights are stable and near
-the $0.7$ heuristic, but the configurations built on them still lose to
+sensitivity to the prior strength $\lambda$. At $\lambda=0.1$, per-stock weights
+range from $0.54$ to $0.84$; stronger penalties pull them toward $0.7$.
+The configurations built on the default weights still lose to
 technical-only (Table~\ref{tab:ablation}).}
 \label{fig:alpha}
 \end{figure}
@@ -699,7 +701,7 @@ positive tone (Table~\ref{tab:data}) that varies little with the next move.
 
 \noindent\textbf{Why is this not visible in prior work?}
 Two reasons. First, test-set selection (Table~\ref{tab:selbias}) manufactures
-roughly $0.9$ Sharpe units regardless of features; a pipeline that quotes the
+roughly $0.9$ Sharpe units for the fixed-70:30 configuration; a pipeline that quotes the
 per-stock maximum will look strong whether or not sentiment helps. Second,
 isolated-modality ablations are typically read on the trading metric alone,
 which is dominated by variance at small trade counts; a careful paired,
@@ -729,7 +731,7 @@ ratios with the Deflated Sharpe Ratio for the number of trials conducted
 
 Our study is deliberately a focused re-evaluation, and its scope bounds its
 % [R1-SCOPE] Make the five-equity and one-year test boundary explicit.
-claims. (i)~\textbf{Universe:} five large-cap U.S.\ equities and a single test
+claims. (i)~\textbf{Universe:} four large-cap U.S.\ stocks, SPY, and a single test
 year (2024); the negative result may not transfer to other regimes, small caps,
 or other markets, though the selection-bias mechanism is general.
 % [R1-SENTIMENT] State that the null may be specific to daily mean-pooled FinBERT-Tone features.
@@ -816,7 +818,7 @@ Stock & Split & News cov. & Social cov. & Mean $S^{\text{news}}$ \\
                       & val   & 0.968 & 0.836 & 0.447 \\
                       & test  & 0.900 & 0.908 & 0.537 \\
 \midrule
-\multirow{3}{*}{NVDA} & train & 0.896 & 1.000 & 0.482 \\
+\multirow{3}{*}{NVDA} & train & 0.896 & 1.000 & 0.481 \\
                       & val   & 1.000 & 0.972 & 0.478 \\
                       & test  & 1.000 & 1.000 & 0.359 \\
 \midrule
@@ -824,7 +826,7 @@ Stock & Split & News cov. & Social cov. & Mean $S^{\text{news}}$ \\
                       & val   & 0.984 & 0.984 & 0.261 \\
                       & test  & \textbf{0.406} & 1.000 & 0.486 \\
 \midrule
-\multirow{3}{*}{TSLA} & train & 1.000 & 1.000 & 0.513 \\
+\multirow{3}{*}{TSLA} & train & 1.000 & 1.000 & 0.512 \\
                       & val   & 1.000 & 0.968 & 0.435 \\
                       & test  & 1.000 & 0.988 & 0.392 \\
 \bottomrule
