@@ -40,10 +40,12 @@
 % [R1-CAMERA] Include the accepted author identities and affiliations in the non-anonymous version.
 \author{
 \IEEEauthorblockN{
-Donghao HUANG\textsuperscript{1},
-Zheng Kai HENG\textsuperscript{2},
+Donghao HUANG\textsuperscript{1,\#},
+Zheng Kai HENG\textsuperscript{2,\#},
 Zhaoxia WANG\textsuperscript{2,*}
-\thanks{*Corresponding author: zxwang@smu.edu.sg}
+\thanks{*Corresponding author: zxwang@smu.edu.sg. 
+\# Donghao HUANG and Zheng Kai HENG contributed equally to this work.
+}
 }
 \IEEEauthorblockA{\textsuperscript{1}Research and Development, Mastercard, Arlington, VA, USA}
 \IEEEauthorblockA{\textsuperscript{2}School of Computing and Information Systems, Singapore Management University, Singapore}
@@ -705,7 +707,7 @@ Sharpe ratio once transaction costs and return asymmetry are accounted for.}
 \label{fig:wrsharpe}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/fig_learned_alpha.pdf}
 \caption{Learned news weight $\alpha^\star$ per stock (and global), and its
@@ -715,7 +717,7 @@ range from $0.54$ to $0.84$; stronger penalties pull them toward $0.7$.
 The configurations built on the default weights still lose to
 technical-only (Table~\ref{tab:ablation}).}
 \label{fig:alpha}
-\end{figure}
+\end{figure*}
 
 %===============================================================================
 \section{Discussion}
@@ -835,6 +837,9 @@ full results table are released at GitHub, together with the immutable
 validation-locked selection file that all reported test numbers are read
 % [R1-CAMERA] Do not claim that an internal checklist is part of the published manuscript package.
 through.
+
+\section*{Acknowledgment}
+This research was supported by the Singapore Ministry of Education (MOE) Academic Research Fund (AcRF) Tier 1 Grant (Grant No.~24-SIS-SMU-131). The authors sincerely acknowledge and appreciate the enthusiastic interest and invaluable contributions of the following students from Singapore Management University (SMU): NEO Gin-e, KOH Wei Feng, Malavika Santosh Kumar NAIR, QIU Lin Han, LAI Jia Xuan, Namyra Binte FAROUK, and AZAD Afra Begum. Their dedication and contributions have significantly enriched this research.
 
 \appendices
 \section{Per-Split Dataset Statistics}
