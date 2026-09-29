@@ -14,6 +14,7 @@
 % [CA-STATS]     Adds a seed-averaged robustness check for dependent Wilcoxon cells.
 % [CA-CITE]      Replaces the unsupported 70:30 attribution with a verified citation.
 % [CA-AUDIT]     Reconciles tables and numerical interpretations with saved results.
+% [CA-CAMERA]    Records final-round camera-ready changes (authorship, Fig. 4 layout, acknowledgment).
 
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts % needed for \thanks in IEEE conference mode
@@ -39,13 +40,13 @@
 
 % [R1-CAMERA] Include the accepted author identities and affiliations in the non-anonymous version.
 \author{
+% [CA-CAMERA] Mark equal first authorship and state it once in the author footnote.
 \IEEEauthorblockN{
 Donghao HUANG\textsuperscript{1,\#},
 Zheng Kai HENG\textsuperscript{2,\#},
 Zhaoxia WANG\textsuperscript{2,*}
-\thanks{*Corresponding author: zxwang@smu.edu.sg. 
-\# Donghao HUANG and Zheng Kai HENG contributed equally to this work.
-}
+\thanks{\textsuperscript{\#}Equal contribution.
+\textsuperscript{*}Corresponding author: zxwang@smu.edu.sg.}
 }
 \IEEEauthorblockA{\textsuperscript{1}Research and Development, Mastercard, Arlington, VA, USA}
 \IEEEauthorblockA{\textsuperscript{2}School of Computing and Information Systems, Singapore Management University, Singapore}
@@ -707,9 +708,10 @@ Sharpe ratio once transaction costs and return asymmetry are accounted for.}
 \label{fig:wrsharpe}
 \end{figure}
 
+% [CA-CAMERA] Span both columns so the two-panel figure's axis labels are legible.
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/fig_learned_alpha.pdf}
+\includegraphics[width=\textwidth]{figures/fig_learned_alpha.pdf}
 \caption{Learned news weight $\alpha^\star$ per stock (and global), and its
 % [CA-AUDIT] Report the observed alpha range instead of calling the weights stable.
 sensitivity to the prior strength $\lambda$. At $\lambda=0.1$, per-stock weights
@@ -838,9 +840,6 @@ validation-locked selection file that all reported test numbers are read
 % [R1-CAMERA] Do not claim that an internal checklist is part of the published manuscript package.
 through.
 
-\section*{Acknowledgment}
-This research was supported by the Singapore Ministry of Education (MOE) Academic Research Fund (AcRF) Tier 1 Grant (Grant No.~24-SIS-SMU-131). The authors sincerely acknowledge and appreciate the enthusiastic interest and invaluable contributions of the following students from Singapore Management University (SMU): NEO Gin-e, KOH Wei Feng, Malavika Santosh Kumar NAIR, QIU Lin Han, LAI Jia Xuan, Namyra Binte FAROUK, and AZAD Afra Begum. Their dedication and contributions have significantly enriched this research.
-
 \appendices
 \section{Per-Split Dataset Statistics}
 Table~\ref{tab:appendix} reports text coverage and mean news sentiment
@@ -882,6 +881,15 @@ Stock & Split & News cov. & Social cov. & Mean $S^{\text{news}}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+% [CA-CAMERA] Add funding and student acknowledgments; IEEE places them after appendices, before references.
+\section*{Acknowledgment}
+This research was supported by the Singapore Ministry of Education (MOE)
+Academic Research Fund (AcRF) Tier~1 Grant (Grant No.~24-SIS-SMU-131). We gratefully
+acknowledge the following Singapore Management University (SMU) students for
+their enthusiasm and valuable contributions to this research: NEO Gin-e, KOH Wei
+Feng, Malavika Santosh Kumar NAIR, QIU Lin Han, LAI Jia Xuan, Namyra Binte
+FAROUK, and AZAD Afra Begum.
 
 \balance
 \bibliographystyle{IEEEtran}
